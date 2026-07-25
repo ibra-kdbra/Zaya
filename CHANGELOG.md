@@ -112,6 +112,19 @@
 
 ## 🔄 Version History
 
+### v5.4.0 - Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
+
+- 60fps Theme Engine refactoring with root CSS variable cascading
+- Pure Vanilla JS Theme Selector with cached palette rendering and 100ms debouncing
+- Zaya Core Plugin Registry (`ZayaPlugins`) & UI Slot APIs (`ZayaUI`)
+- Arrow keys navigation & Fullscreen shortcuts
+
+### v5.3.0 - Zaya Rebrand & Media Polish (2026-04-03)
+
+- Global rebranding to Zaya
+- Integrated Media Loop for Audio/Video
+- Service Worker system refactored into `sw-manager.js`
+
 ### v5.1.1 - Feature Expansion (2026-02-06)
 
 - Implemented Cinematic Single Page centering
