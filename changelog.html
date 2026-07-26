@@ -1,258 +1,186 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%;">
+<html lang="en" class="h-full scroll-smooth">
 
 <head>
   <meta charset="utf-8">
-  <title>Changelog - Zaya</title>
+  <title>Zaya - Changelog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="/assets/changelog.svg" alt="icon svg">
-<!-- 
-  <link href="lib/css/min.css" rel="stylesheet" type="text/css">
-  <link href="lib/css/themify-icons.min.css" rel="stylesheet" type="text/css"> -->
+  <meta name="description" content="Official release notes, architecture improvements, and performance changelog for Zaya PDF Flipbook.">
+  <link rel="icon" type="image/svg+xml" href="/assets/changelog.svg">
+  
+  <!-- Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- CSS -->
   <link rel="stylesheet" href="lib/css/page/changelog.css">
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
+  <!-- JS Dependencies -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="lib/js/features/changelog/performance-monitor.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 </head>
 
-<body class="bg-gray-900 text-white min-h-screen overflow-y-auto">
+<body class="min-h-screen flex flex-col justify-between antialiased">
 
-  <!-- Navigation Header -->
-  <nav class="bg-gray-800/95 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-      <div class="flex items-center justify-between">
-        <a href="index.html" class="flex items-center space-x-3 text-gray-300 hover:text-white transition-all duration-300 group">
-          <div class="p-2 rounded-lg bg-gray-700 group-hover:bg-blue-600 transition-colors duration-300">
-            <i class="fas fa-arrow-left"></i>
-          </div>
-          <div>
-            <span class="font-medium">Back to Zaya</span>
-            <div class="text-xs text-gray-400">PDF Flipbook</div>
-          </div>
-        </a>
+  <!-- Editorial Top Navigation Header -->
+  <header class="nav-header fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
+      <a href="index.html" class="flex items-center space-x-2 text-sm text-gray-400 hover:text-white transition-colors group">
+        <i class="fas fa-arrow-left text-xs group-hover:-translate-x-0.5 transition-transform"></i>
+        <span class="font-medium text-gray-200">Zaya App</span>
+      </a>
 
-        <div class="flex items-center space-x-6">
-          <div class="hidden md:flex items-center space-x-4">
-            <a href="#recent" class="text-gray-400 hover:text-blue-400 transition-colors">Recent</a>
-            <a href="#features" class="text-gray-400 hover:text-blue-400 transition-colors">Features</a>
-            <a href="#versions" class="text-gray-400 hover:text-blue-400 transition-colors">Versions</a>
-          </div>
+      <div class="flex items-center space-x-6">
+        <nav class="hidden md:flex items-center space-x-5 text-xs text-gray-400 font-medium">
+          <a href="#recent" class="hover:text-gray-200 transition-colors">Commits</a>
+          <a href="#features" class="hover:text-gray-200 transition-colors">Features</a>
+          <a href="#performance" class="hover:text-gray-200 transition-colors">Telemetry</a>
+          <a href="#versions" class="hover:text-gray-200 transition-colors">Releases</a>
+        </nav>
 
-          <div class="flex items-center space-x-3">
-            <div class="flex items-center space-x-2 px-3 py-1.5 bg-gray-700 rounded-lg">
-              <i class="fas fa-code-branch text-blue-400"></i>
-              <span id="currentVersion" class="font-mono text-sm font-medium">Loading...</span>
-            </div>
+        <div class="flex items-center space-x-2 px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-xs font-mono text-gray-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="currentVersion"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Editorial Main Header -->
+  <main class="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 pt-24 pb-12 space-y-12">
+    
+    <div class="border-b border-[#30363d] pb-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2">Changelog & Release Notes</h1>
+          <p class="text-sm text-[#8b949e]">Official record of architecture improvements, feature rollouts, and optimizations in Zaya PDF.</p>
+        </div>
+        
+        <div class="flex items-center space-x-3 text-xs font-mono text-[#8b949e]">
+          <div class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] flex items-center space-x-2">
+            <i class="far fa-calendar text-blue-400"></i>
+            <span id="latestDate">July 25, 2026</span>
+          </div>
+          <div class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] flex items-center space-x-2">
+            <i class="fas fa-code-branch text-emerald-400"></i>
+            <span>Commits: <strong id="commitCount" class="text-white">50+</strong></span>
           </div>
         </div>
       </div>
     </div>
-  </nav>
 
-  <!-- Hero Section -->
-  <section class="changelog-hero py-20 px-6">
-    <div class="max-w-7xl mx-auto text-center relative z-10">
-      <div class="animate-fade-in">
-        <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
-          What's <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">New</span>
-        </h1>
-        <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-          Discover the latest features, improvements, and fixes in Zaya.
-          Stay updated with our continuous development and enhancements.
-        </p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <div class="flex items-center space-x-2 px-4 py-2 bg-blue-600/20 border border-blue-500/30 rounded-lg">
-            <i class="fas fa-calendar-alt text-blue-400"></i>
-            <span id="latestDate" class="text-blue-300">Loading...</span>
-          </div>
-          <div class="flex items-center space-x-2 px-4 py-2 bg-green-600/20 border border-green-500/30 rounded-lg">
-            <i class="fas fa-code-branch text-green-400"></i>
-            <span id="commitCount" class="text-green-300">Loading...</span>
-          </div>
-        </div>
+    <!-- Loading State Indicator -->
+    <div id="loadingState" class="py-12 text-center">
+      <div class="inline-flex items-center space-x-3 px-4 py-2.5 rounded-md bg-[#161b22] border border-[#30363d] text-xs font-mono text-gray-400">
+        <i class="fas fa-spinner fa-spin text-blue-400"></i>
+        <span>Parsing release history & metadata...</span>
       </div>
     </div>
-  </section>
 
-  <!-- Loading State -->
-  <div id="loadingState" class="max-w-7xl mx-auto px-6 py-12">
-    <div class="flex items-center justify-center">
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-800 rounded-full mb-4">
-          <i class="fas fa-spinner fa-spin text-2xl text-blue-400"></i>
+    <!-- Main Content Stream -->
+    <div id="changelogContent" class="space-y-14">
+
+      <!-- Recent Commits Stream -->
+      <section id="recent" class="scroll-mt-20">
+        <div class="flex items-center space-x-2 mb-4">
+          <span class="text-xs font-mono font-semibold uppercase text-blue-400 tracking-wider">01 // Recent Activity</span>
         </div>
-        <h3 class="text-xl font-semibold text-white mb-2">Loading Changelog</h3>
-        <p class="text-gray-400">Fetching the latest updates...</p>
-      </div>
+        <h2 class="text-xl font-bold text-white mb-4">Recent Commits</h2>
+        <div id="recentUpdates" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- Features Grid -->
+      <section id="features" class="scroll-mt-20">
+        <div class="flex items-center space-x-2 mb-4">
+          <span class="text-xs font-mono font-semibold uppercase text-emerald-400 tracking-wider">02 // Core Capabilities</span>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-4">Features & Improvements</h2>
+        <div id="featuresGrid" class="feature-grid">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- Technical Architecture Section -->
+      <section class="scroll-mt-20">
+        <div class="flex items-center space-x-2 mb-4">
+          <span class="text-xs font-mono font-semibold uppercase text-purple-400 tracking-wider">03 // Engineering</span>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-4">Technical Improvements</h2>
+        <div id="technicalImprovements" class="feature-grid">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- Bug Fixes Section -->
+      <section class="scroll-mt-20">
+        <div class="flex items-center space-x-2 mb-4">
+          <span class="text-xs font-mono font-semibold uppercase text-rose-400 tracking-wider">04 // Stability</span>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-4">Bug Fixes & Maintenance</h2>
+        <div id="bugFixes" class="feature-grid">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- Telemetry Dashboard -->
+      <section id="performance" class="scroll-mt-20">
+        <div class="flex items-center space-x-2 mb-4">
+          <span class="text-xs font-mono font-semibold uppercase text-cyan-400 tracking-wider">05 // Diagnostics</span>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-4">Performance Telemetry</h2>
+        <div id="performanceStats" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- Version History Timeline -->
+      <section id="versions" class="scroll-mt-20">
+        <div class="flex items-center space-x-2 mb-4">
+          <span class="text-xs font-mono font-semibold uppercase text-amber-400 tracking-wider">06 // Timeline</span>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-6">Release History</h2>
+        
+        <div class="timeline-container">
+          <div id="versionTimeline" class="space-y-6">
+            <!-- Dynamically Rendered -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Notes Section -->
+      <section>
+        <div id="notesSection">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
     </div>
-  </div>
-
-  <!-- Main Content -->
-  <main id="changelogContent" class="max-w-7xl mx-auto px-6 py-12 space-y-16">
-
-    <!-- Recent Updates Section -->
-    <section id="recent" class="animate-slide-up">
-      <div class="flex items-center space-x-3 mb-8">
-        <div class="p-3 bg-blue-600/20 rounded-lg">
-          <i class="fas fa-clock text-blue-400 text-xl"></i>
-        </div>
-        <div>
-          <h2 class="text-3xl font-bold text-white">Recent Updates</h2>
-          <p class="text-gray-400">Latest commits and changes</p>
-        </div>
-      </div>
-
-      <div id="recentUpdates" class="space-y-4">
-        <!-- Recent updates will be populated here -->
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="animate-slide-up">
-      <div class="flex items-center space-x-3 mb-8">
-        <div class="p-3 bg-green-600/20 rounded-lg">
-          <i class="fas fa-star text-green-400 text-xl"></i>
-        </div>
-        <div>
-          <h2 class="text-3xl font-bold text-white">Features & Improvements</h2>
-          <p class="text-gray-400">Major enhancements and new capabilities</p>
-        </div>
-      </div>
-
-      <div id="featuresGrid" class="feature-grid stagger-animation">
-        <!-- Features will be populated here -->
-      </div>
-    </section>
-
-    <!-- Technical Improvements -->
-    <section class="animate-slide-up">
-      <div class="flex items-center space-x-3 mb-8">
-        <div class="p-3 bg-purple-600/20 rounded-lg">
-          <i class="fas fa-cogs text-purple-400 text-xl"></i>
-        </div>
-        <div>
-          <h2 class="text-3xl font-bold text-white">Technical Improvements</h2>
-          <p class="text-gray-400">Code quality and performance enhancements</p>
-        </div>
-      </div>
-
-      <div id="technicalImprovements" class="feature-grid stagger-animation">
-        <!-- Technical improvements will be populated here -->
-      </div>
-    </section>
-
-    <!-- Bug Fixes & Maintenance -->
-    <section class="animate-slide-up">
-      <div class="flex items-center space-x-3 mb-8">
-        <div class="p-3 bg-red-600/20 rounded-lg">
-          <i class="fas fa-bug text-red-400 text-xl"></i>
-        </div>
-        <div>
-          <h2 class="text-3xl font-bold text-white">Bug Fixes & Maintenance</h2>
-          <p class="text-gray-400">Issue resolutions and code maintenance</p>
-        </div>
-      </div>
-
-      <div id="bugFixes" class="feature-grid stagger-animation">
-        <!-- Bug fixes will be populated here -->
-      </div>
-    </section>
-
-    <!-- Performance Analytics -->
-    <section id="performance" class="animate-slide-up">
-      <div class="flex items-center space-x-3 mb-8">
-        <div class="p-3 bg-blue-600/20 rounded-lg">
-          <i class="fas fa-chart-line text-blue-400 text-xl"></i>
-        </div>
-        <div>
-          <h2 class="text-3xl font-bold text-white">Performance Analytics</h2>
-          <p class="text-gray-400">Real-time session performance metrics</p>
-        </div>
-      </div>
-      <div id="performanceStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-        <!-- Performance stats will be populated here -->
-      </div>
-    </section>
-
-    <!-- Version History -->
-    <section id="versions" class="animate-slide-up">
-      <div class="flex items-center space-x-3 mb-8">
-        <div class="p-3 bg-orange-600/20 rounded-lg">
-          <i class="fas fa-history text-orange-400 text-xl"></i>
-        </div>
-        <div>
-          <h2 class="text-3xl font-bold text-white">Version History</h2>
-          <p class="text-gray-400">Complete timeline of releases</p>
-        </div>
-      </div>
-
-      <div class="timeline-container">
-        <div id="versionTimeline" class="space-y-8">
-          <!-- Version timeline will be populated here -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Notes Section -->
-    <section class="animate-slide-up">
-      <div id="notesSection">
-        <!-- Notes will be populated here -->
-      </div>
-    </section>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-gray-800/50 backdrop-blur-sm border-t border-gray-700 py-12 px-6 mt-20">
-    <div class="max-w-7xl mx-auto">
-      <div class="grid md:grid-cols-3 gap-8 mb-8">
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Zaya</h3>
-          <p class="text-gray-400 text-sm">
-            A modern PDF flipbook application with advanced features for digital reading experiences.
-          </p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Links</h3>
-          <div class="space-y-2">
-            <a href="https://github.com/ibra-kdbra/Zaya" target="_blank" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">
-              <i class="fab fa-github mr-2"></i>GitHub Repository
-            </a>
-            <a href="index.html" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">
-              <i class="fas fa-home mr-2"></i>Back to App
-            </a>
-          </div>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Stats</h3>
-          <div class="space-y-2 text-sm text-gray-400">
-            <div class="flex justify-between">
-              <span>Total Commits:</span>
-              <span id="footerStatsCommits" class="text-white font-medium">Loading...</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Current Version:</span>
-              <span id="footerVersion" class="text-white font-medium">Loading...</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Last Updated:</span>
-              <span id="footerStatsDate" class="text-white font-medium">Loading...</span>
-            </div>
-          </div>
-        </div>
+  <!-- Editorial Footer -->
+  <footer class="border-t border-[#30363d] bg-[#0d1117] py-8 px-4 md:px-6 text-xs text-[#8b949e]">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <span class="font-bold text-white">Zaya PDF Flipbook</span>
+        <span>—</span>
+        <span>Open Source Core</span>
       </div>
-      <div class="border-t border-gray-700 pt-8 text-center">
-        <p class="text-gray-400 text-sm">
-          &copy; 2025 Zaya. Built with modern web technologies.
-        </p>
+
+      <div class="flex items-center space-x-4 font-mono text-[#8b949e]">
+        <span>Version: <strong id="footerVersion" class="text-gray-200"></strong></span>
+        <span>Commits: <strong id="footerStatsCommits" class="text-gray-200">50+</strong></span>
+        <span>Updated: <strong id="footerStatsDate" class="text-gray-200">Jul 25, 2026</strong></span>
       </div>
     </div>
   </footer>
 
-  <script type="module" src="lib/js/features/changelog/changelog.js"></script>
+  <script src="lib/js/features/changelog/changelog.bundle.js"></script>
 </body>
 </html>

@@ -2,12 +2,21 @@
 
 ## 🎯 Recent Updates (Latest commits)
 
+- `core-perf` - 60fps Theme Engine & Vanilla JS Refactor (2026-07-25)
+- `plugin-arch` - Added ZayaPlugins & ZayaUI Slot API (2026-07-25)
+- `keyboard-nav` - Arrow keys navigation & Fullscreen shortcuts (2026-07-25)
 - `zaya-rebrand` - Global rebranding to Zaya (2026-04-03)
-- `media-loop` - Integrated Auto Repeat for Audio/Video (2026-04-03)
-- `bug-fixes` - Resolved ReferenceErrors and SW 404s (2026-04-03)
-- `a1b2c3d` - fixed single page mode centering and lighting (2026-02-06)
 
-### ✨ Latest Major Update - v6.0.0 The Zaya Transition (2026-04-03)
+### ✨ Latest Major Update - v5.4.0 Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
+
+- **Theme Engine Optimization**: Completely removed `$('*')` DOM tree class manipulation in `manager.js`. Themes now apply to root `document.documentElement` (`<html class="theme-...">`) for zero layout reflow lag and 60fps instant theme transitions via CSS custom properties.
+- **Theme Selector Performance Refactoring**: Pre-calculated and cached theme palette colors in `selector.js`, eliminating temporary `$('<div class="theme-...">')` DOM insertion loops during theme search. Refactored modal to pure Vanilla JS with 100ms search input debouncing.
+- **Zaya Core Plugin Registry (`ZayaPlugins`)**: Introduced an event-driven plugin extension system in `app-state.js` emitting standardized events: `zaya:pdfLoaded`, `zaya:pageChanged`, `zaya:themeChanged`, `zaya:toolbarReady`, and `zaya:init`.
+- **Zaya UI Extension Slots (`ZayaUI`)**: Implemented `ZayaUI.registerToolbarButton()` and `ZayaUI.registerPanelTab()` slot APIs in `controls.js` to allow Pro/private plugins to inject UI components cleanly without touching core HTML/JS.
+- **Keyboard Navigation Shortcuts**: Added Left (`←`) and Right (`→`) arrow keys for page turns, `F` key for Fullscreen toggle, and `Cmd+K` for the control panel.
+- **Optional Pro Loader**: Integrated a non-blocking script loader in `app.js` (`lib/js/pro-features/index.js`) for seamless private repository feature integration.
+
+### ✨ Previous Major Update - v5.3.0 The Zaya Transition (2026-04-03)
 
 - **Global Rebranding**: Complete transition from Paginis to **Zaya**, including a new logo and a centralized naming convention for all variables and assets.
 - **Integrated Media Loop**: Added persistent "Auto Repeat" controls directly within the Audio player and Video control modals for better contextual access.
@@ -102,6 +111,19 @@
 ---
 
 ## 🔄 Version History
+
+### v5.4.0 - Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
+
+- 60fps Theme Engine refactoring with root CSS variable cascading
+- Pure Vanilla JS Theme Selector with cached palette rendering and 100ms debouncing
+- Zaya Core Plugin Registry (`ZayaPlugins`) & UI Slot APIs (`ZayaUI`)
+- Arrow keys navigation & Fullscreen shortcuts
+
+### v5.3.0 - Zaya Rebrand & Media Polish (2026-04-03)
+
+- Global rebranding to Zaya
+- Integrated Media Loop for Audio/Video
+- Service Worker system refactored into `sw-manager.js`
 
 ### v5.1.1 - Feature Expansion (2026-02-06)
 

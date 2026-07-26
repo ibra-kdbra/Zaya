@@ -2,3 +2,4 @@
 .vscode
 docs
 /design_prototypes
+node_modules
