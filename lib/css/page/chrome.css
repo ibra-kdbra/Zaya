@@ -11,63 +11,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Top-right cluster: repository link + panel toggle become one quiet stack */
-.fixed.top-4.right-4.z-50,
-.fixed.top-20.right-4.z-50 {
-  right: 16px;
-}
-.fixed.top-4.right-4.z-50 { top: 16px; }
-.fixed.top-20.right-4.z-50 { top: 68px; }
-
-.fixed.top-4.right-4.z-50 a,
-#toggleUnifiedPanelBtn {
-  width: 44px !important;
-  height: 44px !important;
-  padding: 0 !important;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 10px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
-}
-.fixed.top-4.right-4.z-50 a:hover,
-#toggleUnifiedPanelBtn:hover,
-.fixed.top-4.right-4.z-50 a:focus-visible,
-#toggleUnifiedPanelBtn:focus-visible {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border-color: var(--border-accent);
-  outline: none;
-}
-.fixed.top-4.right-4.z-50 a i { font-size: 18px; }
-#toggleUnifiedPanelBtn i { font-size: 16px; }
-
-/* Version badge: a label, not a button */
-.fixed.bottom-4.left-4 a {
-  padding: 8px 12px !important;
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  box-shadow: none !important;
-  color: var(--text-secondary) !important;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  border-radius: 8px;
-  transition: color 150ms ease, border-color 150ms ease;
-}
-.fixed.bottom-4.left-4 a:hover,
-.fixed.bottom-4.left-4 a:focus-visible {
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-  outline: none;
-}
-.fixed.bottom-4.left-4 a i { color: var(--text-accent) !important; }
-#currentVersion { font-family: var(--font-mono); font-size: 12px; }
-
 /* Bottom control bar: one surface, flat buttons, accent only on the active/focused control */
 #customControlBar {
   gap: 6px;
@@ -75,7 +18,7 @@ body {
   border-radius: 14px 14px 0 0;
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.28);
 }
-#customControlBar .h-8.w-px { background: var(--border-primary); margin: 0 6px; }
+
 
 .custom-ui-btn {
   width: 44px;
@@ -201,11 +144,9 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 
 @media (max-width: 768px) {
   #customControlBar { width: calc(100vw - 16px); padding: 8px; gap: 2px; }
-  #customControlBar .h-8.w-px { margin: 0 4px; }
+  .bar-sep { margin: 0 4px; }
   .custom-ui-btn { width: 44px; height: 44px; }
   .page-indicator { font-size: 14px; padding: 0 10px 0 4px; min-width: 0; }
-  .fixed.top-4.right-4.z-50 { top: 12px; right: 12px; }
-  .fixed.top-20.right-4.z-50 { top: 64px; right: 12px; }
 }
 
 /* Narrow phones: the bar spans the screen and the least-used control folds into the More menu */
@@ -221,7 +162,7 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
     justify-content: space-between;
   }
   #customControlBar.visible, #customControlBar.always-shown { transform: translateY(0) !important; }
-  #customControlBar .h-8.w-px { display: none; }
+  .bar-sep { display: none; }
   .custom-ui-btn { width: 42px; height: 42px; }
   .page-indicator { height: 42px; gap: 4px; padding: 0 8px 0 3px; font-size: 13px; }
   .page-input-custom { min-width: 40px !important; height: 34px !important; font-size: 13px !important; }

@@ -373,13 +373,6 @@
     bottom: 70px !important;
   }
 
-  /* Version badge would sit under the control bar on phones: keep it out of the way */
-  .fixed.bottom-4.left-4 {
-    bottom: auto !important;
-    top: 1rem !important;
-    left: 1rem !important;
-  }
-
   /* Overlay the book instead of squeezing it into the remaining ~120px */
   .df-container.df-sidemenu-open .df-book-stage {
     padding-left: 20px !important;

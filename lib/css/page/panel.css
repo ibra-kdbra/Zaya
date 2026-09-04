@@ -1428,23 +1428,6 @@ body.panel-open #flipbookContainer {
   background-color: rgba(55, 65, 81, 0.7);
 }
 
-/* Apply consistent theme to all buttons globally */
-.theme-applied button:not(.modal-close),
-.theme-applied .fixed a {
-  background: var(--bg-accent) !important;
-  border-color: var(--border-accent) !important;
-  color: var(--text-primary) !important;
-  transition: all 0.3s ease !important;
-}
-
-.theme-applied button:not(.modal-close):hover,
-.theme-applied .fixed a:hover {
-  background: var(--bg-accent-hover) !important;
-  border-color: var(--text-accent) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: none !important;
-}
-
 /* Apply theme to body and main container */
 .theme-applied body {
   background: var(--bg-primary) !important;

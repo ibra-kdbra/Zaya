@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { openPanel } from './helpers.mjs';
 import { readFileSync } from 'node:fs';
 
 const SAMPLE_PDF = readFileSync(new URL('./fixtures/sample.pdf', import.meta.url));
@@ -91,7 +92,7 @@ test.describe('Zaya app shell', () => {
     await page.goto('/index.html?pdf=https://example.com/sample.pdf');
     await expect(page.locator('#flipbookContainer canvas, #flipbookContainer .df-book-page').first()).toBeVisible({ timeout: 30_000 });
 
-    await page.locator('#toggleUnifiedPanelBtn').click();
+    await openPanel(page, 'Notes');
     const payload = '<img src=x onerror="window.__xss=1">hello';
     await page.locator('#quoteInput').fill(payload);
     await page.locator('#addQuoteBtn').click();
@@ -162,7 +163,7 @@ test.describe('URL options and backup', () => {
     await page.goto('/index.html?pdf=https://example.com/sample.pdf');
     await expect(page.locator('#flipbookContainer canvas').first()).toBeVisible({ timeout: 30_000 });
 
-    await page.locator('#toggleUnifiedPanelBtn').click();
+    await openPanel(page, 'Notes');
     await page.locator('#quoteInput').fill('A quote worth keeping');
     await page.locator('#addQuoteBtn').click();
     await expect(page.locator('.quote-text').first()).toContainText('A quote worth keeping', { timeout: 10_000 });
@@ -192,7 +193,7 @@ test.describe('URL options and backup', () => {
     await stubNetwork(page);
     await page.goto('/index.html?pdf=https://example.com/sample.pdf');
     await expect(page.locator('#flipbookContainer canvas').first()).toBeVisible({ timeout: 30_000 });
-    await page.locator('#toggleUnifiedPanelBtn').click();
+    await openPanel(page, 'Notes');
     await page.locator('#quotesToggleBtn').click();
     const modal = page.locator('#pdfSpecificQuotesModal');
     await expect(modal).toBeVisible();
