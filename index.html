@@ -284,7 +284,7 @@
     </button>
 
     <div class="page-indicator">
-      <input type="text" id="customCurrentPageInput" class="page-input-custom"> / <span id="customTotalPages">1</span>
+      <input type="text" id="customCurrentPageInput" class="page-input-custom" inputmode="numeric" pattern="[0-9]*" aria-label="Current page"><span class="page-sep" aria-hidden="true">/</span><span id="customTotalPages" aria-label="Total pages">1</span>
     </div>
 
     <button class="custom-ui-btn" id="customNextBtn" title="Next Page">
@@ -331,7 +331,7 @@
       </button>
 
       <!-- More Menu Dropdown -->
-      <div id="customMoreMenu" class="absolute bottom-full right-0 mb-4 w-56 bg-[#2D3748] border border-gray-700 rounded-xl shadow-2xl opacity-0 invisible transform translate-y-2 transition-all duration-300 z-[1001]">
+      <div id="customMoreMenu" class="absolute bottom-full right-0 mb-3 w-56 rounded-xl opacity-0 invisible transform translate-y-2 transition-all duration-200 z-[1001]" role="menu" aria-label="More options">
         <div class="p-2 flex flex-col gap-1">
           <button class="more-menu-item" id="menuDownloadBtn">
             <i class="fas fa-download"></i>
@@ -349,14 +349,16 @@
             <i class="fas fa-angle-double-right"></i>
             <span>Goto Last Page</span>
           </button>
-          <div class="h-px bg-gray-700 my-1"></div>
+          <div class="more-menu-sep"></div>
+          <button class="more-menu-item" id="menuFullscreenBtn">
+            <i class="fas fa-expand"></i>
+            <span>Fullscreen</span>
+          </button>
           <button class="more-menu-item" id="menuSoundBtn">
             <i class="fas fa-volume-up"></i>
             <span>Sound: On</span>
           </button>
         </div>
-        <!-- Arrow -->
-        <div class="absolute -bottom-2 right-4 w-4 height-4 bg-[#2D3748] border-r border-b border-gray-700 transform rotate-45"></div>
       </div>
     </div>
   </div>

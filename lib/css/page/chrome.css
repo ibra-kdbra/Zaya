@@ -103,30 +103,61 @@ body {
 .custom-ui-btn:active { transform: none; background: var(--bg-accent-active); }
 
 .page-indicator {
+  /* One pill, one line: [ 12 ] / 199 */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  min-width: 0;
+  padding: 0 12px 0 4px;
+  white-space: nowrap;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1;
+  color: var(--text-secondary);
   background: transparent;
   border: 1px solid var(--border-secondary);
-  color: var(--text-secondary);
-  padding: 6px 10px;
   border-radius: 10px;
 }
+.page-sep { color: var(--text-secondary); opacity: 0.6; }
+#customTotalPages { color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .page-input-custom {
   font-family: var(--font-mono) !important;
+  font-size: 14px !important;
   font-weight: 500 !important;
+  font-variant-numeric: tabular-nums;
+  height: 36px !important;
+  width: 3.2ch !important;
+  min-width: 44px !important;
+  padding: 0 6px !important;
+  text-align: center !important;
   background: var(--bg-tertiary) !important;
-  border: 1px solid var(--border-primary) !important;
+  border: 1px solid transparent !important;
   color: var(--text-primary) !important;
-  width: 48px !important;
   border-radius: 8px !important;
   margin: 0 !important;
+  -moz-appearance: textfield;
 }
 .page-input-custom:focus {
   background: var(--bg-tertiary) !important;
   border-color: var(--text-accent) !important;
   box-shadow: none !important;
 }
+
+/* More menu: same surface as the bar, no arrow, no card-in-card */
+#customMoreMenu {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-primary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.more-menu-item { color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; min-height: 44px; }
+.more-menu-item:hover, .more-menu-item:focus-visible { background: var(--bg-tertiary); color: var(--text-primary); outline: none; }
+.more-menu-item i { color: var(--text-secondary); }
+.more-menu-item:hover i { color: var(--text-accent); }
+.more-menu-sep { height: 1px; background: var(--border-secondary); margin: 4px 6px; }
 
 /* Side panels (thumbnails, outline, search) */
 .df-sidemenu {
@@ -170,26 +201,29 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 
 @media (max-width: 768px) {
   #customControlBar { width: calc(100vw - 16px); padding: 8px; gap: 2px; }
+  #customControlBar .h-8.w-px { margin: 0 4px; }
   .custom-ui-btn { width: 44px; height: 44px; }
+  .page-indicator { font-size: 14px; padding: 0 10px 0 4px; min-width: 0; }
   .fixed.top-4.right-4.z-50 { top: 12px; right: 12px; }
   .fixed.top-20.right-4.z-50 { top: 64px; right: 12px; }
 }
 
-/* Toasts: same surface as the panels; status colour arrives inline from the caller */
-.toastify {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  border: 1px solid var(--border-primary);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transition: opacity 200ms ease, transform 200ms ease;
+/* Narrow phones: the bar spans the screen and the least-used control folds into the More menu */
+@media (max-width: 430px) {
+  #customControlBar {
+    width: 100vw;
+    left: 0;
+    transform: translateY(100%);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 8px 6px;
+    justify-content: space-between;
+  }
+  #customControlBar.visible, #customControlBar.always-shown { transform: translateY(0) !important; }
+  #customControlBar .h-8.w-px { display: none; }
+  .custom-ui-btn { width: 42px; height: 42px; }
+  .page-indicator { height: 42px; gap: 4px; padding: 0 8px 0 3px; font-size: 13px; }
+  .page-input-custom { min-width: 40px !important; height: 34px !important; font-size: 13px !important; }
+  #customFullscreenBtn { display: none; }
 }
-
-/* Native range inputs pick up the accent */
-input[type="range"] { accent-color: var(--text-accent); }
-
-/* Media mode switcher (YouTube / Audio): the active tab carries the accent wash */
-#switchYoutubeMode, #switchAudioMode { color: var(--text-secondary); transition: background-color 150ms ease, color 150ms ease; }
-.media-mode-active { background: var(--bg-accent-active); color: var(--text-primary) !important; }
