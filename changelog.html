@@ -1,186 +1,75 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full scroll-smooth">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
-  <title>Zaya - Changelog</title>
+  <title>Zaya — Changelog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Official release notes, architecture improvements, and performance changelog for Zaya PDF Flipbook.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <meta name="description" content="Release notes for Zaya, the PDF flipbook reader.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" type="image/svg+xml" href="assets/changelog.svg">
-  
-  <!-- Fonts & FontAwesome -->
+
   <link rel="stylesheet" href="lib/css/vendor/fonts.css?v=5.5.0">
-  <link rel="stylesheet" href="lib/css/vendor/tailwind.css?v=5.5.0">
-  <link rel="stylesheet" href="lib/css/vendor/fontawesome.min.css?v=5.5.0">
-
-  <!-- CSS -->
+  <link rel="stylesheet" href="lib/css/themes/themes.css?v=5.5.0">
   <link rel="stylesheet" href="lib/css/page/changelog.css?v=5.5.0">
-  <link rel="stylesheet" href="lib/css/vendor/toastify.min.css?v=5.5.0">
-
-  <!-- JS Dependencies (vendored) -->
-  <script src="lib/js/features/changelog/performance-monitor.js?v=5.5.0"></script>
-  <script src="lib/js/libs/marked.min.js?v=5.5.0"></script>
 </head>
 
-<body class="min-h-screen flex flex-col justify-between antialiased">
+<body>
+  <a class="cl-skip" href="#releases">Skip to releases</a>
 
-  <!-- Editorial Top Navigation Header -->
-  <header class="nav-header fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
-      <a href="index.html" class="flex items-center space-x-2 text-sm text-gray-400 hover:text-white transition-colors group">
-        <i class="fas fa-arrow-left text-xs group-hover:-translate-x-0.5 transition-transform"></i>
-        <span class="font-medium text-gray-200">Zaya App</span>
-      </a>
+  <header class="cl-header">
+    <div class="cl-header__inner">
+      <div class="cl-brand">
+        <img class="cl-brand__mark" src="assets/zaya.svg" alt="Zaya" width="28" height="28">
+        <span class="cl-brand__name">Zaya</span>
+        <span class="cl-brand__sep" aria-hidden="true">/</span>
+        <span class="cl-brand__page">Changelog</span>
+      </div>
 
-      <div class="flex items-center space-x-6">
-        <nav class="hidden md:flex items-center space-x-5 text-xs text-gray-400 font-medium">
-          <a href="#recent" class="hover:text-gray-200 transition-colors">Commits</a>
-          <a href="#features" class="hover:text-gray-200 transition-colors">Features</a>
-          <a href="#performance" class="hover:text-gray-200 transition-colors">Telemetry</a>
-          <a href="#versions" class="hover:text-gray-200 transition-colors">Releases</a>
-        </nav>
-
-        <div class="flex items-center space-x-2 px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-xs font-mono text-gray-300">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span id="currentVersion"></span>
-        </div>
+      <div class="cl-header__meta">
+        <span class="cl-badge" title="Latest release"><span id="currentVersion"></span></span>
+        <a class="cl-back" href="index.html">
+          <span aria-hidden="true">&larr;</span>
+          <span>Back to the reader</span>
+        </a>
       </div>
     </div>
   </header>
 
-  <!-- Editorial Main Header -->
-  <main class="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 pt-24 pb-12 space-y-12">
-    
-    <div class="border-b border-[#30363d] pb-8">
-      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <div>
-          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2">Changelog & Release Notes</h1>
-          <p class="text-sm text-[#8b949e]">Official record of architecture improvements, feature rollouts, and optimizations in Zaya PDF.</p>
-        </div>
-        
-        <div class="flex items-center space-x-3 text-xs font-mono text-[#8b949e]">
-          <div class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] flex items-center space-x-2">
-            <i class="far fa-calendar text-blue-400"></i>
-            <span id="latestDate">July 25, 2026</span>
-          </div>
-          <div class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] flex items-center space-x-2">
-            <i class="fas fa-code-branch text-emerald-400"></i>
-            <span>Commits: <strong id="commitCount" class="text-white">50+</strong></span>
-          </div>
-        </div>
+  <main class="cl-main">
+    <div class="cl-intro">
+      <h1 class="cl-title">Changelog</h1>
+      <p class="cl-lede">Every release of Zaya, newest first. Dates are the day the release was tagged.</p>
+    </div>
+
+    <div class="cl-layout">
+      <aside class="cl-aside" aria-label="All versions">
+        <h2 class="cl-aside__title">All versions</h2>
+        <label class="cl-select" for="versionSelect">
+          <span class="cl-select__label">Jump to a version</span>
+          <select id="versionSelect"></select>
+        </label>
+        <nav class="cl-index-nav">
+          <ul class="cl-index" id="versionIndex"></ul>
+        </nav>
+      </aside>
+
+      <div class="cl-stream" id="releases">
+        <p class="cl-state" id="loadingState">Loading release history…</p>
+        <p class="cl-state cl-state--error" id="errorState" hidden></p>
+        <div class="cl-releases" id="releaseList"></div>
       </div>
     </div>
-
-    <!-- Loading State Indicator -->
-    <div id="loadingState" class="py-12 text-center">
-      <div class="inline-flex items-center space-x-3 px-4 py-2.5 rounded-md bg-[#161b22] border border-[#30363d] text-xs font-mono text-gray-400">
-        <i class="fas fa-spinner fa-spin text-blue-400"></i>
-        <span>Parsing release history & metadata...</span>
-      </div>
-    </div>
-
-    <!-- Main Content Stream -->
-    <div id="changelogContent" class="space-y-14">
-
-      <!-- Recent Commits Stream -->
-      <section id="recent" class="scroll-mt-20">
-        <div class="flex items-center space-x-2 mb-4">
-          <span class="text-xs font-mono font-semibold uppercase text-blue-400 tracking-wider">01 // Recent Activity</span>
-        </div>
-        <h2 class="text-xl font-bold text-white mb-4">Recent Commits</h2>
-        <div id="recentUpdates" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <!-- Dynamically Rendered -->
-        </div>
-      </section>
-
-      <!-- Features Grid -->
-      <section id="features" class="scroll-mt-20">
-        <div class="flex items-center space-x-2 mb-4">
-          <span class="text-xs font-mono font-semibold uppercase text-emerald-400 tracking-wider">02 // Core Capabilities</span>
-        </div>
-        <h2 class="text-xl font-bold text-white mb-4">Features & Improvements</h2>
-        <div id="featuresGrid" class="feature-grid">
-          <!-- Dynamically Rendered -->
-        </div>
-      </section>
-
-      <!-- Technical Architecture Section -->
-      <section class="scroll-mt-20">
-        <div class="flex items-center space-x-2 mb-4">
-          <span class="text-xs font-mono font-semibold uppercase text-amber-400 tracking-wider">03 // Engineering</span>
-        </div>
-        <h2 class="text-xl font-bold text-white mb-4">Technical Improvements</h2>
-        <div id="technicalImprovements" class="feature-grid">
-          <!-- Dynamically Rendered -->
-        </div>
-      </section>
-
-      <!-- Bug Fixes Section -->
-      <section class="scroll-mt-20">
-        <div class="flex items-center space-x-2 mb-4">
-          <span class="text-xs font-mono font-semibold uppercase text-rose-400 tracking-wider">04 // Stability</span>
-        </div>
-        <h2 class="text-xl font-bold text-white mb-4">Bug Fixes & Maintenance</h2>
-        <div id="bugFixes" class="feature-grid">
-          <!-- Dynamically Rendered -->
-        </div>
-      </section>
-
-      <!-- Telemetry Dashboard -->
-      <section id="performance" class="scroll-mt-20">
-        <div class="flex items-center space-x-2 mb-4">
-          <span class="text-xs font-mono font-semibold uppercase text-cyan-400 tracking-wider">05 // Diagnostics</span>
-        </div>
-        <h2 class="text-xl font-bold text-white mb-4">Performance Telemetry</h2>
-        <div id="performanceStats" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Dynamically Rendered -->
-        </div>
-      </section>
-
-      <!-- Version History Timeline -->
-      <section id="versions" class="scroll-mt-20">
-        <div class="flex items-center space-x-2 mb-4">
-          <span class="text-xs font-mono font-semibold uppercase text-amber-400 tracking-wider">06 // Timeline</span>
-        </div>
-        <h2 class="text-xl font-bold text-white mb-6">Release History</h2>
-        
-        <div class="timeline-container">
-          <div id="versionTimeline" class="space-y-6">
-            <!-- Dynamically Rendered -->
-          </div>
-        </div>
-      </section>
-
-      <!-- Notes Section -->
-      <section>
-        <div id="notesSection">
-          <!-- Dynamically Rendered -->
-        </div>
-      </section>
-
-    </div>
-
   </main>
 
-  <!-- Editorial Footer -->
-  <footer class="border-t border-[#30363d] bg-[#0d1117] py-8 px-4 md:px-6 text-xs text-[#8b949e]">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center space-x-3">
-        <span class="font-bold text-white">Zaya PDF Flipbook</span>
-        <span>—</span>
-        <span>Open Source Core</span>
-      </div>
-
-      <div class="flex items-center space-x-4 font-mono text-[#8b949e]">
-        <span>Version: <strong id="footerVersion" class="text-gray-200"></strong></span>
-        <span>Commits: <strong id="footerStatsCommits" class="text-gray-200">50+</strong></span>
-        <span>Updated: <strong id="footerStatsDate" class="text-gray-200">Jul 25, 2026</strong></span>
-      </div>
+  <footer class="cl-footer">
+    <div class="cl-footer__inner">
+      <p>Zaya is released under the MIT licence. Third-party notices are listed in <code class="cl-code">THIRD_PARTY_NOTICES.md</code>.</p>
+      <p><a class="cl-link" href="index.html">Open the reader</a></p>
     </div>
   </footer>
 
-  <script src="lib/js/features/changelog/changelog.bundle.js"></script>
+  <script src="lib/js/features/changelog/changelog.bundle.js?v=5.5.0"></script>
 </body>
 </html>
