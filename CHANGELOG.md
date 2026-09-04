@@ -2,12 +2,29 @@
 
 ## 🎯 Recent Updates (Latest commits)
 
+- `search` - Full-text PDF search panel with snippets and Ctrl+F shortcut (2026-09-04)
+- `mobile-fixes` - Visible controls, page numbers, tap/swipe and side-panel fixes on touch devices (2026-09-04)
+- `hardening` - CSP, URL validation, escaped output, versioned service worker, vendored assets (2026-09-04)
 - `core-perf` - 60fps Theme Engine & Vanilla JS Refactor (2026-07-25)
 - `plugin-arch` - Added ZayaPlugins & ZayaUI Slot API (2026-07-25)
 - `keyboard-nav` - Arrow keys navigation & Fullscreen shortcuts (2026-07-25)
 - `zaya-rebrand` - Global rebranding to Zaya (2026-04-03)
 
-### ✨ Latest Major Update - v5.4.0 Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
+### ✨ Latest Major Update - v5.5.0 Search, Mobile Fixes & Security Hardening (2026-09-04)
+
+- **Full-Text Search (#16)**: New search panel next to thumbnails and outline. Text is extracted once per document with a small concurrency pool and cancellation, results list every matching page with highlighted snippets, and clicking a result jumps to the page. `Ctrl/Cmd+F` opens it.
+- **Thumbnail Panel (#11)**: Wheel and touchpad scrolling inside the panel no longer zooms the book (guarded at the source in the stage, not only in the app layer). Thumbnail rows are cached and painted from the image cache, so scrolling back never re-renders; preloading starts sooner with two parallel renders.
+- **Mobile & Touch (#11, #8)**: The bottom bar (with page numbers) is pinned on touch devices instead of relying on mouse hover. Tap-to-turn works on touch, swipes are measured from the gesture origin with a direction check, and the duplicate gesture handler that clicked non-existent buttons was removed. Side panels close on an outside tap, overlay the book on narrow screens instead of squeezing it, and closing a panel can no longer leave the book frozen (orbit controls now follow panel state).
+- **Core Bug Fixes**: `loadFlipbook` threw a `ReferenceError` after every successful load, which also kept the loading lock stuck; `AppState.updatePdfContext` passed the new state as the previous state so no listener or `zaya:pdfLoaded` event ever fired; `zaya:pageChanged` is now emitted on page turns; the arrow-key handler ignores typing in inputs.
+- **Security Hardening**: strict Content-Security-Policy on both pages (no `unsafe-eval`, no inline scripts), pdf.js loaded with `isEvalSupported:false`, `?pdf=` and stored URLs restricted to `http(s)`, all user-controlled text escaped before rendering (quotes were a stored-XSS vector), YouTube IDs URL-encoded, download links limited to `http(s)`/`blob:`, `eval()`-based feature probes removed.
+- **Service Worker**: versioned cache name, best-effort precache (one missing file no longer blocks install), stale-while-revalidate for static assets, network-first for pages, PDFs and cross-origin requests never cached, message handler replies safely.
+- **Performance**: scripts fetched in parallel with ordered execution, the 845 KB pdf.js worker is no longer executed on the main thread, no per-load cache-busting (assets are versioned by release), Tailwind precompiled instead of the runtime CDN, the changelog bundle and the GitHub API call removed from the main page, throttled mousemove handler, narrower MutationObserver.
+- **Self-contained Assets**: Toastify, marked, Font Awesome and the compiled Tailwind CSS are vendored; the app has no runtime CDN dependency and works offline. Per-deployment settings moved to `config.js`.
+- **Storage Robustness**: quotes database upgrades are additive (no more data loss on version bumps), open errors resolve instead of hanging forever, delete failures are reported, page memory retries after a failed open, `localStorage` writes are guarded.
+- **Project Tooling**: `npm run check` (syntax), `npm run lint` (eslint), `npm test` (Playwright smoke tests incl. a mobile emulation), GitHub Actions CI, issue and PR templates, `SECURITY.md`, `CONTRIBUTING.md`, `THIRD_PARTY_NOTICES.md`, `ROADMAP.md`, and private-repo bootstrap templates under `.github/private-repo/`.
+- **Removed**: the 214 KB `flipbook.js.bak`, dead cache-purge code, the unused `#storedPage` writes.
+
+### ✨ Previous Major Update - v5.4.0 Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
 
 - **Theme Engine Optimization**: Completely removed `$('*')` DOM tree class manipulation in `manager.js`. Themes now apply to root `document.documentElement` (`<html class="theme-...">`) for zero layout reflow lag and 60fps instant theme transitions via CSS custom properties.
 - **Theme Selector Performance Refactoring**: Pre-calculated and cached theme palette colors in `selector.js`, eliminating temporary `$('<div class="theme-...">')` DOM insertion loops during theme search. Refactored modal to pure Vanilla JS with 100ms search input debouncing.
@@ -111,6 +128,14 @@
 ---
 
 ## 🔄 Version History
+
+### v5.5.0 - Search, Mobile Fixes & Security Hardening (2026-09-04)
+
+- Full-text PDF search panel (issue #16)
+- Thumbnail, touch, page-number and side-panel fixes (issues #11, #8)
+- Strict CSP, input validation, escaped output, versioned service worker
+- Vendored third-party assets and precompiled Tailwind; no runtime CDN
+- CI, lint, syntax check and Playwright smoke tests
 
 ### v5.4.0 - Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
 
