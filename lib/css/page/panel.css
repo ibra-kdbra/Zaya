@@ -894,7 +894,11 @@ body.df-fullscreen-active #unifiedPanel {
   }
 
   .quotes-input-container {
-    flex-direction: column;
+    flex-direction: row;
+  }
+  .quotes-input-container .panel-input {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .load-buttons {
