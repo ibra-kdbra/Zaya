@@ -3,3 +3,8 @@
 docs
 /design_prototypes
 node_modules
+
+# test & build artefacts
+test-results
+playwright-report
+.playwright

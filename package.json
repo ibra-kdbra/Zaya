@@ -1,0 +1,31 @@
+{
+  "name": "zaya",
+  "version": "5.5.0",
+  "private": true,
+  "description": "Zaya – 3D PDF flipbook reader. Static site; this package only carries dev tooling.",
+  "license": "MIT",
+  "scripts": {
+    "start": "http-server -p 8080 -c-1 .",
+    "check": "node scripts/check-syntax.mjs",
+    "lint": "eslint .",
+    "test": "playwright test",
+    "build:css": "tailwindcss -c tailwind.config.js -i lib/css/tailwind.src.css -o lib/css/vendor/tailwind.css --minify",
+    "build:changelog": "esbuild lib/js/features/changelog/changelog.js --bundle --format=iife --outfile=lib/js/features/changelog/changelog.bundle.js",
+    "build": "npm run build:css && npm run build:changelog"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "marked": "^12.0.2",
+    "tailwindcss": "^3.4.0",
+    "toastify-js": "^1.12.0",
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "@playwright/test": "^1.47.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.12.0",
+    "globals": "^15.10.0",
+    "http-server": "^14.1.1",
+    "marked": "^12.0.2",
+    "tailwindcss": "^3.4.19",
+    "toastify-js": "^1.12.0"
+  }
+}
