@@ -143,3 +143,59 @@ test.describe('Mobile (touch) behaviour', () => {
     await expect.poll(() => page.evaluate(() => window.dFlipBook.target._activePage), { timeout: 10_000 }).toBe(2);
   });
 });
+
+test.describe('URL options and backup', () => {
+  test('?theme=, ?mode=single and ?search= preset the viewer', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf&theme=nord&mode=single&search=zebra');
+    await expect(page.locator('#flipbookContainer canvas').first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('html')).toHaveClass(/theme-nord/);
+    await expect.poll(() => page.evaluate(() => window.dFlipBook.target.pageMode), { timeout: 10_000 }).toBe(1);
+    await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 15_000 });
+    await expect(page.locator('.df-search-input')).toHaveValue('zebra');
+  });
+
+  test('backup export round-trips quotes and preferences through import', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf');
+    await expect(page.locator('#flipbookContainer canvas').first()).toBeVisible({ timeout: 30_000 });
+
+    await page.locator('#toggleUnifiedPanelBtn').click();
+    await page.locator('#quoteInput').fill('A quote worth keeping');
+    await page.locator('#addQuoteBtn').click();
+    await expect(page.locator('.quote-text').first()).toContainText('A quote worth keeping', { timeout: 10_000 });
+
+    // Export produces a JSON payload containing the quote
+    const payload = await page.evaluate(() => window.ZayaBackup.exportBackup());
+    expect(payload.format).toBe('zaya-backup');
+    expect(payload.quotes.map((q) => q.quote)).toContain('A quote worth keeping');
+
+    // Importing the same file again adds nothing (deduplicated), importing a new quote adds one
+    const result = await page.evaluate(async (p) => {
+      p.quotes.push({ quote: 'Imported from backup', pdfUrl: '', pdfName: 'Backup' });
+      p.preferences.theme = 'dracula';
+      const file = new File([JSON.stringify(p)], 'b.json', { type: 'application/json' });
+      return window.ZayaBackup.importBackup(file);
+    }, payload);
+    expect(result.imported).toBe(1);
+    await expect(page.locator('html')).toHaveClass(/theme-dracula/);
+    await expect(page.locator('.quote-text', { hasText: 'Imported from backup' })).toHaveCount(1, { timeout: 10_000 });
+
+    // Rejects a foreign JSON file
+    const err = await page.evaluate(() => window.ZayaBackup.importBackup(new File(['{"hello":1}'], 'x.json')).catch((e) => e.message));
+    expect(err).toMatch(/Not a Zaya backup/);
+  });
+
+  test('quotes modal traps focus and closes on Escape', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf');
+    await expect(page.locator('#flipbookContainer canvas').first()).toBeVisible({ timeout: 30_000 });
+    await page.locator('#toggleUnifiedPanelBtn').click();
+    await page.locator('#quotesToggleBtn').click();
+    const modal = page.locator('#pdfSpecificQuotesModal');
+    await expect(modal).toBeVisible();
+    await expect(modal).toHaveAttribute('aria-modal', 'true');
+    await page.keyboard.press('Escape');
+    await expect(modal).toBeHidden();
+  });
+});

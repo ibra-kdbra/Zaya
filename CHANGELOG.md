@@ -22,7 +22,11 @@
 - **Self-contained Assets**: Toastify, marked, Font Awesome and the compiled Tailwind CSS are vendored; the app has no runtime CDN dependency and works offline. Per-deployment settings moved to `config.js`.
 - **Storage Robustness**: quotes database upgrades are additive (no more data loss on version bumps), open errors resolve instead of hanging forever, delete failures are reported, page memory retries after a failed open, `localStorage` writes are guarded.
 - **Project Tooling**: `npm run check` (syntax), `npm run lint` (eslint), `npm test` (Playwright smoke tests incl. a mobile emulation), GitHub Actions CI, issue and PR templates, `SECURITY.md`, `CONTRIBUTING.md`, `THIRD_PARTY_NOTICES.md`, `ROADMAP.md`, and private-repo bootstrap templates under `.github/private-repo/`.
-- **Removed**: the 214 KB `flipbook.js.bak`, dead cache-purge code, the unused `#storedPage` writes.
+- **Backup & Restore**: Settings → Backup exports every quote plus preferences (theme, direction, volume, loop, bottom-bar mode) to a JSON file, and imports such a file with validation and de-duplication.
+- **URL Presets**: `?theme=`, `?mode=single|double`, `?search=` and `?rtl=` parameters for shareable, embeddable links (values are allow-listed).
+- **Accessibility**: focus trapping and Escape handling for the quotes and theme dialogs, `role`/`aria-label` on side panels and the control panel, icon-only buttons get `aria-label` from their tooltip.
+- **Fixed**: the theme manager imported the quotes database from a wrong relative path, so theme changes were never persisted to IndexedDB.
+- **Removed**: the 214 KB `flipbook.js.bak`, dead cache-purge code, the unused `#storedPage` writes, and `premium-plan.md` (moved to the private repository).
 
 ### ✨ Previous Major Update - v5.4.0 Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
 

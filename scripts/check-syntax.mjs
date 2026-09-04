@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 const ROOT = new URL('..', import.meta.url).pathname;
 const SKIP = [/\/libs\//, /\.min\.js$/, /\.bak$/, /node_modules/, /changelog\.bundle\.js$/, /\/cmaps\//];
 const MODULE_DIRS = [/lib\/js\/core\/dflip\//, /lib\/js\/features\/themes\//, /lib\/js\/features\/quotes\//,
-  /lib\/js\/features\/changelog\//, /lib\/js\/features\/search\//, /lib\/js\/pro-features\//, /scripts\//, /tests\//];
+  /lib\/js\/features\/changelog\//, /lib\/js\/features\/search\//, /lib\/js\/features\/settings\//, /lib\/js\/pro-features\//, /scripts\//, /tests\//];
 
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;

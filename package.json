@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "http-server -p 8080 -c-1 .",
-    "check": "node scripts/check-syntax.mjs",
+    "check": "node scripts/check-syntax.mjs && node scripts/check-version.mjs",
     "lint": "eslint .",
     "test": "playwright test",
     "build:css": "tailwindcss -c tailwind.config.js -i lib/css/tailwind.src.css -o lib/css/vendor/tailwind.css --minify",

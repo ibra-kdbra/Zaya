@@ -55,7 +55,7 @@
     </div>
 
   <!-- Unified Right-Side Control Panel -->
-  <div id="unifiedPanel" class="panel-container">
+  <div id="unifiedPanel" class="panel-container" role="complementary" aria-label="Control panel">
     <div class="panel-header">
       <h2 class="flex items-center gap-2">
         <i class="fas fa-sliders-h text-blue-400"></i>
@@ -92,6 +92,22 @@
               <span class="slider-modern"></span>
             </label>
             <span class="control-label">Fixed</span>
+          </div>
+        </div>
+
+        <div class="h-px bg-gray-800 my-2 opacity-30"></div>
+
+        <!-- Backup / restore -->
+        <div class="setting-row-modern">
+          <span class="setting-label-modern">Backup</span>
+          <div class="control-group">
+            <button id="exportBackupBtn" class="panel-button" type="button" title="Export quotes and preferences (JSON)">
+              <i class="fas fa-file-export"></i>
+            </button>
+            <button id="importBackupBtn" class="panel-button" type="button" title="Import a Zaya backup file">
+              <i class="fas fa-file-import"></i>
+            </button>
+            <input id="importBackupFile" type="file" accept="application/json,.json" style="display: none;">
           </div>
         </div>
       </div>
@@ -349,10 +365,10 @@
   <div id="flipbookContainer" class="h-screen w-full relative"></div>
 
   <!-- PDF-Specific Quotes Modal -->
-  <div id="pdfSpecificQuotesModal" class="modal-container">
+  <div id="pdfSpecificQuotesModal" class="modal-container" role="dialog" aria-modal="true" aria-labelledby="pdfQuotesModalTitle">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="flex items-center gap-2">
+        <h2 id="pdfQuotesModalTitle" class="flex items-center gap-2">
           <i class="fas fa-edit text-yellow-400"></i>
           PDF Quotes
         </h2>

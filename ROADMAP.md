@@ -1,7 +1,7 @@
 # Zaya Roadmap & Business Plan
 
 _Last updated: 2026-09-04. This document is the decision record for how Zaya grows from a
-side project into a sustainable product. It supersedes the roadmap section of `premium-plan.md`._
+side project into a sustainable product. It supersedes the earlier `premium-plan.md`, which now lives in the private repository._
 
 ---
 

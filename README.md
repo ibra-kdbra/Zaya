@@ -16,6 +16,9 @@ For a complete history of changes, features, and updates, please visit the chang
 - Thumbnails and outline/bookmarks side panels
 - 50+ colour themes, quotes notebook stored locally (IndexedDB), remembered last page per document
 - Built-in media player: YouTube videos/playlists or local audio, with loop
+- Backup and restore: export all quotes and preferences to a JSON file and import them on another device (Settings → Backup)
+- Shareable links: `?theme=`, `?mode=`, `?search=`, `?rtl=` presets for embedding
+- Keyboard accessible dialogs (focus trapping, Escape) and labelled controls
 - Works offline as a PWA; every third-party asset is vendored, no runtime CDN
 - Strict Content-Security-Policy and validated inputs
 
@@ -83,6 +86,17 @@ You can also specify a starting page:
 ```
 https://your-site.com/index.html?pdf=https://example.com/document.pdf&page=5
 ```
+
+### All URL parameters
+
+| Parameter | Example | Effect |
+| --- | --- | --- |
+| `pdf` | `?pdf=https://example.com/a.pdf` | document to open (http/https only) |
+| `page` | `&page=5` | page to open |
+| `theme` | `&theme=nord` | any built-in theme name |
+| `mode` | `&mode=single` | `single` or `double` page layout |
+| `search` | `&search=invoice` | open the search panel with a query |
+| `rtl` | `&rtl=1` | right-to-left reading direction |
 
 > **Note:** Remote PDFs must have CORS enabled on their server for cross-origin loading to work.
 
