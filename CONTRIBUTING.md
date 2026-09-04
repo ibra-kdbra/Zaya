@@ -1,6 +1,6 @@
 # Contributing to Zaya
 
-Thanks for helping. Zaya is a static site: there is no build step for the app itself, only for the changelog bundle.
+Thanks for helping. Zaya is a static site: there is no build step at deploy time. Tailwind CSS and the changelog bundle are precompiled with `npm run build:assets` and the outputs are committed.
 
 ## Getting started
 

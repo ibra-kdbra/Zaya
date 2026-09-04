@@ -11,7 +11,7 @@
     "test": "playwright test",
     "build:css": "tailwindcss -c tailwind.config.js -i lib/css/tailwind.src.css -o lib/css/vendor/tailwind.css --minify",
     "build:changelog": "esbuild lib/js/features/changelog/changelog.js --bundle --format=iife --outfile=lib/js/features/changelog/changelog.bundle.js",
-    "build": "npm run build:css && npm run build:changelog"
+    "build:assets": "npm run build:css && npm run build:changelog"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^6.5.1",

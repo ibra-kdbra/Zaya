@@ -1,0 +1,12 @@
+node_modules
+tests
+scripts
+test-results
+playwright-report
+.github
+*.md
+!README.md
+eslint.config.mjs
+playwright.config.mjs
+tailwind.config.js
+package-lock.json

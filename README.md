@@ -40,7 +40,7 @@ npm start       # http://localhost:8080
 npm run check   # syntax-check every script
 npm run lint    # eslint
 npm test        # Playwright smoke tests (desktop + mobile emulation)
-npm run build   # recompile Tailwind CSS and the changelog bundle
+npm run build:assets   # recompile Tailwind CSS and the changelog bundle (outputs are committed)
 ```
 
 See `CONTRIBUTING.md`, `SECURITY.md` and `ROADMAP.md`.
