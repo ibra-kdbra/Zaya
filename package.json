@@ -4,6 +4,9 @@
   "private": true,
   "description": "Zaya – 3D PDF flipbook reader. Static site; this package only carries dev tooling.",
   "license": "MIT",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "start": "http-server -p 8080 -c-1 .",
     "check": "node scripts/check-syntax.mjs && node scripts/check-version.mjs",
