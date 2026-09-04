@@ -1459,3 +1459,10 @@ body.panel-open #flipbookContainer {
 #toggleQuotePanelBtn {
   display: none !important;
 }
+
+
+/* Touch devices: no hover, so the bottom bar is pinned and the hover strip is removed */
+@media (hover: none) {
+  .hover-trigger { display: none !important; }
+  #customControlBar { transform: translateX(-50%) translateY(0) !important; }
+}

@@ -118,12 +118,127 @@
   z-index: 999 !important;
 }
 
-.df-thumb-container, .df-outline-container {
+.df-thumb-container, .df-outline-container, .df-search-container {
   padding: 30px 5px 10px 5px !important; /* Shorter space */
 }
 
-.df-thumb-wrapper, .df-outline-wrapper {
+.df-thumb-wrapper, .df-outline-wrapper, .df-search-wrapper {
   background: transparent !important;
+}
+
+/* In-document search panel */
+.df-search-wrapper {
+  position: absolute;
+  inset: 40px 6px 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.df-search-form {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.df-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  color: var(--text-primary);
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.df-search-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.df-search-input:focus {
+  border-color: var(--text-accent);
+  box-shadow: 0 0 10px var(--shadow-accent);
+}
+
+.df-search-status {
+  flex: 0 0 auto;
+  min-height: 1.2em;
+  font-size: 11px;
+  color: var(--text-secondary);
+  padding: 0 2px;
+}
+
+.df-search-results {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 2px;
+}
+
+.df-search-result {
+  background: var(--bg-tertiary);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.df-search-result:hover,
+.df-search-result:focus-visible {
+  border-color: var(--text-accent);
+  outline: none;
+  transform: translateX(2px);
+}
+
+.df-search-result.df-selected {
+  border-color: var(--text-accent);
+  box-shadow: 0 0 10px var(--shadow-accent);
+}
+
+.df-search-result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.df-search-result-count {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--bg-accent);
+  color: var(--text-primary);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.df-search-snippet {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.df-search-snippet mark {
+  background: var(--bg-accent-active);
+  color: var(--text-primary);
+  border-radius: 3px;
+  padding: 0 2px;
 }
 
 /* Taller thumbnails */
@@ -235,19 +350,32 @@
   box-shadow: 0 0 15px var(--shadow-accent) !important;
 }
 
+/* Side panels must be scrollable by touch, never zoom the book */
+.df-sidemenu,
+.df-thumb-wrapper,
+.df-outline-wrapper,
+.df-search-results {
+  touch-action: pan-y !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Mobile Adjustments */
 @media (max-width: 768px) {
-  .df-ui-page {
-    display: flex !important;
+  /* Same specificity as min.css so the page indicator is not hidden on narrow containers */
+  .df-container.df-xs .df-ui-controls .df-ui-btn.df-ui-page {
+    display: inline-block !important;
   }
-  
+
   .df-sidemenu {
-    width: 220px !important;
+    width: min(80vw, 260px) !important;
     top: 10px !important;
     bottom: 70px !important;
   }
-  
-  .df-thumb-wrapper {
-    -webkit-overflow-scrolling: touch;
+
+  /* Overlay the book instead of squeezing it into the remaining ~120px */
+  .df-container.df-sidemenu-open .df-book-stage {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
 }
