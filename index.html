@@ -49,7 +49,7 @@
     <div class="fixed bottom-4 left-4 z-50">
         <a href="changelog.html" class="flex items-center px-4 py-2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-[var(--border-primary)]
     rounded-lg shadow-md transition duration-300 hover:bg-[var(--bg-accent-hover)] hover:text-[var(--text-accent)] no-underline" title="View Changelog">
-            <i class="fas fa-code-branch text-blue-400 mr-2"></i>
+            <i class="fas fa-code-branch text-[var(--text-accent)] mr-2"></i>
             <span id="currentVersion" class="font-mono text-sm" data-original=""></span>
         </a>
     </div>
@@ -58,7 +58,7 @@
   <div id="unifiedPanel" class="panel-container" role="complementary" aria-label="Control panel">
     <div class="panel-header">
       <h2 class="flex items-center gap-2">
-        <i class="fas fa-sliders-h text-blue-400"></i>
+        <i class="fas fa-sliders-h text-[var(--text-accent)]"></i>
         Control Panel
       </h2>
       <button id="closeUnifiedPanelBtn" class="panel-close">✕</button>
@@ -178,7 +178,7 @@
 
       <!-- Media Mode Switcher -->
       <div class="flex bg-gray-800/50 p-1 rounded-lg mb-4 border border-gray-700">
-        <button id="switchYoutubeMode" class="flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md transition-all duration-300 bg-blue-500 text-white shadow-lg">
+        <button id="switchYoutubeMode" class="flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md transition-all duration-300 media-mode-active">
           <i class="fab fa-youtube"></i>
           <span class="text-xs font-medium">YouTube</span>
         </button>
@@ -206,17 +206,17 @@
         <div class="input-field">
           <input id="localAudioFile" type="file" accept="audio/*" style="display: none;">
           <label for="localAudioFile" class="panel-button w-full text-center cursor-pointer flex items-center justify-center gap-2 bg-[var(--bg-tertiary)] hover:bg-[var(--bg-accent-hover)] transition-colors py-2 rounded group">
-            <i class="fas fa-cloud-upload-alt text-blue-400 group-hover:scale-110 transition-transform"></i>
+            <i class="fas fa-cloud-upload-alt text-[var(--text-accent)] group-hover:scale-110 transition-transform"></i>
             <span>Import Local File</span>
           </label>
         </div>
-        <div id="localAudioFileName" class="text-[10px] text-gray-500 mt-1 truncate hidden text-center italic"></div>
+        <div id="localAudioFileName" class="text-xs text-gray-500 mt-1 truncate hidden text-center italic"></div>
       </div>
 
       <div class="media-player-container mt-2 relative group">
         <!-- Unified Close Button (Top-Right) -->
         <button id="closeMediaContainer" class="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 border border-gray-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors z-10 hidden shadow-xl group-hover:flex">
-          <i class="fas fa-times text-[10px] text-gray-400 hover:text-white"></i>
+          <i class="fas fa-times text-xs text-gray-400 hover:text-white"></i>
         </button>
 
         <div class="media-player-youtube" id="youtubePlayerContainer">
@@ -226,14 +226,14 @@
         <!-- Custom Local Audio Player UI -->
         <div id="customAudioPlayer" class="hidden flex flex-col gap-3 mt-4 p-4 bg-gray-800/40 rounded-xl border border-gray-700/50 backdrop-blur-sm">
           <div class="flex items-center gap-4">
-            <button id="audioPlayPauseBtn" class="w-10 h-10 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/20 active:scale-95">
+            <button id="audioPlayPauseBtn" class="w-10 h-10 flex items-center justify-center bg-[var(--bg-accent-active)] hover:bg-[var(--bg-accent-hover)] text-[var(--text-accent)] rounded-full transition-colors duration-150">
               <i class="fas fa-play text-xs text-white"></i>
             </button>
             <div class="flex-1 flex flex-col gap-1.5">
-              <input type="range" id="audioProgressSlider" min="0" max="100" value="0" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-400">
+              <input type="range" id="audioProgressSlider" min="0" max="100" value="0" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer ">
               <div class="flex justify-between items-center px-0.5">
-                <span id="audioCurrentTime" class="text-[10px] text-gray-500 font-mono">0:00</span>
-                <span id="audioTotalTime" class="text-[10px] text-gray-500 font-mono">0:00</span>
+                <span id="audioCurrentTime" class="text-xs text-gray-500 font-mono">0:00</span>
+                <span id="audioTotalTime" class="text-xs text-gray-500 font-mono">0:00</span>
               </div>
             </div>
           </div>
@@ -241,13 +241,13 @@
           <!-- Integrated Volume Slider & Loop Toggle -->
           <div class="flex flex-col gap-2 mt-1 pt-2 border-t border-gray-700/30">
             <div class="flex items-center gap-3 px-1">
-              <i class="fas fa-volume-down text-[10px] text-gray-500"></i>
-              <input type="range" id="volumeSlider" min="0" max="100" value="50" class="flex-1 h-0.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-blue-400 transition-all">
-              <i class="fas fa-volume-up text-[10px] text-gray-500"></i>
+              <i class="fas fa-volume-down text-xs text-gray-500"></i>
+              <input type="range" id="volumeSlider" min="0" max="100" value="50" class="flex-1 h-0.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 hover: transition-all">
+              <i class="fas fa-volume-up text-xs text-gray-500"></i>
             </div>
 
             <div class="flex items-center justify-between px-1 mt-1">
-              <span class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Auto Repeat Audio</span>
+              <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Auto Repeat Audio</span>
               <label class="toggle-switch-modern scale-75 origin-right">
                 <input type="checkbox" id="mediaLoopToggle">
                 <span class="slider-modern"></span>
@@ -265,7 +265,7 @@
             <input type="range" id="videoVolumeSlider" min="0" max="100" value="50" class="volume-slider flex-1">
           </div>
           <div class="flex items-center justify-between px-1 mt-1 border-t border-gray-700/30 pt-2">
-            <span class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Auto Repeat Video</span>
+            <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Auto Repeat Video</span>
             <label class="toggle-switch-modern scale-75 origin-right">
               <input type="checkbox" id="videoMediaLoopToggle">
               <span class="slider-modern"></span>

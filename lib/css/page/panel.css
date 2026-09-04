@@ -51,7 +51,7 @@
 }
 
 .panel-header h2 {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
@@ -88,7 +88,7 @@
 }
 
 .panel-section-title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -112,8 +112,8 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: var(--bg-accent);
+  border: 1px solid var(--border-accent);
   border-radius: 10px;
   color: #e5e7eb;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -123,11 +123,11 @@
 }
 
 .panel-button:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
+  background: var(--bg-accent-hover);
+  border-color: var(--text-accent);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .panel-button:active {
@@ -161,8 +161,8 @@
 
 .panel-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 2px var(--border-accent);
   background: rgba(45, 55, 72, 0.7);
 }
 
@@ -178,7 +178,7 @@
 .add-quote-btn:hover {
   background: rgba(34, 197, 94, 0.3);
   border-color: rgba(34, 197, 94, 0.6);
-  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .quotes-list {
@@ -298,7 +298,7 @@ input:checked + .slider:before {
 .direction-btn:hover {
   background: rgba(107, 114, 128, 0.4);
   border-color: rgba(107, 114, 128, 0.6);
-  box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 /* PDF Inputs */
@@ -345,15 +345,15 @@ el-sect:focus,
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: rgba(59, 130, 246, 0.2);
+  background: var(--bg-accent-hover);
   border-color: rgba(59, 130, 246, 0.4);
   box-sizing: border-box;
 }
 
 .input-field .load-btn:hover {
-  background: rgba(59, 130, 246, 0.3);
+  background: var(--border-accent);
   border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .input-field .load-btn:active {
@@ -368,14 +368,14 @@ el-sect:focus,
 }
 
 .load-btn {
-  background: rgba(59, 130, 246, 0.2);
+  background: var(--bg-accent-hover);
   border-color: rgba(59, 130, 246, 0.4);
 }
 
 .load-btn:hover {
-  background: rgba(59, 130, 246, 0.3);
+  background: var(--border-accent);
   border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 /* Settings Section Styling */
@@ -478,8 +478,8 @@ el-sect:focus,
   align-items: center;
   width: 100%;
   padding: 14px 16px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: var(--bg-accent);
+  border: 1px solid var(--border-accent);
   border-radius: 12px;
   color: var(--text-primary);
   cursor: pointer;
@@ -488,8 +488,8 @@ el-sect:focus,
 }
 
 .setting-item-clickable:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
+  background: var(--bg-accent-hover);
+  border-color: var(--text-accent);
 }
 
 .item-left {
@@ -570,7 +570,7 @@ el-sect:focus,
 }
 
 input:checked + .slider-modern {
-  background-color: #3b82f6;
+  background-color: var(--text-accent);
 }
 
 input:checked + .slider-modern:before {
@@ -585,7 +585,7 @@ input:checked + .slider-modern:before {
   border-radius: 8px;
   color: var(--text-primary);
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   cursor: pointer;
   transition: all 0.2s ease;
   appearance: none;
@@ -600,7 +600,7 @@ input:checked + .slider-modern:before {
 .settings-dropdown:focus {
   outline: none;
   border-color: var(--text-accent);
-  box-shadow: 0 0 0 3px var(--shadow-accent);
+  box-shadow: 0 0 0 2px var(--border-accent);
   background: var(--bg-accent);
 }
 
@@ -653,7 +653,7 @@ input:checked + .slider-modern:before {
 .media-close-btn:hover {
   background: rgba(239, 68, 68, 0.3);
   border-color: rgba(239, 68, 68, 0.6);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .volume-control {
@@ -678,21 +678,21 @@ input:checked + .slider-modern:before {
   appearance: none;
   width: 16px;
   height: 16px;
-  background: #3b82f6;
+  background: var(--text-accent);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .volume-slider::-webkit-slider-thumb:hover {
-  background: #2563eb;
+  background: var(--text-accent);
   transform: scale(1.1);
 }
 
 .volume-slider::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: #3b82f6;
+  background: var(--text-accent);
   border-radius: 50%;
   cursor: pointer;
   border: none;
@@ -700,7 +700,7 @@ input:checked + .slider-modern:before {
 }
 
 .volume-slider::-moz-range-thumb:hover {
-  background: #2563eb;
+  background: var(--text-accent);
   transform: scale(1.1);
 }
 
@@ -782,8 +782,8 @@ body.df-fullscreen-active #unifiedPanel {
   background: var(--bg-accent-hover);
   border-color: var(--text-accent);
   color: var(--text-accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px var(--shadow-accent);
+  
+  box-shadow: none;
 }
 
 .custom-ui-btn:active {
@@ -791,7 +791,7 @@ body.df-fullscreen-active #unifiedPanel {
 }
 
 .page-indicator {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 600;
   font-size: 14px;
   color: var(--text-primary);
@@ -983,7 +983,7 @@ body.panel-open #flipbookContainer {
 .panel-button:focus,
 .panel-input:focus,
 .panel-select:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline: 2px solid var(--text-accent);
   outline-offset: 2px;
 }
 
@@ -1057,7 +1057,7 @@ body.panel-open #flipbookContainer {
   display: flex;
   gap: 8px;
   margin-top: 4px;
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(156, 163, 175, 0.8);
 }
 
@@ -1135,7 +1135,7 @@ body.panel-open #flipbookContainer {
 }
 
 .modal-header h2 {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
@@ -1215,7 +1215,7 @@ body.panel-open #flipbookContainer {
 }
 
 .modal-quotes-header h3 {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
@@ -1267,7 +1267,7 @@ body.panel-open #flipbookContainer {
 }
 
 .no-quotes-modal h3 {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
@@ -1350,7 +1350,7 @@ body.panel-open #flipbookContainer {
   padding: 2px 8px;
   border-radius: 12px;
   font-weight: 600;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .modal-quote-actions {
@@ -1372,7 +1372,7 @@ body.panel-open #flipbookContainer {
 
 .modal-quote-actions .panel-button:hover {
   transform: scale(1.1) !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+  box-shadow: none !important;
 }
 
 .modal-quote-actions .panel-button:active {
@@ -1420,7 +1420,7 @@ body.panel-open #flipbookContainer {
 
 .theme-applied .theme-dropdown:focus {
   border-color: var(--text-accent);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px var(--border-accent);
   background-color: rgba(55, 65, 81, 0.7);
 }
 
@@ -1438,7 +1438,7 @@ body.panel-open #flipbookContainer {
   background: var(--bg-accent-hover) !important;
   border-color: var(--text-accent) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px var(--shadow-accent) !important;
+  box-shadow: none !important;
 }
 
 /* Apply theme to body and main container */

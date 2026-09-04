@@ -1,8 +1,8 @@
 /* Authentic Editorial Developer Changelog Design System for Zaya */
 
 :root {
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', ui-monospace, monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 
   --gh-bg: #0d1117;
   --gh-surface: #161b22;
@@ -16,7 +16,7 @@
 
   --gh-blue: #58a6ff;
   --gh-green: #3fb950;
-  --gh-purple: #bc8cff;
+  --gh-purple: #e0b260;
   --gh-amber: #d29922;
   --gh-rose: #f85149;
 }
@@ -57,7 +57,7 @@ body {
 
 .feature-card:hover {
   border-color: var(--gh-blue);
-  transform: translateY(-2px);
+  
 }
 
 /* Timeline Layout */

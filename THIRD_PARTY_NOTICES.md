@@ -11,7 +11,7 @@
 | Toastify JS | `lib/js/libs/toastify.min.js`, `lib/css/vendor/toastify.min.css` | 1.12.0 | MIT |
 | marked | `lib/js/libs/marked.min.js` (changelog page only) | 12.0.2 | MIT |
 | Tailwind CSS | precompiled to `lib/css/vendor/tailwind.css` from `lib/css/tailwind.src.css` (`npm run build:css`) | 3.4 | MIT |
-| Inter font | loaded from fonts.googleapis.com (optional, falls back to system fonts) | – | SIL OFL 1.1 |
+| IBM Plex Sans / Mono | `lib/fonts/plex/` (latin subset, self-hosted via `lib/css/vendor/fonts.css`) | 5.x (fontsource) | SIL OFL 1.1 |
 
 Everything else in this repository is © ibra-kdbra and released under the MIT License (see `LICENSE`).
 

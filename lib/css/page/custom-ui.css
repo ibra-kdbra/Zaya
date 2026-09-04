@@ -42,7 +42,7 @@
 
 .df-share-title {
   color: var(--text-primary) !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: var(--font-sans) !important;
   font-size: 18px !important;
   font-weight: 600 !important;
 }
@@ -65,7 +65,7 @@
   border-radius: 8px !important;
   color: var(--text-primary) !important;
   padding: 12px !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: var(--font-sans) !important;
   font-size: 13px !important;
   width: 100% !important;
   resize: none !important;
@@ -100,7 +100,7 @@
 }
 
 .df-share-button:hover {
-  transform: translateY(-2px);
+  
   filter: brightness(1.1);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
@@ -162,13 +162,13 @@
 
 .df-search-input:focus {
   border-color: var(--text-accent);
-  box-shadow: 0 0 10px var(--shadow-accent);
+  box-shadow: 0 0 0 2px var(--border-accent);
 }
 
 .df-search-status {
   flex: 0 0 auto;
   min-height: 1.2em;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
   padding: 0 2px;
 }
@@ -202,7 +202,7 @@
 
 .df-search-result.df-selected {
   border-color: var(--text-accent);
-  box-shadow: 0 0 10px var(--shadow-accent);
+  box-shadow: 0 0 0 2px var(--border-accent);
 }
 
 .df-search-result-head {
@@ -216,7 +216,7 @@
 }
 
 .df-search-result-count {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   background: var(--bg-accent);
   color: var(--text-primary);
@@ -225,7 +225,7 @@
 }
 
 .df-search-snippet {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
   color: var(--text-secondary);
   overflow: hidden;
@@ -289,13 +289,13 @@
 
 .df-vrow.df-selected {
   border-color: var(--text-accent) !important;
-  box-shadow: 0 0 10px var(--shadow-accent) !important;
+  box-shadow: 0 0 0 2px var(--border-accent) !important;
 }
 
 .df-vrow div {
   background: rgba(0,0,0,0.7) !important; /* Higher contrast for thumb numbers */
   color: white !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   padding: 2px 6px !important;
   border-radius: 0 0 4px 0 !important;
   position: absolute !important;
@@ -334,7 +334,7 @@
   width: 45px !important; 
   text-align: center !important;
   font-weight: 600 !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: var(--font-sans) !important;
   padding: 4px 0 !important;
   cursor: text !important;
   pointer-events: auto !important;
@@ -371,6 +371,13 @@
     width: min(80vw, 260px) !important;
     top: 10px !important;
     bottom: 70px !important;
+  }
+
+  /* Version badge would sit under the control bar on phones: keep it out of the way */
+  .fixed.bottom-4.left-4 {
+    bottom: auto !important;
+    top: 1rem !important;
+    left: 1rem !important;
   }
 
   /* Overlay the book instead of squeezing it into the remaining ~120px */

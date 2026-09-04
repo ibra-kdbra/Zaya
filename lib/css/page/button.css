@@ -143,7 +143,7 @@ button:active {
 .modern-theme-button:hover {
   background: var(--bg-accent-hover);
   border-color: var(--text-accent);
-  transform: translateY(-2px);
+  
 }
 
 .modern-theme-button i {
