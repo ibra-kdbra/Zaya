@@ -6,7 +6,9 @@
   <title>Zaya</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Zaya turns any PDF into a realistic 3D flipbook, with search, quotes, themes and a built-in media player.">
-  <meta name="theme-color" content="#111827">
+  <meta name="theme-color" content="#17181c">
+  <!-- First paint: the page ground and ink before any stylesheet arrives, so there is no colour flash -->
+  <style>html,body{background:#17181c;color:#ecebe6;margin:0}</style>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https: http:; connect-src 'self' blob: https: http:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" type="image/svg+xml" href="assets/zaya.svg">
@@ -29,7 +31,7 @@
 
 </head>
 
-<body class="bg-gray-900 text-white">
+<body>
 
   <!-- Top header strip: brand, document title, drawer toggles -->
   <header id="appHeader" class="app-header" role="banner">
@@ -415,12 +417,8 @@
 
   <!-- Document loading state (shown until the first page is rendered) -->
   <div id="docLoadingState" class="doc-loading" role="status" aria-live="polite">
-    <div class="doc-skeleton" aria-hidden="true">
-      <span class="doc-skeleton-page"></span>
-      <span class="doc-skeleton-page"></span>
-    </div>
+    <span class="doc-loading-bar" aria-hidden="true"></span>
     <p class="doc-loading-name"><span data-pdf-info></span></p>
-    <p class="doc-loading-text">Opening document…</p>
   </div>
 
   <!-- PDF-Specific Quotes Modal -->

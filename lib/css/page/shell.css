@@ -606,6 +606,8 @@ h3 { font-size: 12px; line-height: 1.4; }
 /* --------------------------------------------------- loading / empty states */
 
 .doc-loading {
+  /* Quiet by design: the page ground, a hairline of progress under the header, and the document name.
+     It only becomes visible after 350 ms, so fast loads never flash it. */
   position: fixed;
   inset: var(--shell-header-h) 0 var(--shell-bar-h) 0;
   z-index: 50;
@@ -613,44 +615,51 @@ h3 { font-size: 12px; line-height: 1.4; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
   background: var(--bg-primary);
   pointer-events: none;
+  opacity: 0;
+  animation: docLoadingReveal 200ms ease-out 350ms forwards;
 }
 .doc-loading[hidden] { display: none; }
+@keyframes docLoadingReveal { to { opacity: 1; } }
 
-.doc-skeleton { display: flex; gap: 6px; }
-.doc-skeleton-page {
-  display: block;
-  width: min(22vw, 150px);
-  height: min(30vh, 210px);
-  border-radius: 6px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-secondary);
-  animation: docSkeletonPulse 1.6s ease-in-out infinite;
+.doc-loading-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  overflow: hidden;
+  background: var(--border-secondary);
 }
-.doc-skeleton-page:last-child { animation-delay: 0.2s; }
-
-@keyframes docSkeletonPulse {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
+.doc-loading-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 28%;
+  background: var(--text-accent);
+  animation: docLoadingSweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes docLoadingSweep {
+  from { left: -30%; }
+  to { left: 100%; }
 }
 
 .doc-loading-name {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--text-primary);
-  max-width: 80vw;
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 70vw;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.doc-loading-text {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  color: var(--text-secondary);
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-loading { animation: none; opacity: 1; }
+  .doc-loading-bar::after { animation: none; left: 0; width: 100%; opacity: 0.5; }
 }
 
 /* ------------------------------------------------------------------- mobile */
