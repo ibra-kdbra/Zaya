@@ -1,0 +1,74 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Length 115 >>
+stream
+BT /F1 18 Tf 50 700 Td (Chapter One. The quick brown fox jumps over the lazy dog. Search for flipbooks here.) Tj ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 3 0 R >>
+endobj
+5 0 obj
+<< /Length 87 >>
+stream
+BT /F1 18 Tf 50 700 Td (Chapter Two. Second page mentions flipbooks and a zebra.) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 89 >>
+stream
+BT /F1 18 Tf 50 700 Td (Appendix. Third and final page with notes about flipbooks.) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Type /Outlines /First 10 0 R /Last 13 0 R /Count 4 >>
+endobj
+10 0 obj
+<< /Title (Chapter One) /Parent 9 0 R /Next 12 0 R /First 11 0 R /Last 11 0 R /Count 1 /Dest [4 0 R /XYZ 0 842 0] >>
+endobj
+11 0 obj
+<< /Title (Section 1.1 The fox) /Parent 10 0 R /Dest [4 0 R /XYZ 0 700 0] >>
+endobj
+12 0 obj
+<< /Title (Chapter Two) /Parent 9 0 R /Prev 10 0 R /Next 13 0 R /Dest [6 0 R /XYZ 0 842 0] >>
+endobj
+13 0 obj
+<< /Title (Appendix) /Parent 9 0 R /Prev 12 0 R /Dest [8 0 R /XYZ 0 842 0] >>
+endobj
+14 0 obj
+<< /Type /Catalog /Pages 2 0 R /Outlines 9 0 R /PageMode /UseOutlines >>
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000000148 00000 n 
+0000000314 00000 n 
+0000000440 00000 n 
+0000000577 00000 n 
+0000000703 00000 n 
+0000000842 00000 n 
+0000000968 00000 n 
+0000001041 00000 n 
+0000001174 00000 n 
+0000001267 00000 n 
+0000001377 00000 n 
+0000001471 00000 n 
+trailer
+<< /Size 15 /Root 14 0 R >>
+startxref
+1560
+%%EOF

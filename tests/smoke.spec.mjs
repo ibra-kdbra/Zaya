@@ -59,11 +59,13 @@ test.describe('Zaya app shell', () => {
 
     // Reveal the auto-hidden bottom bar and open the panel via the button, then confirm Ctrl+F focuses it too
     await page.mouse.move(640, 715);
+    await expect(page.locator('#customControlBar')).toBeInViewport({ timeout: 10_000 });
+    await page.waitForTimeout(500); // let the slide-in transition finish so the click target is stable
     await page.locator('#customSearchBtn').click({ timeout: 10_000 });
     const input = page.locator('.df-search-input');
-    await expect(input).toBeVisible();
+    await expect(input).toBeVisible({ timeout: 10_000 });
     await page.keyboard.press('Control+f');
-    await expect(input).toBeFocused();
+    await expect(input).toBeFocused({ timeout: 10_000 });
     await expect(input).toBeVisible();
     await input.fill('flipbooks');
 
