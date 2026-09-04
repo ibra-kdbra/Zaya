@@ -283,7 +283,7 @@
 }
 
 input:checked + .slider {
-  background-color: rgba(59, 130, 246, 0.8);
+  background-color: var(--text-accent);
 }
 
 input:checked + .slider:before {
@@ -346,13 +346,13 @@ el-sect:focus,
   width: 40px;
   height: 40px;
   background: var(--bg-accent-hover);
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: var(--border-accent);
   box-sizing: border-box;
 }
 
 .input-field .load-btn:hover {
   background: var(--border-accent);
-  border-color: rgba(59, 130, 246, 0.6);
+  border-color: var(--text-accent);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
@@ -369,12 +369,12 @@ el-sect:focus,
 
 .load-btn {
   background: var(--bg-accent-hover);
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: var(--border-accent);
 }
 
 .load-btn:hover {
   background: var(--border-accent);
-  border-color: rgba(59, 130, 246, 0.6);
+  border-color: var(--text-accent);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
@@ -1043,13 +1043,13 @@ body.panel-open #flipbookContainer {
 }
 
 .panel-container::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.6);
+  background: var(--text-accent);
   border-radius: 3px;
   transition: background 0.2s ease;
 }
 
 .panel-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.8);
+  background: var(--text-accent);
 }
 
 /* Enhanced Quote Items */
@@ -1070,7 +1070,7 @@ body.panel-open #flipbookContainer {
 }
 
 .quote-pdf-info {
-  color: rgba(59, 130, 246, 0.8);
+  color: var(--text-accent);
 }
 
 .no-quotes {
