@@ -6,22 +6,24 @@
   <title>Zaya - Changelog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Official release notes, architecture improvements, and performance changelog for Zaya PDF Flipbook.">
-  <link rel="icon" type="image/svg+xml" href="/assets/changelog.svg">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" type="image/svg+xml" href="assets/changelog.svg">
   
   <!-- Fonts & FontAwesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <!-- CSS -->
-  <link rel="stylesheet" href="lib/css/page/changelog.css">
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="lib/css/vendor/tailwind.css?v=5.5.0">
+  <link rel="stylesheet" href="lib/css/vendor/fontawesome.min.css?v=5.5.0">
 
-  <!-- JS Dependencies -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="lib/js/features/changelog/performance-monitor.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="lib/css/page/changelog.css?v=5.5.0">
+  <link rel="stylesheet" href="lib/css/vendor/toastify.min.css?v=5.5.0">
+
+  <!-- JS Dependencies (vendored) -->
+  <script src="lib/js/features/changelog/performance-monitor.js?v=5.5.0"></script>
+  <script src="lib/js/libs/marked.min.js?v=5.5.0"></script>
 </head>
 
 <body class="min-h-screen flex flex-col justify-between antialiased">

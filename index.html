@@ -5,17 +5,25 @@
   <meta charset="utf-8">
   <title>Zaya</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="/assets/zaya.svg" alt="icon svg">
+  <meta name="description" content="Zaya turns any PDF into a realistic 3D flipbook, with search, quotes, themes and a built-in media player.">
+  <meta name="theme-color" content="#111827">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https: http:; connect-src 'self' blob: https: http:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" type="image/svg+xml" href="assets/zaya.svg">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="lib/css/style.css">
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="preload" href="lib/js/libs/jquery.min.js?v=5.5.0" as="script">
+  <link rel="preload" href="lib/js/libs/three.min.js?v=5.5.0" as="script">
+  <link rel="preload" href="lib/js/libs/pdf.min.js?v=5.5.0" as="script">
+  <link rel="preload" href="lib/fonts/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- All third-party assets are vendored (see THIRD_PARTY_NOTICES.md); no runtime CDN dependency -->
+  <link rel="stylesheet" href="lib/css/vendor/tailwind.css?v=5.5.0">
+  <link rel="stylesheet" href="lib/css/vendor/fontawesome.min.css?v=5.5.0">
+  <link rel="stylesheet" href="lib/css/vendor/toastify.min.css?v=5.5.0">
+  <link rel="stylesheet" href="lib/css/style.css?v=5.5.0">
 
-  <!-- Custom PDF Configuration -->
-  <!-- Uncomment and set your own PDF URL to change the default document: -->
-  <!-- <script>window.ZAYA_DEFAULT_PDF = "./path/to/your.pdf";</script> -->
+  <!-- Per-deployment settings (default PDF, etc.) live in config.js -->
+  <script src="config.js"></script>
 
 </head>
 
@@ -196,7 +204,8 @@
         </button>
 
         <div class="media-player-youtube" id="youtubePlayerContainer">
-          <iframe id="youtubePlayer" src="" frameborder="0" allowfullscreen></iframe>
+          <iframe id="youtubePlayer" src="" title="YouTube player" frameborder="0" allowfullscreen
+                  allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
         </div>
         <!-- Custom Local Audio Player UI -->
         <div id="customAudioPlayer" class="hidden flex flex-col gap-3 mt-4 p-4 bg-gray-800/40 rounded-xl border border-gray-700/50 backdrop-blur-sm">
@@ -274,6 +283,10 @@
 
     <button class="custom-ui-btn" id="customThumbnailBtn" title="Toggle Thumbnails">
       <i class="fas fa-th-large"></i>
+    </button>
+
+    <button class="custom-ui-btn" id="customSearchBtn" title="Search in document (Ctrl+F)">
+      <i class="fas fa-search"></i>
     </button>
 
     <div class="h-8 w-px bg-gray-700 mx-2 mobile-hide"></div>
