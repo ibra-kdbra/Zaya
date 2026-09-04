@@ -47,11 +47,17 @@ function isSameOrigin(url) {
   return url.origin === self.location.origin;
 }
 
-function shouldCache(request, url) {
+function isStaticAsset(request, url) {
   if (!isSameOrigin(url)) return false;
   if (url.searchParams.has('t')) return false; // legacy cache-busted URLs must never pile up
   if (/\.pdf($|\?)/i.test(url.pathname)) return false;
   return STATIC_DESTINATIONS.has(request.destination) || /\.(js|mjs|css|woff2?|ttf|eot|svg|png|jpe?g|gif|json|mp3)$/i.test(url.pathname);
+}
+
+// Only URLs that carry the release version may be served from cache first; an unversioned script or
+// stylesheet must always come from the network so a new deploy never runs on top of old code.
+function isVersioned(url) {
+  return url.searchParams.get('v') === VERSION || /\/(fonts|images|sound|cmaps)\//.test(url.pathname);
 }
 
 async function trimCache(cache) {
@@ -98,8 +104,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(networkFirst(request));
     return;
   }
-  if (shouldCache(request, url)) {
-    event.respondWith(staleWhileRevalidate(request));
+  if (isStaticAsset(request, url)) {
+    event.respondWith(isVersioned(url) ? staleWhileRevalidate(request) : networkFirst(request));
   }
   // Anything else: default browser behaviour (no interception).
 });
