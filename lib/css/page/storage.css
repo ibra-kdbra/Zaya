@@ -1,0 +1,47 @@
+/* --- Stored copies and space (Recent group, Document tab) ---------------------------------- */
+/* Loaded after shell.css: the recent list lives there, this file only adds what storage needs. */
+
+/* "Kept in this browser · 1.2 MB" under a file's name. */
+.recent-meta .recent-state,
+.recent-meta .recent-size {
+  font-family: var(--font-sans);
+}
+.recent-meta .recent-state.is-kept { color: var(--text-secondary); }
+.recent-meta .recent-size::before {
+  content: "·";
+  margin: 0 6px;
+  color: var(--border-primary);
+}
+
+.storage-box {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.storage-usage {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.storage-actions { display: flex; }
+
+.storage-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.storage-confirm-text {
+  flex: 1 1 100%;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.storage-box [hidden] { display: none; }
