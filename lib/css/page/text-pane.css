@@ -1,0 +1,199 @@
+/*
+ * The Text pane (issue #26) and the floating action bar it raises over a selection.
+ *
+ * The pane is a Navigator tab like the other three, so it takes the same surface and spacing;
+ * what is different is that its content is prose the reader is meant to select, so the text is
+ * set at reading size (15px/1.6) rather than at control size.
+ */
+
+.text-pane {
+  /* The engine's drawer rules (page/shell.css) already pin every pane to the body's box. */
+  color: var(--text-primary);
+}
+
+.text-pane-list {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px 16px 24px;
+}
+
+/* ---------------------------------------------------------------- a page */
+
+.text-page + .text-page {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-secondary);
+}
+
+.text-page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.text-page-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.text-page-copy {
+  flex: 0 0 auto;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 9px;
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.text-page-copy i { font-size: 13px; }
+.text-page-copy:hover,
+.text-page-copy:focus-visible {
+  background: var(--bg-tertiary);
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.text-page-para {
+  margin: 0 0 12px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  overflow-wrap: break-word;
+  /* The pane exists to be selected from. */
+  user-select: text;
+  -webkit-user-select: text;
+}
+.text-page-para:last-child { margin-bottom: 0; }
+
+.text-page-blank {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ---------------------------------------------------- reading / no text */
+
+.text-pane-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 60%;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.text-pane-state i {
+  font-size: 22px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.text-pane-state p {
+  margin: 0;
+  max-width: 32ch;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.text-pane-link {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 9px;
+  background: var(--bg-accent);
+  border: 1px solid var(--border-accent);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+.text-pane-link:hover,
+.text-pane-link:focus-visible {
+  background: var(--bg-accent-hover);
+  outline: none;
+}
+
+/* ------------------------------------------------- floating action bar */
+
+/*
+ * Anchored above the selection, in the viewport rather than in the drawer, because the drawer
+ * slides on a transform and a fixed child of a transformed box is positioned against it.
+ * Neutral elevation, no tint: it is chrome over the reader's own words.
+ */
+.text-actions {
+  position: fixed;
+  z-index: 1000002;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 11px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.text-actions[hidden] { display: none; }
+
+.text-action {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.text-action i { font-size: 13px; color: var(--text-secondary); }
+.text-action:hover,
+.text-action:focus-visible {
+  background: var(--bg-tertiary);
+  outline: none;
+}
+.text-action:hover i,
+.text-action:focus-visible i { color: var(--text-accent); }
+
+/* On a phone the bar keeps the labels but tightens up so all three fit across the sheet. */
+@media (max-width: 767.98px) {
+  .text-action { padding: 0 10px; font-size: 12px; gap: 6px; }
+  .text-pane-list { padding: 12px 14px 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-page-copy,
+  .text-action,
+  .text-pane-link { transition: none; }
+}

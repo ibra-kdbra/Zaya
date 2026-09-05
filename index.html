@@ -26,6 +26,7 @@
   <!-- App shell (header, drawers, tabs): loaded last so it wins by order, not by !important -->
   <link rel="stylesheet" href="lib/css/page/shell.css?v=6.2.0">
   <link rel="stylesheet" href="lib/css/page/storage.css?v=6.2.0">
+  <link rel="stylesheet" href="lib/css/page/text-pane.css?v=6.2.0">
 
   <!-- Per-deployment settings (default PDF, etc.) live in config.js -->
   <script src="config.js"></script>
@@ -85,6 +86,10 @@
         <button class="switch-btn" id="navTabSearch" type="button" role="tab" data-nav-tab="search"
                 title="Search" aria-selected="false" tabindex="-1" aria-controls="navPaneSearch">
           <i class="fas fa-search" aria-hidden="true"></i><span class="switch-label">Search</span>
+        </button>
+        <button class="switch-btn" id="navTabText" type="button" role="tab" data-nav-tab="text"
+                title="Text" aria-selected="false" tabindex="-1" aria-controls="navPaneText">
+          <i class="fas fa-align-left" aria-hidden="true"></i><span class="switch-label">Text</span>
         </button>
       </div>
       <div class="drawer-col">

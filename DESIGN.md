@@ -61,7 +61,7 @@ gradient or `--shadow-primary` into a coloured glow is wrong.
 
 ## Navigation model by device class
 
-Both drawers — the Navigator (Pages / Outline / Search) on the left and the control panel
+Both drawers — the Navigator (Pages / Outline / Search / Text) on the left and the control panel
 (Document / Notes / Media / Settings) on the right — use one system. Only two things change with
 the viewport: whether the drawer overlays the book or takes space from it, and where the section
 switcher sits.
@@ -91,6 +91,21 @@ switcher sits.
   Left/Right on the tab bar).
 - **Surfaces.** Drawers are `--bg-primary` with a 1px `--border-primary` edge, never
   `--bg-secondary` — that token is 94–95% opaque and the page used to bleed through it.
+
+## Floating action bar
+
+One pattern floats over content rather than sitting at an edge: the bar the Text pane raises above
+a selection. It is allowed because it is *about* something the reader is pointing at, and it leaves
+with the selection.
+
+- Anchored to the selection: centred over its box, above it, and below it only when there is no
+  room above. It is fixed to the viewport, not to the drawer, because the drawer slides on a
+  transform and a fixed child would be positioned against that instead.
+- `--bg-secondary` with a 1px `--border-primary` edge and `--shadow-primary`. No tint and no glow:
+  the accent appears only on the icon of the item under the pointer.
+- Every action is an icon and a word, at least 44px tall, and the bar never carries more than three.
+- It never appears for an empty or whitespace-only selection, and it is dismissed by `Esc`, by a
+  page turn, and by the selection collapsing.
 
 ## Checks
 

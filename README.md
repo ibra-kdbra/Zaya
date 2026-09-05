@@ -21,6 +21,9 @@ and it works offline as a PWA.
 - **Text recognition for scanned books**: pages without a text layer are recognised on the reader's
   device (Tesseract in WebAssembly, Arabic and English packs vendored), kept per document in the
   browser, and searched and highlighted like real text. Nothing is uploaded.
+- **Selectable page text**: a **Text** tab in the Navigator shows the text of the pages on screen as
+  real text — copy a page, or select a passage and keep it as a note, copy it, or search for it.
+  Recognised pages read exactly like pages with a text layer, and Arabic reads right to left
 - Thumbnails and outline/bookmark side panels that overlay the book on narrow screens
 - 50+ colour themes built on one set of design tokens (see `DESIGN.md`)
 - Quotes notebook stored locally in IndexedDB, and the last page remembered per document
@@ -41,6 +44,7 @@ and it works offline as a PWA.
 | `Ctrl/Cmd + F` | open in-document search |
 | `F` | toggle fullscreen |
 | `Ctrl/Cmd + K` | toggle control panel |
+| `Ctrl/Cmd + Shift + N` | keep the text selected in the Text tab as a note |
 | `Esc` | close panel / leave fullscreen |
 
 ## Development
