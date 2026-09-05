@@ -307,11 +307,13 @@ h3 { font-size: 12px; line-height: 1.4; }
   transform: none !important;
   outline: none;
 }
+/* Active tab: the label stays --text-primary (the accent alone fails 4.5:1 on the light and
+   nord palettes); the accent carries the state through the fill and the border. */
 .seg-btn[aria-selected="true"],
 .seg-btn.media-mode-active {
   background: var(--bg-accent) !important;
-  border-color: var(--border-accent) !important;
-  color: var(--text-accent) !important;
+  border-color: var(--text-accent) !important;
+  color: var(--text-primary) !important;
   font-weight: 600;
 }
 .segmented-sm .seg-btn { min-height: 38px; font-size: 13px; }
@@ -625,6 +627,10 @@ h3 { font-size: 12px; line-height: 1.4; }
 
 /* Shortcuts: two columns, key caps on the right */
 .shortcut-list { margin: 0; display: flex; flex-direction: column; gap: 2px; }
+/* A device with no keyboard has nothing to do with this table */
+@media (hover: none) and (pointer: coarse) {
+  .panel-group-shortcuts { display: none; }
+}
 .shortcut {
   display: flex;
   align-items: center;

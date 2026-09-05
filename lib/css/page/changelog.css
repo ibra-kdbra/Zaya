@@ -98,15 +98,16 @@ a {
   gap: 8px;
 }
 
+/* The badge is a label, so it stays quiet; the accent belongs to the one action on this page. */
 .cl-badge {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--border-accent);
+  border: 1px solid var(--border-secondary);
   border-radius: 4px;
-  background: var(--bg-accent);
-  color: var(--text-accent);
+  background: transparent;
+  color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
@@ -118,17 +119,18 @@ a {
   gap: 8px;
   min-height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--border-secondary);
+  border: 1px solid var(--text-accent);
   border-radius: 4px;
-  color: var(--text-secondary);
+  background: var(--bg-accent);
+  color: var(--text-primary);
   font-size: 13px;
+  font-weight: 500;
   text-decoration: none;
-  transition: color 150ms ease, border-color 150ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
 .cl-back:hover {
-  color: var(--text-primary);
-  border-color: var(--border-primary);
+  background: var(--bg-accent-hover);
 }
 
 /* --- Page frame ----------------------------------------------------------- */
@@ -155,6 +157,11 @@ a {
   max-width: 62ch;
   color: var(--text-secondary);
   font-size: 14px;
+}
+
+/* Reading measure: the release stream never runs wider than a comfortable line. */
+.cl-stream {
+  max-width: 72ch;
 }
 
 .cl-layout {

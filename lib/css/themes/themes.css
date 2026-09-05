@@ -75,19 +75,21 @@
   --shadow-error: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
+/* Light is a paper theme: the canvas is a warm grey so the white page keeps a silhouette,
+   and the accent is darkened to hold 4.5:1 against it. */
 .theme-light {
-  --bg-primary: #ffffff;
-  --bg-secondary: rgba(255, 255, 255, 0.95);
-  --bg-tertiary: rgba(240, 240, 240, 0.5);
-  --bg-accent: rgba(59, 130, 246, 0.1);
-  --bg-accent-hover: rgba(59, 130, 246, 0.2);
-  --bg-accent-active: rgba(59, 130, 246, 0.3);
-  --border-primary: rgba(200, 200, 200, 0.3);
-  --border-secondary: rgba(200, 200, 200, 0.2);
-  --border-accent: rgba(59, 130, 246, 0.3);
+  --bg-primary: #e9e6df;
+  --bg-secondary: rgba(252, 251, 249, 0.95);
+  --bg-tertiary: rgba(23, 24, 28, 0.06);
+  --bg-accent: rgba(29, 78, 216, 0.1);
+  --bg-accent-hover: rgba(29, 78, 216, 0.18);
+  --bg-accent-active: rgba(29, 78, 216, 0.26);
+  --border-primary: rgba(23, 24, 28, 0.18);
+  --border-secondary: rgba(23, 24, 28, 0.1);
+  --border-accent: rgba(29, 78, 216, 0.45);
   --text-primary: #1a1a1a;
-  --text-secondary: #666666;
-  --text-accent: #3b82f6;
+  --text-secondary: #5a5751;
+  --text-accent: #1d4ed8;
   --text-success: #22c55e;
   --text-warning: #f59e0b;
   --text-error: #ef4444;

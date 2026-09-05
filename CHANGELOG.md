@@ -14,6 +14,9 @@ touch-first layout. The version number jumps to 6.0.0 because the look, the layo
 navigation model all changed.
 
 ### Added
+- **Navigator and control panel**: the two side drawers were rebuilt: a titled Navigator with Pages (tile grid, two columns on phones), Outline (tree with indent lines) and Search tabs; a control panel with Document / Notes / Media / Settings tabs whose actions are labelled and show their state, a document header with page count, and a footer with the version.
+- **Theme picker**: grouped into Dark / Light / Coloured / Editors, compact tiles with a single swatch strip, search, keyboard navigation and a close button.
+- **Error state**: a plain-language message with "Try again" and "Open another document" replaces the raw engine error; a document you opened yourself that fails no longer silently swaps in the default document.
 
 - **Full-text search (#16)**: a search panel beside thumbnails and outline. Text is extracted once
   per document with a small concurrency pool and cancellation, every matching page is listed with a
