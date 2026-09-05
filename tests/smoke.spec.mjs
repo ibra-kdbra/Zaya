@@ -259,4 +259,36 @@ test.describe('Documents and languages', () => {
     await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 20_000 });
     await expect(page.locator('.df-search-result').first()).toContainText('Page 3');
   });
+
+  test('Arabic stored in logical order is still found through the reversed query', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', FIXTURES + 'sample-arabic-logical.pdf');
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe('sample-arabic-logical.pdf');
+    await waitForBook(page);
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    const input = page.locator('.df-search-input');
+    await expect(input).toBeVisible({ timeout: 15_000 });
+    await input.fill('القراءة');
+    await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 20_000 });
+    await input.fill('العقل');
+    await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 20_000 });
+  });
+
+  test('an image-only document explains why it cannot be searched', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', FIXTURES + 'sample-scanned.pdf');
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe('sample-scanned.pdf');
+    await waitForBook(page);
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    const input = page.locator('.df-search-input');
+    await expect(input).toBeVisible({ timeout: 15_000 });
+    await input.fill('anything');
+    await expect(page.locator('.df-search-status')).toContainText('no text layer', { timeout: 20_000 });
+  });
 });
