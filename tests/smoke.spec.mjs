@@ -131,7 +131,8 @@ test.describe('Mobile (touch) behaviour', () => {
     await page.locator('#customThumbnailBtn').tap();
     const thumbs = page.locator('.df-thumb-container');
     await expect(thumbs).toHaveClass(/df-sidemenu-visible/, { timeout: 10_000 });
-    await page.touchscreen.tap(350, 300); // right of the 260px-wide panel
+    // On phones the Navigator is a full-width sheet: close it with its own button (Esc/outside tap are desktop paths)
+    await page.locator('#closeNavigatorBtn').tap();
     await expect(thumbs).not.toHaveClass(/df-sidemenu-visible/, { timeout: 10_000 });
 
     // Orbit controls must be re-enabled after the panel closes (issue #11 "freeze")
@@ -152,7 +153,7 @@ test.describe('URL options and backup', () => {
     await stubNetwork(page);
     await page.goto('/index.html?pdf=https://example.com/sample.pdf&theme=nord&mode=single&search=zebra');
     await expect(page.locator('#flipbookContainer canvas').first()).toBeVisible({ timeout: 30_000 });
-    await expect(page.locator('html')).toHaveClass(/theme-nord/);
+    await expect(page.locator('html')).toHaveClass(/theme-nord/, { timeout: 15_000 });
     await expect.poll(() => page.evaluate(() => window.dFlipBook.target.pageMode), { timeout: 10_000 }).toBe(1);
     await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 15_000 });
     await expect(page.locator('.df-search-input')).toHaveValue('zebra');

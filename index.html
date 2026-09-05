@@ -62,6 +62,12 @@
   <!-- LEFT DRAWER: Navigator (thumbnails / outline / search) -->
   <aside id="navigatorDrawer" class="drawer drawer-left" role="dialog" aria-label="Navigator" aria-hidden="true">
     <div class="drawer-head">
+      <div class="drawer-head-row">
+        <h2 class="drawer-title">Navigator</h2>
+        <button id="closeNavigatorBtn" class="drawer-close" type="button" title="Close navigator" aria-label="Close navigator">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
       <div class="segmented" role="tablist" aria-label="Navigator sections">
         <button class="seg-btn" id="navTabThumbs" type="button" role="tab" data-nav-tab="thumbs"
                 aria-selected="true" aria-controls="navPaneThumbs">
@@ -76,7 +82,6 @@
           <i class="fas fa-search" aria-hidden="true"></i><span>Search</span>
         </button>
       </div>
-      <button id="closeNavigatorBtn" class="drawer-close" type="button" title="Close navigator">✕</button>
     </div>
     <div class="drawer-body" id="navigatorBody">
       <div class="drawer-empty" id="navEmptyState" hidden></div>
@@ -88,9 +93,13 @@
     <div class="panel-header">
       <div class="panel-head-text">
         <h2 class="panel-doc-name"><span data-pdf-info>Zaya</span></h2>
-        <p class="panel-doc-meta"><span id="panelPageCount">1</span> pages</p>
+        <p class="panel-doc-meta">
+          <span id="panelPageNow">1</span> of <span id="panelPageCount">1</span> <span class="panel-doc-meta-unit">pages</span>
+        </p>
       </div>
-      <button id="closeUnifiedPanelBtn" class="drawer-close panel-close" type="button" title="Close control panel">✕</button>
+      <button id="closeUnifiedPanelBtn" class="drawer-close panel-close" type="button" title="Close control panel" aria-label="Close control panel">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
     </div>
 
     <div class="panel-tabs segmented" role="tablist" aria-label="Control panel sections">
@@ -119,35 +128,36 @@
         <div class="panel-group">
           <h3 class="panel-section-title">Open a document</h3>
           <div class="input-field">
-            <input id="pdfUrl" type="url" placeholder="Paste PDF URL here..." class="panel-input" autocomplete="off">
-            <button id="loadPdfUrlBtn" class="panel-button load-btn" type="button" title="Load PDF from URL">
-              <i class="fas fa-globe"></i>
-            </button>
-            <button id="loadPdfFileBtn" class="panel-button load-btn" type="button" title="Load Local PDF">
-              <i class="fas fa-folder-open"></i>
-            </button>
-            <input id="pdfFile" type="file" accept="application/pdf" style="display: none;">
+            <label class="sr-only" for="pdfUrl">PDF link</label>
+            <input id="pdfUrl" type="url" placeholder="Paste a PDF link" class="panel-input" autocomplete="off">
+            <button id="loadPdfUrlBtn" class="ui-btn ui-btn-primary" type="button" title="Open the PDF at this link">Open</button>
           </div>
+          <button id="loadPdfFileBtn" class="ui-btn ui-btn-quiet ui-btn-block" type="button">
+            <i class="fas fa-folder-open" aria-hidden="true"></i><span>Open a file from this device</span>
+          </button>
+          <input id="pdfFile" type="file" accept="application/pdf" class="sr-only-input">
         </div>
 
         <div class="panel-group">
           <h3 class="panel-section-title">Reading</h3>
           <div class="panel-row">
             <span class="panel-row-label">Reading direction</span>
-            <button id="toggleDirectionBtn" class="panel-button direction-btn" type="button" title="Toggle Direction">
-              <i class="fas fa-exchange-alt"></i>
+            <button id="toggleDirectionBtn" class="ui-btn ui-btn-quiet" type="button" aria-pressed="false"
+                    title="Switch to right-to-left reading">
+              <i class="fas fa-exchange-alt" aria-hidden="true"></i><span id="directionLabel">Left to right</span>
             </button>
           </div>
-          <div class="panel-row">
-            <span class="panel-row-label">Share &amp; download</span>
-            <div class="control-group">
-              <button id="panelShareBtn" class="panel-button" type="button" title="Share this document">
-                <i class="fas fa-share-alt"></i>
-              </button>
-              <button id="panelDownloadBtn" class="panel-button" type="button" title="Download PDF">
-                <i class="fas fa-download"></i>
-              </button>
-            </div>
+        </div>
+
+        <div class="panel-group">
+          <h3 class="panel-section-title">This document</h3>
+          <div class="btn-pair">
+            <button id="panelShareBtn" class="ui-btn ui-btn-quiet" type="button">
+              <i class="fas fa-share-alt" aria-hidden="true"></i><span>Share</span>
+            </button>
+            <button id="panelDownloadBtn" class="ui-btn ui-btn-quiet" type="button">
+              <i class="fas fa-download" aria-hidden="true"></i><span>Download</span>
+            </button>
           </div>
         </div>
       </section>
@@ -155,64 +165,68 @@
       <!-- Notes -->
       <section class="panel-pane" id="panelPaneNotes" role="tabpanel" aria-labelledby="panelTabNotes" tabindex="0" hidden>
         <div class="panel-group">
-          <div class="quotes-input-container">
-            <input id="quoteInput" type="text" placeholder="Add new quote?" class="panel-input">
-            <button id="addQuoteBtn" class="panel-button add-quote-btn" type="button" title="Add Quote">
-              <i class="fas fa-plus"></i>
-            </button>
+          <h3 class="panel-section-title">New note</h3>
+          <div class="input-field quotes-input-container">
+            <label class="sr-only" for="quoteInput">Note text</label>
+            <input id="quoteInput" type="text" placeholder="Something worth keeping" class="panel-input">
+            <button id="addQuoteBtn" class="ui-btn ui-btn-primary" type="button" aria-label="Save this note"
+                    title="Save this note with the current page"><i class="fas fa-plus" aria-hidden="true"></i></button>
           </div>
-          <div class="panel-row">
-            <span class="panel-row-label">In <span id="currentPdfInfo">this document</span></span>
-            <div class="control-group">
-              <button id="quotesToggleBtn" class="panel-button" type="button" title="Show quotes for this document">
-                <i class="fas fa-quote-left"></i>
+        </div>
+
+        <div class="panel-group panel-group-flush">
+          <div class="panel-group-head">
+            <h3 class="panel-section-title">Saved notes</h3>
+            <div class="btn-pair btn-pair-tight">
+              <button id="quotesToggleBtn" class="ui-btn ui-btn-quiet ui-btn-sm" type="button" title="Show all notes for this document">
+                <i class="fas fa-quote-left" aria-hidden="true"></i><span>All notes</span>
               </button>
-              <button id="exportQuotesBtn" class="panel-button" type="button" title="Export Quotes">
-                <i class="fas fa-download"></i>
+              <button id="exportQuotesBtn" class="ui-btn ui-btn-quiet ui-btn-sm" type="button" title="Export notes">
+                <i class="fas fa-download" aria-hidden="true"></i><span>Export</span>
               </button>
             </div>
           </div>
+          <p class="panel-note">In <span id="currentPdfInfo">this document</span>, kept on this device.</p>
+          <div class="quotes-list" id="quoteList" data-empty="No notes yet. Anything you add is kept with this document, on this device."></div>
         </div>
-        <div class="quotes-list" id="quoteList" data-empty="No notes yet. Add a quote above to keep it with this document."></div>
       </section>
 
       <!-- Media -->
       <section class="panel-pane" id="panelPaneMedia" role="tabpanel" aria-labelledby="panelTabMedia" tabindex="0" hidden>
-        <div class="segmented segmented-sm media-switch">
-          <button id="switchYoutubeMode" type="button" class="seg-btn media-mode-active">
-            <i class="fab fa-youtube" aria-hidden="true"></i><span>YouTube</span>
-          </button>
-          <button id="switchAudioMode" type="button" class="seg-btn">
-            <i class="fas fa-music" aria-hidden="true"></i><span>Audio</span>
-          </button>
-        </div>
-
-        <div id="youtubeInputGroup" class="youtube-input-container">
-          <div class="input-field">
-            <input id="youtubeUrl" type="url" placeholder="Paste YouTube URL here..." class="panel-input" autocomplete="off">
-            <button id="loadYoutubeBtn" class="panel-button load-btn" type="button" title="Play YouTube Video">
-              <i class="fas fa-play"></i>
+        <div class="panel-group">
+          <h3 class="panel-section-title">Soundtrack</h3>
+          <div class="segmented segmented-sm media-switch" role="group" aria-label="Media source">
+            <button id="switchYoutubeMode" type="button" class="seg-btn media-mode-active">
+              <i class="fab fa-youtube" aria-hidden="true"></i><span>YouTube</span>
             </button>
-            <button id="loadPlaylistBtn" class="panel-button load-btn" type="button" title="Load Playlist">
-              <i class="fas fa-compact-disc"></i>
+            <button id="switchAudioMode" type="button" class="seg-btn">
+              <i class="fas fa-music" aria-hidden="true"></i><span>Audio file</span>
             </button>
           </div>
-        </div>
 
-        <div id="audioInputGroup" class="local-audio-container hidden">
-          <div class="input-field">
-            <input id="localAudioFile" type="file" accept="audio/*" style="display: none;">
-            <label for="localAudioFile" class="panel-file-label">
-              <i class="fas fa-cloud-upload-alt"></i>
-              <span>Import Local File</span>
+          <div id="youtubeInputGroup" class="youtube-input-container">
+            <div class="input-field">
+              <label class="sr-only" for="youtubeUrl">YouTube link</label>
+              <input id="youtubeUrl" type="url" placeholder="Paste a YouTube link" class="panel-input" autocomplete="off">
+              <button id="loadYoutubeBtn" class="ui-btn ui-btn-primary" type="button" title="Play this video">Play</button>
+            </div>
+            <button id="loadPlaylistBtn" class="ui-btn ui-btn-quiet ui-btn-block" type="button" title="Load the whole playlist">
+              <i class="fas fa-compact-disc" aria-hidden="true"></i><span>Load as playlist</span>
+            </button>
+          </div>
+
+          <div id="audioInputGroup" class="local-audio-container hidden">
+            <input id="localAudioFile" type="file" accept="audio/*" class="sr-only-input">
+            <label for="localAudioFile" class="ui-btn ui-btn-quiet ui-btn-block panel-file-label">
+              <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i><span>Choose an audio file</span>
             </label>
+            <div id="localAudioFileName" class="media-filename hidden"></div>
           </div>
-          <div id="localAudioFileName" class="media-filename hidden"></div>
         </div>
 
         <div class="media-player-container">
-          <button id="closeMediaContainer" class="media-close hidden" type="button" title="Close media">
-            <i class="fas fa-times"></i>
+          <button id="closeMediaContainer" class="media-close hidden" type="button" title="Close media" aria-label="Close media">
+            <i class="fas fa-times" aria-hidden="true"></i>
           </button>
 
           <div class="media-player-youtube" id="youtubePlayerContainer">
@@ -222,7 +236,7 @@
 
           <div id="customAudioPlayer" class="hidden media-card">
             <div class="media-transport">
-              <button id="audioPlayPauseBtn" class="media-play-btn" type="button" title="Play or pause">
+              <button id="audioPlayPauseBtn" class="media-play-btn" type="button" title="Play or pause" aria-label="Play or pause">
                 <i class="fas fa-play"></i>
               </button>
               <div class="media-progress">
@@ -239,10 +253,11 @@
               <i class="fas fa-volume-up" aria-hidden="true"></i>
             </div>
             <div class="panel-row">
-              <span class="panel-row-label">Auto repeat audio</span>
+              <span class="panel-row-label">Repeat when it ends</span>
               <label class="toggle-switch-modern">
                 <input type="checkbox" id="mediaLoopToggle">
                 <span class="slider-modern"></span>
+                <span class="sr-only">Repeat audio</span>
               </label>
             </div>
             <audio id="localAudioPlayer" class="hidden"></audio>
@@ -254,14 +269,15 @@
               <input type="range" id="videoVolumeSlider" min="0" max="100" value="50" class="volume-slider" aria-label="Video volume">
             </div>
             <div class="panel-row">
-              <span class="panel-row-label">Auto repeat video</span>
+              <span class="panel-row-label">Repeat when it ends</span>
               <label class="toggle-switch-modern">
                 <input type="checkbox" id="videoMediaLoopToggle">
                 <span class="slider-modern"></span>
+                <span class="sr-only">Repeat video</span>
               </label>
             </div>
           </div>
-        </div>
+          </div>
       </section>
 
       <!-- Settings -->
@@ -269,45 +285,40 @@
         <div class="panel-group">
           <h3 class="panel-section-title">Appearance</h3>
           <button id="openThemeSelectorBtn" class="setting-item-clickable" type="button">
-            <div class="item-left">
-              <i class="fas fa-palette"></i>
-              <span>Theme: Default</span>
-            </div>
-            <i class="fas fa-chevron-right chevron"></i>
+            <span class="item-left">Theme: Default</span>
+            <i class="fas fa-chevron-right chevron" aria-hidden="true"></i>
           </button>
           <div class="panel-row">
             <span class="panel-row-label">Bottom bar</span>
-            <div class="control-group">
-              <span class="control-label">Auto-hide</span>
-              <label class="toggle-switch-modern">
+            <label class="switch-field">
+              <span class="switch-value" id="bottomBarModeLabel">Auto-hide</span>
+              <span class="toggle-switch-modern">
                 <input type="checkbox" id="bottomPanelAlwaysShown">
                 <span class="slider-modern"></span>
-              </label>
-              <span class="control-label">Fixed</span>
-            </div>
+                <span class="sr-only">Keep the bottom bar always visible</span>
+              </span>
+            </label>
           </div>
         </div>
 
         <div class="panel-group">
           <h3 class="panel-section-title">Backup</h3>
-          <div class="panel-row">
-            <span class="panel-row-label">Quotes &amp; preferences</span>
-            <div class="control-group">
-              <button id="exportBackupBtn" class="panel-button" type="button" title="Export quotes and preferences (JSON)">
-                <i class="fas fa-file-export"></i>
-              </button>
-              <button id="importBackupBtn" class="panel-button" type="button" title="Import a Zaya backup file">
-                <i class="fas fa-file-import"></i>
-              </button>
-              <input id="importBackupFile" type="file" accept="application/json,.json" style="display: none;">
-            </div>
+          <p class="panel-note">Notes and preferences live in this browser. Keep a copy as a JSON file.</p>
+          <div class="btn-pair">
+            <button id="exportBackupBtn" class="ui-btn ui-btn-quiet" type="button" title="Export notes and preferences (JSON)">
+              <i class="fas fa-file-export" aria-hidden="true"></i><span>Export</span>
+            </button>
+            <button id="importBackupBtn" class="ui-btn ui-btn-quiet" type="button" title="Import a Zaya backup file">
+              <i class="fas fa-file-import" aria-hidden="true"></i><span>Import</span>
+            </button>
+            <input id="importBackupFile" type="file" accept="application/json,.json" class="sr-only-input">
           </div>
         </div>
 
         <div class="panel-group">
           <h3 class="panel-section-title">Keyboard shortcuts</h3>
           <dl class="shortcut-list">
-            <div class="shortcut"><dt>Turn page</dt><dd><kbd>←</kbd><kbd>→</kbd></dd></div>
+            <div class="shortcut"><dt>Turn page</dt><dd><kbd>&larr;</kbd><kbd>&rarr;</kbd></dd></div>
             <div class="shortcut"><dt>Search in document</dt><dd><kbd>Ctrl</kbd><kbd>F</kbd></dd></div>
             <div class="shortcut"><dt>Control panel</dt><dd><kbd>Ctrl</kbd><kbd>K</kbd></dd></div>
             <div class="shortcut"><dt>Fullscreen</dt><dd><kbd>F</kbd></dd></div>
@@ -321,6 +332,7 @@
       <a href="changelog.html" class="panel-version-link" title="View Changelog">
         <i class="fas fa-code-branch" aria-hidden="true"></i>
         <span id="currentVersion" data-original=""></span>
+        <span class="panel-version-word">changelog</span>
       </a>
     </footer>
   </div>

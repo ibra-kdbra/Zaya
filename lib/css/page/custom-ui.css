@@ -105,224 +105,339 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* Side Panel Restyling (Thumbnails & Outline) */
+/* ---------------------------------------------------------------------------
+ * Navigator panels (Pages / Outline / Search).
+ * The engine builds these three `.df-sidemenu` containers; the Navigator drawer
+ * adopts them into `#navigatorBody`, so every skin here is scoped to that host —
+ * that also lets it win over the generic engine rules in chrome.css / min.css.
+ * ------------------------------------------------------------------------- */
+
+/* Standalone (un-adopted) side panels keep a readable surface */
 .df-sidemenu {
   background: var(--bg-secondary) !important;
-  border-left: 1px solid var(--border-primary) !important;
-  box-shadow: var(--shadow-primary) !important;
+  border-right: 1px solid var(--border-primary) !important;
+  border-radius: 0 12px 12px 0 !important;
   top: 20px !important;
   bottom: 80px !important;
   height: auto !important;
-  border-radius: 12px 0 0 12px !important;
-  width: 220px !important; /* Tighter sidebar width */
+  width: 300px !important;
   z-index: 999 !important;
-}
-
-.df-thumb-container, .df-outline-container, .df-search-container {
-  padding: 30px 5px 10px 5px !important; /* Shorter space */
 }
 
 .df-thumb-wrapper, .df-outline-wrapper, .df-search-wrapper {
   background: transparent !important;
+  box-shadow: none !important;
 }
 
-/* In-document search panel */
-.df-search-wrapper {
-  position: absolute;
-  inset: 40px 6px 8px 6px;
+/* --------------------------------------------------------------- Pages tab */
+
+/* The virtualised list positions every row at `index * --thumb-row-h`; the tile
+   is derived from that height so the two can never drift apart. */
+#navigatorBody .df-thumb-container {
+  --thumb-row-h: 232px;
+  --thumb-gap: 16px;
+  --thumb-caption-h: 26px;
+  text-align: left !important;
+}
+
+#navigatorBody .df-thumb-wrapper { padding: 14px 0 24px 0; }
+
+#navigatorBody .df-thumb-container .df-vrow {
+  /* Column cell = 100% / --thumb-cols; the tile is centred inside its cell */
+  --thumb-w: calc((var(--thumb-row-h) - var(--thumb-gap) - var(--thumb-caption-h)) * 0.75);
+  left: calc(var(--thumb-col, 0) * (100% / var(--thumb-cols, 1)) + ((100% / var(--thumb-cols, 1)) - var(--thumb-w)) / 2) !important;
+  right: auto !important;
+  margin: 0 !important;
+  height: calc(var(--thumb-row-h) - var(--thumb-gap)) !important;
+  width: var(--thumb-w) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  /* The caption strip lives in the bottom border, so the inset ring frames the page alone */
+  border-bottom: var(--thumb-caption-h) solid transparent !important;
+  border-radius: 4px !important;
+  overflow: visible !important;
+  background-color: var(--bg-tertiary) !important;
+  background-clip: padding-box !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  box-shadow: inset 0 0 0 1px var(--border-secondary) !important;
+  transition: box-shadow 150ms ease !important;
+  transform: none !important;
+  cursor: pointer;
+}
+
+#navigatorBody .df-thumb-container .df-vrow:hover,
+#navigatorBody .df-thumb-container .df-vrow:focus-visible {
+  background-color: var(--bg-tertiary) !important;
+  box-shadow: inset 0 0 0 1px var(--text-accent) !important;
+  transform: none !important;
+  outline: none;
+}
+
+#navigatorBody .df-thumb-container .df-vrow.df-selected {
+  background-color: var(--bg-tertiary) !important;
+  box-shadow: inset 0 0 0 2px var(--text-accent) !important;
+}
+
+/* The page number sits under its tile, in the caption strip */
+#navigatorBody .df-vrow > div {
+  position: absolute !important;
+  top: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: calc(-1 * var(--thumb-caption-h)) !important;
+  width: auto !important;
+  height: var(--thumb-caption-h) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border-radius: 0 !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+#navigatorBody .df-vrow.df-selected > div {
+  color: var(--text-accent) !important;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------- Outline tab */
+
+#navigatorBody .df-outline-container { color: var(--text-primary) !important; }
+#navigatorBody .df-outline-wrapper { padding: 10px 12px calc(24px + env(safe-area-inset-bottom)) 12px !important; }
+
+#navigatorBody .df-outline-item {
+  position: relative;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+#navigatorBody .df-outline-item > a {
+  display: flex !important;
+  align-items: center;
+  min-height: 44px;
+  padding: 9px 10px 9px 36px !important;
+  border-radius: 9px;
+  color: var(--text-primary) !important;
+  font-size: 14px;
+  line-height: 1.35;
+  text-decoration: none !important;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+#navigatorBody .df-outline-item > a:hover,
+#navigatorBody .df-outline-item > a:focus-visible {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+#navigatorBody .df-outline-item > a:active { color: var(--text-accent) !important; }
+
+/* Nested levels: one hairline guide per depth, indent from it */
+/* Only nested levels get the guide; the wrapper itself carries the class too */
+#navigatorBody .df-outline-item > .df-outline-items {
+  margin: 0 0 0 17px !important;
+  padding-left: 10px !important;
+  border-left: 1px solid var(--border-secondary);
+}
+#navigatorBody .df-outline-items > .df-outline-item { margin-left: 0 !important; }
+#navigatorBody .df-outline-wrapper.df-outline-items { margin: 0 !important; padding-left: 12px !important; border-left: none; }
+
+/* Chevron: a 34x44 hit area in the gutter the links leave free */
+#navigatorBody .df-outline-toggle {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 34px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer;
+  transition: color 150ms ease;
+  z-index: 1;
+}
+#navigatorBody .df-outline-toggle:hover { background: transparent !important; color: var(--text-accent) !important; }
+#navigatorBody .df-outline-toggle:before { color: inherit !important; font-size: 11px; }
+
+/* -------------------------------------------------------------- Search tab */
+
+#navigatorBody .df-search-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   overflow: hidden;
+  padding: 0;
 }
 
-.df-search-form {
-  margin: 0;
+#navigatorBody .df-search-form {
+  position: relative;
   flex: 0 0 auto;
+  margin: 0;
+  padding: 14px 14px 10px 14px;
 }
 
-.df-search-input {
+/* Search glyph inside the field (Font Awesome is this product's icon system) */
+#navigatorBody .df-search-form::before {
+  content: "\f002";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 27px;
+  top: 36px; /* form padding-top (14) + half the 44px field */
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+#navigatorBody .df-search-input {
   width: 100%;
+  height: 44px;
   box-sizing: border-box;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-primary);
   border-radius: 10px;
   color: var(--text-primary);
-  padding: 8px 10px;
-  font-size: 13px;
-  font-family: inherit;
+  padding: 0 12px 0 38px;
+  font-family: var(--font-sans);
+  font-size: 14px;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 150ms ease;
+}
+#navigatorBody .df-search-input::placeholder { color: var(--text-secondary); opacity: 0.85; }
+#navigatorBody .df-search-input:focus { border-color: var(--text-accent); box-shadow: none; }
+#navigatorBody .df-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  background: var(--text-secondary);
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M10 2a8 8 0 100 16 8 8 0 000-16zm3.2 11.2a.8.8 0 01-1.13 0L10 11.13l-2.07 2.07a.8.8 0 11-1.13-1.13L8.87 10 6.8 7.93A.8.8 0 117.93 6.8L10 8.87l2.07-2.07a.8.8 0 111.13 1.13L11.13 10l2.07 2.07a.8.8 0 010 1.13z'/></svg>") center / contain no-repeat;
 }
 
-.df-search-input::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.8;
-}
-
-.df-search-input:focus {
-  border-color: var(--text-accent);
-  box-shadow: 0 0 0 2px var(--border-accent);
-}
-
-.df-search-status {
+/* The one-line answer: how many, on how many pages */
+#navigatorBody .df-search-status {
   flex: 0 0 auto;
-  min-height: 1.2em;
+  min-height: 18px;
+  padding: 0 16px 10px 16px;
+  font-family: var(--font-sans);
   font-size: 12px;
+  letter-spacing: 0.01em;
   color: var(--text-secondary);
-  padding: 0 2px;
 }
 
-.df-search-results {
+#navigatorBody .df-search-results {
   flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-right: 2px;
+  gap: 8px;
+  padding: 2px 14px calc(24px + env(safe-area-inset-bottom)) 14px;
 }
 
-.df-search-result {
+/* Nothing typed yet: say what this field does */
+#navigatorBody .df-search-wrapper:has(.df-search-input:placeholder-shown) .df-search-results:empty::before {
+  content: "Type at least two characters. Matches are listed by page, with the words in context.";
+  display: block;
+  max-width: 32ch;
+  margin: 24px auto 0 auto;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+#navigatorBody .df-search-result {
   background: var(--bg-tertiary);
-  border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 8px 10px;
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+  padding: 12px 12px 11px 12px;
   cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.15s ease;
+  transition: border-color 150ms ease, background-color 150ms ease;
 }
 
-.df-search-result:hover,
-.df-search-result:focus-visible {
-  border-color: var(--text-accent);
+#navigatorBody .df-search-result:hover,
+#navigatorBody .df-search-result:focus-visible {
+  border-color: var(--border-accent);
   outline: none;
-  transform: translateX(2px);
+  transform: none;
 }
+#navigatorBody .df-search-result:focus-visible { outline: 2px solid var(--text-accent); outline-offset: 2px; }
 
-.df-search-result.df-selected {
+#navigatorBody .df-search-result.df-selected {
   border-color: var(--text-accent);
-  box-shadow: 0 0 0 2px var(--border-accent);
+  box-shadow: none;
 }
 
-.df-search-result-head {
+#navigatorBody .df-search-result-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+  color: var(--text-accent);
 }
 
-.df-search-result-count {
-  font-size: 12px;
+#navigatorBody .df-search-result-count {
+  flex: 0 0 auto;
+  min-width: 20px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
   font-weight: 600;
   background: var(--bg-accent);
+  border: 1px solid var(--border-accent);
   color: var(--text-primary);
   border-radius: 999px;
-  padding: 1px 7px;
+  padding: 2px 7px;
 }
 
-.df-search-snippet {
-  font-size: 12px;
-  line-height: 1.4;
+#navigatorBody .df-search-snippet {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.5;
   color: var(--text-secondary);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+#navigatorBody .df-search-snippet + .df-search-snippet { margin-top: 4px; }
 
-.df-search-snippet mark {
+#navigatorBody .df-search-snippet mark {
   background: var(--bg-accent-active);
   color: var(--text-primary);
   border-radius: 3px;
   padding: 0 2px;
-}
-
-/* Taller thumbnails */
-.df-vrow {
-  height: 140px !important; 
-  margin-bottom: 8px !important;
-}
-
-/* Outline/Bookmark Text Contrast */
-.df-outline-item {
-  color: #ffffff !important; /* High contrast white */
-  font-weight: 500 !important;
-  padding: 8px 12px !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
-
-.df-outline-item:hover {
-  color: var(--text-accent) !important;
-  background: transparent !important;
-}
-
-/* Override min.css specific link hover style */
-.df-outline-item a:hover {
-  background: transparent !important;
-  color: inherit !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-
-.df-vrow {
-  /* margin-bottom is handled in the taller thumbnails block */
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  border: 2px solid transparent !important;
-  transition: all 0.2s ease !important;
-  background-size: contain !important; /* Respect aspect ratio */
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  background-color: var(--bg-tertiary) !important;
-}
-
-.df-vrow:hover {
-  border-color: var(--text-accent) !important;
-  transform: scale(1.02);
-}
-
-.df-vrow.df-selected {
-  border-color: var(--text-accent) !important;
-  box-shadow: 0 0 0 2px var(--border-accent) !important;
-}
-
-.df-vrow div {
-  background: rgba(0,0,0,0.7) !important; /* Higher contrast for thumb numbers */
-  color: white !important;
-  font-size: 12px !important;
-  padding: 2px 6px !important;
-  border-radius: 0 0 4px 0 !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-}
-
-.df-ui-sidemenu-close {
-  top: 10px !important;
-  right: 10px !important;
-  background: var(--bg-tertiary) !important;
-  color: var(--text-secondary) !important;
-  border-radius: 50% !important;
-  width: 32px !important;
-  height: 32px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  z-index: 1001 !important;
-  transition: all 0.2s ease !important;
-}
-
-.df-ui-sidemenu-close:hover {
-  background: var(--bg-accent-hover) !important;
-  color: var(--text-error) !important;
-  transform: rotate(90deg);
 }
 
 /* Custom Page Indicator Input Styling */
@@ -347,7 +462,7 @@
   outline: none !important;
   background: var(--bg-accent-hover) !important;
   border-color: var(--text-accent) !important;
-  box-shadow: 0 0 15px var(--shadow-accent) !important;
+  box-shadow: none !important;
 }
 
 /* Side panels must be scrollable by touch, never zoom the book */
@@ -368,9 +483,16 @@
   }
 
   .df-sidemenu {
-    width: min(80vw, 260px) !important;
+    width: min(80vw, 300px) !important;
     top: 10px !important;
     bottom: 70px !important;
+  }
+
+  /* A phone sheet is wide: the page tiles grow with it (the row height is set in JS to match) */
+  #navigatorBody .df-thumb-container {
+    --thumb-row-h: 320px;
+    --thumb-gap: 20px;
+    --thumb-caption-h: 28px;
   }
 
   /* Overlay the book instead of squeezing it into the remaining ~120px */
