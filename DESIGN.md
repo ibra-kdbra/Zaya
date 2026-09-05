@@ -60,6 +60,39 @@ gradient or `--shadow-primary` into a coloured glow is wrong.
 - `lib/css/page/custom-ui.css` – the search panel, thumbnails and outline skins.
 - `lib/css/vendor/tailwind.css` – utilities used by the markup, precompiled (`npm run build:css`).
 
+## Navigation model by device class
+
+Both drawers — the Navigator (Pages / Outline / Search) on the left and the control panel
+(Document / Notes / Media / Settings) on the right — use one system. Only two things change with
+the viewport: whether the drawer overlays the book or takes space from it, and where the section
+switcher sits.
+
+| | **Large** ≥1200px | **Medium** 768–1199px | **Small** <768px |
+| --- | --- | --- | --- |
+| Drawer | **docks**: the reading area shrinks | overlays with a scrim | full-width sheet |
+| Width | Navigator 340px, panel 380px | 380px / 420px | 100vw |
+| Both open at once | yes | no — the other yields | no — the other yields |
+| Switcher | vertical icon rail, 68px, on the drawer's **outer** edge | same rail | **bottom tab bar**, 56px, above the app bar |
+| Dismissal | close button, Esc | + scrim and outside tap | + scrim and outside tap |
+| Focus | normal | normal | `ZayaA11y.trap` (the sheet is modal) |
+
+- **Docking.** `body.dock-left` / `body.dock-right` publish the drawer widths as `--dock-l` /
+  `--dock-r`. `#flipbookContainer` takes them as margins (with `width:auto`, because the markup
+  carries `w-full`), the bottom bar re-centres on the remaining area, and `ZayaDrawers.syncDock()`
+  calls `dFlipBook.resize()` once the 180ms slide has settled. The margin itself is never
+  animated: the WebGL stage would relayout on every frame. While docked, the engine's own
+  side-menu shift in `preview-object.js` is skipped, so the book centres in what is left, and an
+  outside tap no longer dismisses — a docked drawer is layout, not an overlay.
+- **The rail.** 68px wide (enough for "Document" at 11px), items ≥52px tall, an 18px icon over an
+  11px label, `title` for the tooltip. The active item takes a `--bg-accent` fill and a 3px
+  `--text-accent` bar on the outer edge; its label stays `--text-primary`, because the accent
+  alone fails 4.5:1 on the light and nord palettes. On a phone the same element becomes the
+  bottom tab bar (12px labels), so there is one tablist, one set of ids, one keyboard model:
+  `role=tablist/tab/tabpanel`, `aria-selected`, and arrows in both axes (Up/Down on the rail,
+  Left/Right on the tab bar).
+- **Surfaces.** Drawers are `--bg-primary` with a 1px `--border-primary` edge, never
+  `--bg-secondary` — that token is 94–95% opaque and the page used to bleed through it.
+
 ## Checks
 
 `npx impeccable detect index.html changelog.html lib/css/page lib/css/themes` runs the

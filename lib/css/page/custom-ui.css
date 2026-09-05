@@ -114,7 +114,7 @@
 
 /* Standalone (un-adopted) side panels keep a readable surface */
 .df-sidemenu {
-  background: var(--bg-secondary) !important;
+  background: var(--bg-primary) !important;
   border-right: 1px solid var(--border-primary) !important;
   border-radius: 0 12px 12px 0 !important;
   top: 20px !important;
@@ -144,7 +144,10 @@
 
 #navigatorBody .df-thumb-container .df-vrow {
   /* Column cell = 100% / --thumb-cols; the tile is centred inside its cell */
-  --thumb-w: calc((var(--thumb-row-h) - var(--thumb-gap) - var(--thumb-caption-h)) * 0.75);
+  --thumb-w: min(
+    calc((var(--thumb-row-h) - var(--thumb-gap) - var(--thumb-caption-h)) * 0.75),
+    calc(100% / var(--thumb-cols, 1) - 14px)
+  );
   left: calc(var(--thumb-col, 0) * (100% / var(--thumb-cols, 1)) + ((100% / var(--thumb-cols, 1)) - var(--thumb-w)) / 2) !important;
   right: auto !important;
   margin: 0 !important;
