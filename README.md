@@ -17,7 +17,10 @@ and it works offline as a PWA.
 
 - Realistic 3D page turning (WebGL) with a CSS fallback; single and double page modes, RTL support
 - **Full-text search** across the whole PDF, with highlighted snippets in the panel and marks painted
-  on the page itself (`Ctrl/Cmd+F`)
+  on the page itself (`Ctrl/Cmd+F`). Arabic is handled: shaped glyphs, vowel marks and either storage order
+- **Text recognition for scanned books**: pages without a text layer are recognised on the reader's
+  device (Tesseract in WebAssembly, Arabic and English packs vendored), kept per document in the
+  browser, and searched and highlighted like real text. Nothing is uploaded.
 - Thumbnails and outline/bookmark side panels that overlay the book on narrow screens
 - 50+ colour themes built on one set of design tokens (see `DESIGN.md`)
 - Quotes notebook stored locally in IndexedDB, and the last page remembered per document
@@ -150,6 +153,8 @@ the control panel (Settings → Media Loop). The setting is remembered across se
 - **[Three.js](https://threejs.org/)** — the WebGL layer behind the page-turn animation.
 - **[DFlip](https://github.com/dearhive/dearflip-js-flipbook)** — the flipbook engine Zaya's core is
   derived from, refactored into ES modules under `lib/js/core/dflip/`.
+- **[Tesseract.js](https://tesseract.projectnaptha.com/)** — on-device text recognition for scanned pages
+  (`lib/ocr/`, loaded on demand).
 
 Full attribution and licences are in `THIRD_PARTY_NOTICES.md`.
 

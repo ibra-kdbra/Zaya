@@ -289,6 +289,49 @@ test.describe('Documents and languages', () => {
     const input = page.locator('.df-search-input');
     await expect(input).toBeVisible({ timeout: 15_000 });
     await input.fill('anything');
-    await expect(page.locator('.df-search-status')).toContainText('no text layer', { timeout: 20_000 });
+    await expect(page.locator('.df-search-status')).toContainText('pages are images', { timeout: 20_000 });
+    await expect(page.locator('.df-ocr')).toContainText('no text layer');
+  });
+});
+
+test.describe('Text recognition (OCR)', () => {
+  test('a scanned Arabic document is recognised on the device and becomes searchable, with the result kept for next time', async ({ page }) => {
+    test.setTimeout(240_000);
+    const FIXTURES = new URL('./fixtures/', import.meta.url).pathname;
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', FIXTURES + 'sample-scanned-arabic.pdf');
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe('sample-scanned-arabic.pdf');
+    await waitForBook(page);
+
+    // Opening the search pane is enough to be told the pages are images and offered recognition.
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    const box = page.locator('.df-ocr');
+    await expect(box).toBeVisible({ timeout: 20_000 });
+    await expect(box).toContainText('no text layer');
+    await page.locator('.df-search-input').fill('القراءة');
+    await expect(page.locator('.df-search-status')).toContainText('pages are images', { timeout: 20_000 });
+
+    await page.locator('.df-ocr-lang').selectOption('ara+eng');
+    await page.locator('.df-ocr-run').click();
+    await expect(page.locator('.df-ocr-run')).toHaveText('Stop');
+    // Both pages carry the word; results arrive as pages complete.
+    await expect(page.locator('.df-search-result')).toHaveCount(2, { timeout: 200_000 });
+    await expect(page.locator('.df-ocr-progress')).toContainText('Recognised 2 pages', { timeout: 60_000 });
+    await expect(page.locator('.df-search-status')).toContainText(/on 2 pages/);
+    // Latin text on the same pages is found too, so the mixed-language pack did its job.
+    await page.locator('.df-search-input').fill('Chapter');
+    await expect(page.locator('.df-search-result')).toHaveCount(2, { timeout: 20_000 });
+
+    // Recognised text is stored per document: after a reload it is searchable at once, no engine needed.
+    await page.reload();
+    await waitForBook(page);
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    await page.locator('.df-search-input').fill('العقل');
+    await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 20_000 });
+    await expect(page.locator('.df-ocr')).toContainText('recognised on this device', { timeout: 20_000 });
+    expect(await page.evaluate(() => !!window.Tesseract)).toBe(false);
   });
 });

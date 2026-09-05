@@ -24,6 +24,7 @@ navigation model all changed.
 - **Full-text search (#16)**: a search panel beside thumbnails and outline. Text is extracted once
   per document with a small concurrency pool and cancellation, every matching page is listed with a
   highlighted snippet, and clicking a result jumps to that page. `Ctrl/Cmd+F` opens it.
+- **Text recognition for scanned pages (OCR)**: when a document has no text layer, the search pane offers to recognise its pages on the device with Tesseract (WebAssembly; Arabic and English language packs are vendored, so it works offline and nothing is uploaded). Recognition starts at the page being read, results and on-page highlights appear as each page completes, it can be stopped at any time, and recognised text is kept per document in IndexedDB so a book is only processed once.
 - **Search hits on the page**: matches are painted onto the rendered page itself in both the 3D and
   the 2D renderer, not only listed in the panel. Marks follow what you type and clear when the panel
   closes.

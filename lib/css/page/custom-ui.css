@@ -504,3 +504,42 @@
     padding-right: 20px !important;
   }
 }
+
+/* --- Recognise text (OCR) offer inside the search pane ------------------------------------- */
+#navigatorBody .df-ocr {
+  flex: 0 0 auto;
+  margin: 0 14px 12px 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+  background: var(--bg-tertiary);
+}
+#navigatorBody .df-ocr[hidden] { display: none; }
+#navigatorBody .df-ocr-text,
+#navigatorBody .df-ocr-progress {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+#navigatorBody .df-ocr-progress { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+#navigatorBody .df-ocr-progress:empty { display: none; }
+#navigatorBody .df-ocr-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#navigatorBody .df-ocr-lang {
+  flex: 1 1 140px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+}
+#navigatorBody .df-ocr-lang:focus-visible { outline: 2px solid var(--text-accent); outline-offset: 1px; }
+#navigatorBody .df-ocr-run { flex: 0 0 auto; }

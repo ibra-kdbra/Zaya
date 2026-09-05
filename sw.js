@@ -59,7 +59,7 @@ function isStaticAsset(request, url) {
 // the release version, so a deploy within the same version never runs on top of stale code; the cache
 // is their offline fallback only.
 function isImmutable(url) {
-  return /\/(fonts|images|sound|cmaps)\//.test(url.pathname);
+  return /\/(fonts|images|sound|cmaps|ocr)\//.test(url.pathname);
 }
 
 async function trimCache(cache) {

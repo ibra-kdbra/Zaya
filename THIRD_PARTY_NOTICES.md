@@ -11,6 +11,9 @@
 | Toastify JS | `lib/js/libs/toastify.min.js`, `lib/css/vendor/toastify.min.css` | 1.12.0 | MIT |
 | marked | `lib/js/libs/marked.min.js` (changelog page only) | 12.0.2 | MIT |
 | Tailwind CSS | precompiled to `lib/css/vendor/tailwind.css` from `lib/css/tailwind.src.css` (`npm run build:css`) | 3.4 | MIT |
+| Tesseract.js | `lib/ocr/tesseract.min.js`, `lib/ocr/worker.min.js` (loaded only when the reader asks to recognise scanned pages) | 6.0.1 | Apache-2.0 |
+| Tesseract.js-core (Tesseract OCR compiled to WebAssembly) | `lib/ocr/core/tesseract-core-simd-lstm.wasm.js`, `tesseract-core-lstm.wasm.js` | 6.1.2 (Tesseract 5) | Apache-2.0 |
+| tessdata_fast language packs | `lib/ocr/lang/ara.traineddata.gz`, `eng.traineddata.gz` | tessdata_fast (Tesseract 4/5 LSTM) | Apache-2.0 |
 | IBM Plex Sans / Mono | `lib/fonts/plex/` (latin subset, self-hosted via `lib/css/vendor/fonts.css`) | 5.x (fontsource) | SIL OFL 1.1 |
 
 Everything else in this repository is © ibra-kdbra and released under the MIT License (see `LICENSE`).
