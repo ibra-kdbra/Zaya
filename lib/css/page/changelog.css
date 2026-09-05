@@ -59,40 +59,41 @@ a {
 }
 
 .cl-header__inner {
-  min-height: 60px;
+  min-height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  gap: 16px;
+  flex-wrap: nowrap;
 }
 
+/* Brand + breadcrumb on one baseline. The brand is one link (to the repository); the page name is a label. */
 .cl-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .cl-brand__link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: inherit;
+  min-height: 44px;
+  color: var(--text-primary);
   text-decoration: none;
   transition: color 150ms ease;
 }
 
 .cl-brand__link:hover { color: var(--text-accent); }
-.cl-brand__github { width: 15px; height: 15px; color: var(--text-secondary); }
-.cl-brand__link:hover .cl-brand__github { color: var(--text-accent); }
 
 .cl-brand__mark {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   display: block;
+  flex: none;
 }
 
 .cl-brand__name {
@@ -100,52 +101,71 @@ a {
   letter-spacing: 0.01em;
 }
 
+.cl-brand__github {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: var(--text-secondary);
+  transition: color 150ms ease;
+}
+
+.cl-brand__link:hover .cl-brand__github { color: var(--text-accent); }
+
 .cl-brand__sep,
 .cl-brand__page {
   color: var(--text-secondary);
 }
 
-.cl-header__meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.cl-brand__sep { opacity: 0.6; }
 
-/* The badge is a label, so it stays quiet; the accent belongs to the one action on this page. */
-.cl-badge:has(> :empty) { display: none; }
-
-.cl-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 0 10px;
-  border: 1px solid var(--border-secondary);
-  border-radius: 4px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-
+/* The one action in the header: accent text, no fill, full touch height. */
 .cl-back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  flex: none;
   min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--text-accent);
-  border-radius: 4px;
-  background: var(--bg-accent);
-  color: var(--text-primary);
+  padding: 0 4px;
+  color: var(--text-accent);
   font-size: 13px;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color 150ms ease, border-color 150ms ease;
+  white-space: nowrap;
+  border-radius: 4px;
+  transition: color 150ms ease;
 }
 
-.cl-back:hover {
-  background: var(--bg-accent-hover);
+.cl-back:hover { color: var(--text-primary); }
+.cl-back__short { display: none; }
+
+@media (max-width: 480px) {
+  .cl-brand__page,
+  .cl-brand__sep { display: none; }
+  .cl-back__label { display: none; }
+  .cl-back__short { display: inline; }
+}
+
+/* Version eyebrow above the title; hidden until the changelog has loaded. */
+.cl-eyebrow {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.cl-eyebrow:has(> .cl-eyebrow__version:empty) { display: none; }
+
+.cl-eyebrow__label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cl-eyebrow__version {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
 }
 
 /* --- Page frame ----------------------------------------------------------- */
