@@ -4,6 +4,551 @@
  * Tokens only (see DESIGN.md). Loaded after chrome.css, wins by order.
  */
 
+/* ===========================================================================
+ * From the retired page/panel.css. That sheet was written for a control panel
+ * that no longer exists; what survived is the bottom control bar, the More menu,
+ * the notes modal, the toggle switch and the volume slider. Everything the later
+ * sheets already restyle was dropped, and these rules sit first so chrome.css'
+ * successors -- and the rest of this file -- still win by order.
+ * =========================================================================== */
+
+.panel-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.panel-section:last-child {
+  border-bottom: none;
+}
+.panel-section-title i {
+  color: var(--text-accent);
+  font-size: 14px;
+}
+.panel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+.toggle-switch-modern {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.toggle-switch-modern input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider-modern {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #374151;
+  transition: .3s;
+  border-radius: 24px;
+}
+.slider-modern:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+input:checked + .slider-modern {
+  background-color: var(--text-accent);
+}
+input:checked + .slider-modern:before {
+  transform: translateX(20px);
+}
+.media-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+.volume-slider {
+  width: 100px;
+  height: 4px;
+  background: rgba(107, 114, 128, 0.3);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--text-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.volume-slider::-webkit-slider-thumb:hover {
+  background: var(--text-accent);
+  transform: scale(1.1);
+}
+.volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--text-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+.volume-slider::-moz-range-thumb:hover {
+  background: var(--text-accent);
+  transform: scale(1.1);
+}
+body.df-fullscreen-active .fixed {
+  display: none !important;
+}
+body.df-fullscreen-active #toggleUnifiedPanelBtn {
+  display: none !important;
+}
+body.df-fullscreen-active #unifiedPanel {
+  display: none !important;
+}
+#customControlBar {
+  z-index: 2147483647 !important;
+}
+.df-ui {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#customControlBar {
+  position: fixed;
+  bottom: 0;
+  background: var(--bg-secondary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-primary);
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto !important;
+  visibility: visible !important;
+  z-index: 2147483647 !important;
+}
+
+/*
+ * Centring and the side edges apply at every width except the narrowest phones, where the bar
+ * spans the screen: the `max-width: 430px` block in chrome.css owns those properties there.
+ */
+@media (min-width: 430.02px) {
+  #customControlBar {
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    border-left: 1px solid var(--border-primary);
+    border-right: 1px solid var(--border-primary);
+  }
+  #customControlBar.visible,
+  #customControlBar.always-shown {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+}
+.hover-trigger {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 60px;
+  z-index: 999998;
+  pointer-events: auto !important;
+  background: transparent;
+}
+.custom-ui-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.custom-ui-btn:hover {
+  border-color: var(--text-accent);
+}
+.page-indicator {
+  text-align: center;
+}
+.more-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.more-menu-item i {
+  width: 16px;
+  text-align: center;
+}
+#customMoreMenu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0) translateY(0);
+}
+@media (max-width: 768px) {
+  .panel-button {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+  .mobile-hide {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-section {
+    padding: 16px;
+  }
+}
+
+body.panel-open #flipbookContainer {
+  transition: opacity 0.3s ease;
+}
+.panel-button.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.panel-button.loading i {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-secondary);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.modal-container.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  display: flex !important;
+}
+.modal-content {
+  background: var(--bg-secondary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  box-shadow: var(--shadow-primary);
+  max-width: 800px;
+  max-height: 80vh;
+  width: 90vw;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.9) translateY(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.modal-container.open .modal-content {
+  transform: scale(1) translateY(0);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-secondary);
+  background: var(--bg-tertiary);
+  border-radius: 16px 16px 0 0;
+}
+.modal-header h2 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto !important;
+  z-index: 1000001 !important;
+  position: relative !important;
+}
+.modal-close:hover {
+  background: var(--bg-accent-hover);
+  color: var(--text-error);
+}
+.modal-body {
+  padding: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-quote-list {
+  padding: 24px;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+.modal-quotes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.modal-header-actions {
+  display: flex;
+  gap: 8px;
+}
+.modal-export-btn {
+  background: var(--bg-accent);
+  border-color: var(--border-accent);
+}
+.modal-export-btn:hover {
+  background: var(--bg-accent-hover);
+  border-color: var(--text-accent);
+  box-shadow: var(--shadow-accent);
+}
+.modal-quotes-header h3 {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.quotes-count {
+  background: var(--bg-accent);
+  color: var(--text-accent);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.no-quotes-modal {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+.modal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--text-secondary);
+}
+.modal-loading i {
+  font-size: 32px;
+  color: var(--text-accent);
+  margin-bottom: 16px;
+  animation: spin 1s linear infinite;
+}
+.modal-loading p {
+  font-size: 14px;
+  margin: 0;
+  color: var(--text-secondary);
+}
+.no-quotes-modal i {
+  font-size: 48px;
+  color: var(--text-accent);
+  margin-bottom: 16px;
+  display: block;
+}
+.no-quotes-modal h3 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+.no-quotes-modal p {
+  font-size: 14px;
+  margin: 0;
+}
+.modal-quote-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-secondary);
+  transition: all 0.2s ease;
+}
+.modal-quote-item:hover {
+  background: var(--bg-accent);
+  border-color: var(--border-accent);
+  transform: translateY(-1px);
+}
+.modal-quote-item:last-child {
+  margin-bottom: 0;
+}
+.modal-quote-content {
+  flex: 1;
+}
+.modal-quote-text {
+  display: block;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  font-style: italic;
+  position: relative;
+}
+.modal-quote-text::before {
+  content: '"';
+  color: var(--text-accent);
+  font-size: 20px;
+  font-weight: bold;
+  margin-right: 4px;
+}
+.modal-quote-text::after {
+  content: '"';
+  color: var(--text-accent);
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 4px;
+}
+.modal-quote-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  align-items: center;
+}
+.modal-quote-timestamp {
+  font-weight: 500;
+}
+.modal-quote-page {
+  background: var(--bg-accent);
+  color: var(--text-accent);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+}
+.modal-quote-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.modal-quote-actions .panel-button {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+  pointer-events: auto !important;
+  z-index: 1000001 !important;
+  position: relative !important;
+  cursor: pointer !important;
+  user-select: none;
+}
+.modal-quote-actions .panel-button:hover {
+  transform: scale(1.1) !important;
+  box-shadow: none !important;
+}
+.modal-quote-actions .panel-button:active {
+  transform: scale(0.95) !important;
+}
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95vw;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+  .modal-header {
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+  }
+  .modal-quote-list {
+    padding: 20px;
+  }
+  .modal-quote-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal-quote-actions {
+    align-self: flex-end;
+  }
+}
+
+.theme-applied #flipbookContainer {
+  background: var(--bg-primary) !important;
+}
+@media (hover: none) {
+  .hover-trigger {
+    display: none !important;
+  }
+}
+
+/* Below 430px the bar spans the screen and is not centre-shifted (chrome.css owns that). */
+@media (hover: none) and (min-width: 430.02px) {
+  #customControlBar {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+}
+
+/* ======================= end of the retired panel.css ====================== */
+
+
 :root {
   --shell-header-h: 52px;
   --shell-bar-h: 76px;
