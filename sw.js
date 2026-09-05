@@ -9,7 +9,7 @@
  *  - Cache name carries the app version so a deploy invalidates the old cache on activate.
  */
 
-const VERSION = '6.0.0';
+const VERSION = '6.1.0';
 const CACHE_NAME = `zaya-assets-v${VERSION}`;
 const MAX_ENTRIES = 300;
 

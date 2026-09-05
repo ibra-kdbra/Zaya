@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-09-05
+
+Two weeks of reader feedback on the 6.0 preview: the drawers now behave differently on a desk, a
+tablet and a phone; files opened from disk come back after a reload; and Arabic is a first-class
+citizen in search, including scanned books, which are recognised on the device.
+
+### Added
+- **Navigation model by device class**: on screens 1200px and wider the drawers dock beside the book, which re-centres in the remaining space, and both can stay open; between 768px and 1199px they overlay with a scrim and never stack; below 768px each is a full-width sheet. The section switcher is a vertical icon rail on the drawer's outer edge at desk sizes and a thumb-reachable bottom tab bar on phones. Drawer surfaces are fully opaque in every theme, and the tab lists carry `role=tablist` with arrow-key navigation in both axes.
+- **Local files survive a reload**: a PDF opened from this device is kept in the browser (IndexedDB, the six most recent files up to 120 MB each) and reopens on the same page next time, instead of falling back to the default document with a "re-select it" prompt. A **Recent** list in the Document tab shows links and files opened before; a file reopens from the store, a link from the network, and entries can be removed or cleared.
+- **Arabic search**: queries and page text are normalised the same way (Unicode NFKC, so the shaped presentation forms many Arabic PDFs expose as text match the letters you type; vowel marks, tatweel and alef variants are folded), glyph-split runs are glued back into words, a right-to-left query is also looked for in reverse (some producers store Arabic in the opposite order), and highlights on right-to-left runs are mirrored correctly. When a document has no text layer or its text is unmapped glyph codes, the search panel says so instead of a bare "No matches".
+- **Text recognition for scanned pages (OCR)**: when a document has no text layer, the search pane offers to recognise its pages on the device with Tesseract (WebAssembly; Arabic and English language packs are vendored, so it works offline and nothing is uploaded). Recognition runs several pages at once (one worker per spare core, fewer on phones), skips the engine's slow inverted-image retry and sizes the page image to what the model needs, so a 200-page book takes minutes rather than tens of minutes on a laptop. It starts at the page being read, shows which pages are in flight and how long is left, can be stopped at any time, and recognised text (blank pages included) is kept per document in IndexedDB so a book is only processed once. Results and on-page highlights appear as each page completes.
+
+### Changed
+- **Changelog page header**: one row that never wraps; the brand links to the repository with a small GitHub mark, the back link is plain accent text, and the version moved out of the header into a "Latest release" line above the title.
+- **Reader header**: the Zaya wordmark links to the repository (the More menu entry stays).
+- **Service worker**: scripts and stylesheets are always fetched from the network while online, even when their URL carries the release version; only fonts, images, sounds, CMaps and the OCR engine are served cache-first. A deploy within one version can no longer run new markup on old code or styles.
+- **Search status**: when nothing matches because the document has no text layer or its text is unmapped glyph codes, the panel says so.
+- **Recognition language** is a three-way segmented control (Arabic + English, Arabic, English) instead of a native dropdown, which several browsers refused to open inside the drawer. One language is about twice as fast as two, and the panel says so.
+
+### Fixed
+- **Navigator stale after opening another document**: the previous book was never disposed, so its Pages, Outline and Search panels stayed in the drawer and the new document's panels were hidden behind them. The engine is now torn down properly and the drawer replaces its panels with the new document's.
+- **Changelog page empty on Vercel**: `.vercelignore` excluded every Markdown file, so `CHANGELOG.md` was a 404 on deploys. It is now shipped, and the version badge stays hidden until the log has loaded.
+- **Control-panel width on tablets**: a user-agent check forced the panel to the full viewport width on any tablet browser and never released it; the override now applies only below 768px.
+
 ## [6.0.0] - 2026-09-04
 
 The reading interface was rebuilt around the document: a quieter theme, a real search, and a
@@ -15,16 +39,12 @@ navigation model all changed.
 
 ### Added
 - **Navigator and control panel**: the two side drawers were rebuilt: a titled Navigator with Pages (tile grid, two columns on phones), Outline (tree with indent lines) and Search tabs; a control panel with Document / Notes / Media / Settings tabs whose actions are labelled and show their state, a document header with page count, and a footer with the version.
-- **Navigation model by device class**: on screens 1200px and wider the drawers dock beside the book, which re-centres in the remaining space, and both can stay open; between 768px and 1199px they overlay with a scrim and never stack; below 768px each is a full-width sheet. The section switcher is a vertical icon rail on the drawer's outer edge at desk sizes and a thumb-reachable bottom tab bar on phones. Drawer surfaces are fully opaque in every theme, and the tab lists carry `role=tablist` with arrow-key navigation in both axes.
-- **Local files survive a reload**: a PDF opened from this device is kept in the browser (IndexedDB, the six most recent files up to 120 MB each) and reopens on the same page next time, instead of falling back to the default document with a "re-select it" prompt. A **Recent** list in the Document tab shows links and files opened before; a file reopens from the store, a link from the network, and entries can be removed or cleared.
-- **Arabic search**: queries and page text are normalised the same way (Unicode NFKC, so the shaped presentation forms many Arabic PDFs expose as text match the letters you type; vowel marks, tatweel and alef variants are folded), glyph-split runs are glued back into words, a right-to-left query is also looked for in reverse (some producers store Arabic in the opposite order), and highlights on right-to-left runs are mirrored correctly. When a document has no text layer or its text is unmapped glyph codes, the search panel says so instead of a bare "No matches".
 - **Theme picker**: grouped into Dark / Light / Coloured / Editors, compact tiles with a single swatch strip, search, keyboard navigation and a close button.
 - **Error state**: a plain-language message with "Try again" and "Open another document" replaces the raw engine error; a document you opened yourself that fails no longer silently swaps in the default document.
 
 - **Full-text search (#16)**: a search panel beside thumbnails and outline. Text is extracted once
   per document with a small concurrency pool and cancellation, every matching page is listed with a
   highlighted snippet, and clicking a result jumps to that page. `Ctrl/Cmd+F` opens it.
-- **Text recognition for scanned pages (OCR)**: when a document has no text layer, the search pane offers to recognise its pages on the device with Tesseract (WebAssembly; Arabic and English language packs are vendored, so it works offline and nothing is uploaded). Recognition starts at the page being read, results and on-page highlights appear as each page completes, it can be stopped at any time, and recognised text is kept per document in IndexedDB so a book is only processed once.
 - **Search hits on the page**: matches are painted onto the rendered page itself in both the 3D and
   the 2D renderer, not only listed in the panel. Marks follow what you type and clear when the panel
   closes.
@@ -77,7 +97,6 @@ navigation model all changed.
   commit counter are gone.
 
 ### Fixed
-- **Navigator stale after opening another document**: the previous book was never disposed, so its Pages, Outline and Search panels stayed in the drawer and the new document's panels were hidden behind them. The engine is now torn down properly and the drawer replaces its panels with the new document's.
 
 - `loadFlipbook` threw a `ReferenceError` after every successful load, which also left the loading
   lock stuck.

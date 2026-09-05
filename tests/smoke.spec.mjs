@@ -314,12 +314,13 @@ test.describe('Text recognition (OCR)', () => {
     await page.locator('.df-search-input').fill('القراءة');
     await expect(page.locator('.df-search-status')).toContainText('pages are images', { timeout: 20_000 });
 
-    await page.locator('.df-ocr-lang').selectOption('ara+eng');
+    await page.locator('.df-ocr-langbtn[data-lang="ara+eng"]').click();
+    await expect(page.locator('.df-ocr-langbtn[data-lang="ara+eng"]')).toHaveAttribute('aria-checked', 'true');
     await page.locator('.df-ocr-run').click();
     await expect(page.locator('.df-ocr-run')).toHaveText('Stop');
     // Both pages carry the word; results arrive as pages complete.
     await expect(page.locator('.df-search-result')).toHaveCount(2, { timeout: 200_000 });
-    await expect(page.locator('.df-ocr-progress')).toContainText('Recognised 2 pages', { timeout: 60_000 });
+    await expect(page.locator('.df-ocr-progress')).toContainText(/Recognised 2 pages in \d+ s/, { timeout: 60_000 });
     await expect(page.locator('.df-search-status')).toContainText(/on 2 pages/);
     // Latin text on the same pages is found too, so the mixed-language pack did its job.
     await page.locator('.df-search-input').fill('Chapter');
