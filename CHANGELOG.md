@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **One place for everything kept on the device**: page memory, quotes, files opened from disk and recognised text now live in a single IndexedDB database (`Zaya`) instead of four. The first load after upgrading copies every record across from the old databases and removes them; a database that another tab is holding open is left alone and tried again next time, so nothing is lost.
+- **Storage space is visible and manageable**: the Recent group shows how much of the space this browser allows Zaya is using, and a **Free up space** action (with an inline confirmation, not a browser dialogue) drops the stored copies of files and recognised text for documents no longer in the list. The recent entries and their remembered pages are kept. Each file entry says whether its bytes are still kept in this browser and how large it is, and the list can be walked entirely from the keyboard.
+- **Backups keep more**: the backup file is now format 2 and carries the recent documents list (metadata only, never the files themselves) and recognised text for scanned pages, up to 20 MB of it; beyond that the text is left out with a note in the file. Backups written by the previous release are still imported.
+- **Drawer state in AppState**: `navigatorOpen`, `navigatorTab` (`thumbs` | `outline` | `search`), `panelOpen` and `panelTab` (`Document` | `Notes` | `Media` | `Settings`) are stored and restored like the other preferences, so both drawers reopen where the reader left them (issue #24).
+- **More-menu choices are remembered**: the page-mode override (single or double) and the page-turn sound survive a reload and a change of document, alongside the bottom-bar mode that was already kept. An explicit `?mode=` still wins over the remembered choice.
+
+### Changed
+- **The app layer no longer uses jQuery**: `ui/controls.js`, `features/controls/custom-controls.js` and the DOM work in `core/load.js` are plain DOM — the same ids, `zaya:*` events, `ZayaPanel` / `ZayaNavigator` / `ZayaDrawers` / `ZayaDocuments` APIs, keyboard shortcuts and drawer model, with the engine's jQuery objects unwrapped only where the flipbook itself hands them over. jQuery remains a dependency of the vendored engine.
+- **No user text is ever built into markup**: the notes list and its modal, the delete confirmation, the theme picker, the mobile hints and the "re-select the file" toast are all built from elements, so a quote, a filename or a document name reaches the page as text and never through `innerHTML`. A plugin's `ZayaUI.registerPanelTab({ content })` now takes a node or plain text; markup goes through `renderContent`.
+- **Drawer state reads and writes AppState**: the Navigator and the control panel take their open state and selected tab from `navigatorOpen` / `navigatorTab` / `panelOpen` / `panelTab`, so link presets and a restored backup drive them. Drawers that were left open are only reopened where they are layout rather than an overlay (1200px and wider); on smaller screens the tab is remembered but the drawer starts closed.
+- **The legacy panel stylesheet is retired**: `lib/css/page/panel.css` is gone. What was still in use — the bottom bar, the More menu, the notes modal, the toggle switch and the volume slider — moved to the top of `page/shell.css`, and everything a later sheet already restyled was dropped.
+- **The flipbook engine is split by responsibility**: the search pane (query, results, and the offer to recognise scanned pages) is now `lib/js/features/search/search-panel.js`, the thumbnail and outline drawers are `lib/js/core/dflip/features/side-panels.js`, and `texture-library.js` is left with textures and page rendering — half its previous size, with no change to what the panels do.
+
+### Fixed
+- **Pages are visible without WebGL**: the 2D renderer never received page images, so a browser with no working WebGL (or `?render=css`) showed a blank book. It now paints every page face, turns pages with a real fold-free flip, and keeps thumbnails, search and painted search marks working; the renderer can be pinned with `?render=css` or `?render=webgl` for testing (issue #22).
+- **A full browser no longer fails silently**: a file that would not fit is not stored, and the reader is told it opens normally but will need to be picked again. Every write that runs out of space raises one clear message instead of an unhandled error.
+
 ## [6.1.0] - 2026-09-05
 
 Two weeks of reader feedback on the 6.0 preview: the drawers now behave differently on a desk, a

@@ -61,6 +61,60 @@ export async function goToPage(page, n, key) {
   }
 }
 
+/**
+ * A same-origin page that runs none of the app, so a test can prepare IndexedDB before the first
+ * load. The static server's directory listing is enough.
+ */
+export async function blankPage(page) {
+  await page.goto('/tests/fixtures/');
+}
+
+/** Seed the four databases Zaya used before everything moved into one. */
+export async function seedLegacyDatabases(page, seed) {
+  await page.evaluate(async (data) => {
+    const open = (name, version, upgrade) => new Promise((resolve, reject) => {
+      const req = indexedDB.open(name, version);
+      req.onupgradeneeded = (e) => upgrade(e.target.result, e.target.transaction);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    const write = (db, store, rows) => new Promise((resolve, reject) => {
+      const t = db.transaction([store], 'readwrite');
+      const s = t.objectStore(store);
+      rows.forEach((r) => (r.key !== undefined ? s.put(r.value, r.key) : s.put(r.value)));
+      t.oncomplete = () => resolve();
+      t.onerror = () => reject(t.error);
+    });
+
+    const pages = await open('FlipBookPageMemory', 1, (db) => db.createObjectStore('pages'));
+    await write(pages, 'pages', [{ key: data.pageKey, value: data.page }]);
+    pages.close();
+
+    const quotes = await open('QuotesDB', 3, (db) => {
+      const store = db.createObjectStore('quotes', { keyPath: 'id', autoIncrement: true });
+      store.createIndex('pdfUrl', 'pdfUrl', { unique: false });
+      store.createIndex('timestamp', 'timestamp', { unique: false });
+      db.createObjectStore('settings', { keyPath: 'id' });
+    });
+    await write(quotes, 'quotes', [{ value: { id: 1, quote: data.quote, pdfUrl: data.docKey, pdfName: data.docKey, pageNumber: 2, timestamp: new Date().toISOString() } }]);
+    await write(quotes, 'settings', [{ value: { id: 'user_settings', theme: 'nord', autoHide: true, volume: 42 } }]);
+    quotes.close();
+
+    const files = await open('ZayaLocalDocs', 1, (db) => db.createObjectStore('files', { keyPath: 'name' }).createIndex('savedAt', 'savedAt'));
+    await write(files, 'files', [{ value: { name: data.docKey, size: 9, type: 'application/pdf', lastModified: 0, savedAt: Date.now(), blob: new Blob(['%PDF-1.4\n'], { type: 'application/pdf' }) } }]);
+    files.close();
+
+    const ocr = await open('ZayaOcr', 1, (db) => db.createObjectStore('pages', { keyPath: 'id' }).createIndex('doc', 'doc'));
+    await write(ocr, 'pages', [{ value: { id: `${data.docKey} 1`, doc: data.docKey, page: 1, lang: 'eng', lines: [{ words: [{ s: 'legacy', x: 1, y: 1, w: 10, h: 5 }] }], at: Date.now() } }]);
+    ocr.close();
+  }, seed);
+}
+
+/** The IndexedDB databases this origin holds, by name. */
+export function databaseNames(page) {
+  return page.evaluate(() => (indexedDB.databases ? indexedDB.databases().then((l) => l.map((d) => d.name)) : []));
+}
+
 export function readState(page) {
   return page.evaluate(() => ({
     ...window.appState.getState(),

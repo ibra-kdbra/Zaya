@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
-  stubNetwork, collectErrors, waitForBook, openPanel, activePage, goToPage, readState, wavFixture, SAMPLE_PDF_PATH
+  stubNetwork, collectErrors, waitForBook, openPanel, activePage, goToPage, readState, wavFixture,
+  blankPage, seedLegacyDatabases, databaseNames, SAMPLE_PDF_PATH
 } from './helpers.mjs';
 
 // A same-origin PDF (served by the test web server) and a stubbed remote one.
@@ -228,7 +229,7 @@ test.describe('Quotes', () => {
 
     // Filed under the filename, not the blob URL that dies with the page.
     const stored = await page.evaluate(() => new Promise((resolve) => {
-      const req = indexedDB.open('QuotesDB');
+      const req = indexedDB.open('Zaya');
       req.onsuccess = () => {
         const all = req.result.transaction('quotes', 'readonly').objectStore('quotes').getAll();
         all.onsuccess = () => resolve(all.result);
@@ -449,6 +450,7 @@ test.describe('Offline shell and backup', () => {
       window.themeManager.setTheme('gruvbox');
     });
     const payload = await page.evaluate(() => window.ZayaBackup.exportBackup());
+    expect(payload.version).toBe(2);
     expect(payload.preferences).toMatchObject({ theme: 'gruvbox', mediaVolume: 71, mediaLoop: true, mediaMode: 'audio' });
     expect(payload.settings).toBeTruthy();
 
@@ -464,6 +466,249 @@ test.describe('Offline shell and backup', () => {
     expect(state.mediaMode).toBe('audio');
     await expect(page.locator('html')).toHaveClass(/theme-gruvbox/);
   });
+
+  test('a backup carries the recent list and recognised text, and a version 1 file still imports', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    // A recent entry and one recognised page.
+    await page.evaluate(() => {
+      window.ZayaLocalDocs.touch({ key: 'scanned.pdf', type: 'local', name: 'scanned.pdf', size: 2048 });
+      return window.ZayaDB.put('ocr', { id: 'scanned.pdf 1', doc: 'scanned.pdf', page: 1, lang: 'eng', lines: [{ words: [{ s: 'hello', x: 1, y: 1, w: 9, h: 4 }] }], at: Date.now() });
+    });
+
+    const payload = await page.evaluate(() => window.ZayaBackup.exportBackup());
+    expect(payload.version).toBe(2);
+    expect(payload.recent.map((r) => r.key)).toContain('scanned.pdf');
+    expect(payload.ocr).toHaveLength(1);
+    expect(payload.ocr[0]).toMatchObject({ doc: 'scanned.pdf', page: 1, lang: 'eng' });
+    expect(payload.notes).toEqual([]);
+
+    // Wipe both, then import the same file back.
+    await page.evaluate(() => {
+      localStorage.removeItem('zayaRecentDocs');
+      return window.ZayaDB.clear('ocr');
+    });
+    await page.evaluate((p) => window.ZayaBackup.importBackup(new File([JSON.stringify(p)], 'b.json')), payload);
+    await expect.poll(() => page.evaluate(() => window.ZayaLocalDocs.recent().map((r) => r.key)), { timeout: 10_000 }).toContain('scanned.pdf');
+    await expect.poll(() => page.evaluate(() => window.ZayaDB.byIndex('ocr', 'doc', 'scanned.pdf').then((r) => r.length)), { timeout: 10_000 }).toBe(1);
+
+    // Importing it a second time adds nothing new.
+    await page.evaluate((p) => window.ZayaBackup.importBackup(new File([JSON.stringify(p)], 'b.json')), payload);
+    expect(await page.evaluate(() => window.ZayaLocalDocs.recent().filter((r) => r.key === 'scanned.pdf').length)).toBe(1);
+
+    // A file written by the previous release carries neither section and is still accepted.
+    const v1 = { ...payload, version: 1 };
+    delete v1.recent;
+    delete v1.ocr;
+    const result = await page.evaluate((p) => window.ZayaBackup.importBackup(new File([JSON.stringify(p)], 'v1.json')), v1);
+    expect(result.recent).toBe(0);
+    expect(result.ocr).toBe(0);
+  });
+});
+
+test.describe('One database', () => {
+  const SEED = { pageKey: 'legacy.pdf', page: 7, docKey: 'legacy.pdf', quote: 'A quote from the old database' };
+
+  test('the four older databases are imported once and then removed', async ({ page }) => {
+    await stubNetwork(page);
+    const errors = collectErrors(page);
+
+    // Seed the old databases on a page that runs none of the app, then start Zaya for the first time.
+    await blankPage(page);
+    await seedLegacyDatabases(page, SEED);
+    expect(await databaseNames(page)).toEqual(
+      expect.arrayContaining(['FlipBookPageMemory', 'QuotesDB', 'ZayaLocalDocs', 'ZayaOcr'])
+    );
+
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    // Everything reaches the new APIs unchanged.
+    await expect.poll(() => page.evaluate(() => window.getLastPage('legacy.pdf')), { timeout: 15_000 }).toBe(7);
+    await expect.poll(() => page.evaluate(() => window.ZayaLocalDocs.getFile('legacy.pdf').then((r) => !!r)), { timeout: 15_000 }).toBe(true);
+    const quotes = await page.evaluate(() => window.ZayaDB.getAll('quotes'));
+    expect(quotes.map((q) => q.quote)).toContain(SEED.quote);
+    const ocr = await page.evaluate(() => window.ZayaDB.byIndex('ocr', 'doc', 'legacy.pdf'));
+    expect(ocr).toHaveLength(1);
+    expect(ocr[0].lines[0].words[0].s).toBe('legacy');
+
+    // ...and the old databases are gone, leaving one.
+    await expect.poll(() => databaseNames(page), { timeout: 15_000 }).toEqual(['Zaya']);
+    expect(errors).toEqual([]);
+
+    // A second visit finds nothing to import and leaves the data alone.
+    await page.reload();
+    await waitForBook(page);
+    await expect.poll(() => databaseNames(page), { timeout: 15_000 }).toEqual(['Zaya']);
+    expect(await page.evaluate(() => window.getLastPage('legacy.pdf'))).toBe(7);
+    expect(await page.evaluate(() => window.ZayaDB.getAll('quotes').then((q) => q.length))).toBe(1);
+  });
+
+  test('a fresh profile opens the single database with every store', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+    await expect.poll(() => page.evaluate(() => window.ZayaDB.open().then((db) => Array.from(db.objectStoreNames).sort())), { timeout: 15_000 })
+      .toEqual(['files', 'ocr', 'pages', 'quotes', 'settings']);
+    await expect.poll(() => databaseNames(page), { timeout: 15_000 }).toEqual(['Zaya']);
+  });
+});
+
+test.describe('Storage space', () => {
+  test('the Recent group reports usage and can free up space without forgetting anything', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
+    await waitForBook(page);
+    await goToPage(page, 2, 'sample.pdf');
+
+    // The entry says the file is kept, with its size, and the group carries a usage line.
+    const item = page.locator('#recentDocsList .recent-item').first();
+    await expect(item.locator('.recent-state')).toHaveText('Kept in this browser', { timeout: 10_000 });
+    await expect(item.locator('.recent-size')).not.toHaveText('');
+    await expect(page.locator('#storageUsageLine')).toContainText('of the space this browser allows');
+
+    // Freeing space asks first, in the panel rather than through the browser.
+    await page.locator('#freeUpSpaceBtn').click();
+    await expect(page.locator('#freeUpSpaceConfirm')).toBeVisible();
+    await page.locator('#freeUpSpaceCancelBtn').click();
+    await expect(page.locator('#freeUpSpaceConfirm')).toBeHidden();
+    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf').then((r) => !!r))).toBe(true);
+
+    await page.locator('#freeUpSpaceBtn').click();
+    await page.locator('#freeUpSpaceConfirmBtn').click();
+
+    // The stored copy goes; the entry and the page it remembers stay.
+    await expect(item.locator('.recent-state')).toHaveText('Not kept', { timeout: 10_000 });
+    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf'))).toBeNull();
+    expect(await page.evaluate(() => window.ZayaLocalDocs.recent().map((r) => r.key))).toContain('sample.pdf');
+    expect(await page.evaluate(() => window.getLastPage('sample.pdf'))).toBe(2);
+  });
+
+  test('a file that would not fit is not kept, and the reader is told', async ({ page }) => {
+    await stubNetwork(page);
+    // Pretend the browser is nearly full for this page only.
+    await page.addInitScript(() => {
+      if (navigator.storage) navigator.storage.estimate = () => Promise.resolve({ usage: 1000, quota: 1200 });
+    });
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
+    await expect(page.locator('.toastify')).toContainText('Not enough space in this browser', { timeout: 15_000 });
+    await waitForBook(page);
+
+    // The document still opens; it is simply not kept for next time.
+    expect(await page.evaluate(() => window.appState.get('currentPdfType'))).toBe('local');
+    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf'))).toBeNull();
+    await expect(page.locator('#recentDocsList .recent-state').first()).toHaveText('Not kept');
+  });
+
+  test('the recent list can be walked and cleared from the keyboard', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
+    await waitForBook(page);
+    await page.locator('#pdfUrl').fill(REMOTE_PDF);
+    await page.locator('#loadPdfUrlBtn').click();
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdf')), { timeout: 20_000 }).toBe(REMOTE_PDF);
+    await waitForBook(page);
+
+    const items = page.locator('#recentDocsList .recent-item');
+    await expect(items).toHaveCount(2, { timeout: 10_000 });
+
+    // The current document's Open button is disabled, so the first stop is its remove button.
+    await items.nth(0).locator('.recent-remove').focus();
+    await page.keyboard.press('ArrowDown');
+    await expect.poll(() => page.evaluate(() => document.activeElement.className)).toContain('recent-open');
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => page.evaluate(() => document.activeElement.className)).toContain('recent-remove');
+    await page.keyboard.press('ArrowLeft');
+    await expect.poll(() => page.evaluate(() => document.activeElement.className)).toContain('recent-open');
+    await page.keyboard.press('Delete');
+    await expect(items).toHaveCount(1);
+  });
+
+  test('a full browser raises one toast instead of an unhandled rejection', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    const rejections = [];
+    page.on('pageerror', (err) => rejections.push(err.message));
+    const failed = await page.evaluate(async () => {
+      // Every store write refuses, the way a browser that has run out of room does.
+      const original = IDBObjectStore.prototype.put;
+      IDBObjectStore.prototype.put = function put() { throw new DOMException('full', 'QuotaExceededError'); };
+      const results = await Promise.all([
+        window.saveLastPage('quota-test.pdf', 3).then(() => 'ok', () => 'rejected'),
+        window.ZayaLocalDocs.saveFile(new File([new Uint8Array(10)], 'quota.pdf')).then((kept) => kept, () => 'rejected')
+      ]);
+      IDBObjectStore.prototype.put = original;
+      return results;
+    });
+    expect(failed).toEqual(['ok', false]); // handled, never thrown back at the caller
+    await expect(page.locator('.toastify')).toContainText('no room left in this browser', { timeout: 10_000 });
+    expect(rejections).toEqual([]);
+  });
+});
+
+test.describe('Drawer state in AppState', () => {
+  test('the drawer fields default sensibly, persist, and reject unknown tabs', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    let state = await readState(page);
+    expect(state.navigatorOpen).toBe(false);
+    expect(state.navigatorTab).toBe('thumbs');
+    expect(state.panelOpen).toBe(false);
+    expect(state.panelTab).toBe('Document');
+
+    const seen = await page.evaluate(() => new Promise((resolve) => {
+      window.appState.subscribe('navigatorTab', (value) => resolve(value));
+      window.appState.setNavigatorTab('outline');
+    }));
+    expect(seen).toBe('outline');
+
+    await page.evaluate(() => {
+      window.appState.setNavigatorOpen(true);
+      window.appState.setPanelTab('Notes');
+      window.appState.setPanelOpen(true);
+      window.appState.setNavigatorTab('nonsense');   // ignored
+      window.appState.setPanelTab('Elsewhere');      // ignored
+    });
+    expect(await page.evaluate(() => ({
+      navigatorTab: localStorage.getItem('navigatorTab'),
+      navigatorOpen: localStorage.getItem('navigatorOpen'),
+      panelTab: localStorage.getItem('panelTab'),
+      panelOpen: localStorage.getItem('panelOpen')
+    }))).toEqual({ navigatorTab: 'outline', navigatorOpen: 'true', panelTab: 'Notes', panelOpen: 'true' });
+
+    await page.reload();
+    await waitForBook(page);
+    state = await readState(page);
+    expect(state.navigatorOpen).toBe(true);
+    expect(state.navigatorTab).toBe('outline');
+    expect(state.panelTab).toBe('Notes');
+
+    // A hand-edited value from another release falls back to the default.
+    await page.evaluate(() => localStorage.setItem('navigatorTab', 'sideways'));
+    await page.reload();
+    await waitForBook(page);
+    expect(await page.evaluate(() => window.appState.get('navigatorTab'))).toBe('thumbs');
+  });
 });
 
 test.describe('Deploy guard', () => {
@@ -473,7 +718,7 @@ test.describe('Deploy guard', () => {
       // The guard reloads the page mid-flight; a fetch cut off by that navigation must not fail the test.
       try {
         const res = await route.fetch();
-        const html = (await res.text()).replace('data-zaya-version="6.1.0"', 'data-zaya-version="0.0.1"');
+        const html = (await res.text()).replace('data-zaya-version="6.2.0"', 'data-zaya-version="0.0.1"');
         await route.fulfill({ response: res, body: html, headers: { ...res.headers(), 'content-type': 'text/html' } });
       } catch (e) {
         try { await route.continue(); } catch (e2) { /* the request is gone */ }
@@ -483,7 +728,7 @@ test.describe('Deploy guard', () => {
     await page.goto('/index.html');
     // The guard reloads exactly once, then boots normally on the second pass.
     await expect.poll(() => page.evaluate(() => { try { return sessionStorage.getItem('zaya:reloaded-for'); } catch (e) { return null; } }).catch(() => null), { timeout: 15_000 }).toBe('0.0.1');
-    await expect(page.locator('#currentVersion')).toHaveText(/v6\.1\.0/, { timeout: 30_000 });
+    await expect(page.locator('#currentVersion')).toHaveText(/v6\.2\.0|Unreleased/, { timeout: 30_000 });
     const cacheNames = await page.evaluate(async () => ('caches' in window) ? (await caches.keys()).filter((k) => k.startsWith('zaya-')) : []);
     // Only the freshly (re)installed worker's cache may exist; nothing from before the reload.
     expect(cacheNames.length).toBeLessThanOrEqual(1);

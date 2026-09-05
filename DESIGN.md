@@ -56,7 +56,6 @@ gradient or `--shadow-primary` into a coloured glow is wrong.
 
 - `lib/css/page/chrome.css` – the fixed controls around the book (top-right cluster, version
   label, bottom bar, side-panel skins, focus rings). Loaded last, wins by order not by `!important`.
-- `lib/css/page/panel.css` – the right-hand control panel and the quotes/media sections.
 - `lib/css/page/custom-ui.css` – the search panel, thumbnails and outline skins.
 - `lib/css/vendor/tailwind.css` – utilities used by the markup, precompiled (`npm run build:css`).
 

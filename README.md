@@ -117,7 +117,7 @@ the control panel (Settings → Media Loop). The setting is remembered across se
     └── 📁assets
     └── 📁lib
         └── 📁css
-            └── 📁page        chrome.css, panel.css, custom-ui.css, changelog.css
+            └── 📁page        chrome.css, shell.css, custom-ui.css, storage.css, changelog.css
             └── 📁themes      themes.css (all colour themes and design tokens)
             └── 📁vendor      fonts.css, tailwind.css, fontawesome, toastify (compiled/vendored)
         └── 📁fonts           self-hosted IBM Plex Sans/Mono
