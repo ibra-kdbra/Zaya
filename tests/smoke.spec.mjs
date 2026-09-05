@@ -336,3 +336,127 @@ test.describe('Text recognition (OCR)', () => {
     expect(await page.evaluate(() => !!window.Tesseract)).toBe(false);
   });
 });
+
+test.describe('2D (CSS) render mode', () => {
+  // `?render=css` pins the renderer that browsers without WebGL fall back to (issue #22).
+  const activePage = (page) => page.evaluate(() => window.dFlipBook.target._activePage);
+
+  /** How many on-screen page faces actually carry a rendered page. */
+  const paintedFaces = (page) => page.evaluate(() => {
+    const leaves = Array.from(document.querySelectorAll('.df-book-page.df-css-page'))
+      .filter((leaf) => leaf.style.display !== 'none');
+    let painted = 0;
+    for (const leaf of leaves) {
+      for (const face of leaf.querySelectorAll('.df-page-front, .df-page-back')) {
+        if (face.querySelector('canvas') || /url\(/.test(face.style.backgroundImage)) painted++;
+      }
+    }
+    return painted;
+  });
+
+  test('pages render as images and the bar buttons turn them', async ({ page }) => {
+    await stubNetwork(page);
+    const errors = collectErrors(page);
+
+    await page.goto('/index.html?render=css&pdf=https://example.com/sample.pdf');
+    await expect(page.locator('#flipbookContainer .df-book-page').first()).toBeVisible({ timeout: 30_000 });
+
+    expect(await page.evaluate(() => window.dFlipBook.renderMode)).toBe('css');
+    expect(await page.evaluate(() => window.dFlipBook.target.type)).toBe('BookCSS');
+    expect(await page.evaluate(() => document.querySelectorAll('#flipbookContainer > canvas').length)).toBe(0);
+
+    // The cover is painted, not a blank sheet.
+    await expect.poll(() => paintedFaces(page), { timeout: 20_000 }).toBeGreaterThan(0);
+    expect(await activePage(page)).toBe(1);
+
+    // Reveal the auto-hidden bottom bar, then turn forward and back with its buttons.
+    await page.mouse.move(640, 715);
+    await expect(page.locator('#customControlBar')).toBeInViewport({ timeout: 10_000 });
+    await page.waitForTimeout(500); // let the slide-in settle so the click target is stable
+    await page.locator('#customNextBtn').click({ timeout: 10_000 });
+    await expect.poll(() => activePage(page), { timeout: 15_000 }).toBe(3);
+    await expect.poll(() => paintedFaces(page), { timeout: 20_000 }).toBeGreaterThan(1);
+    await expect(page.locator('#customCurrentPageInput')).toHaveValue('3', { timeout: 10_000 });
+
+    await page.locator('#customPrevBtn').click({ timeout: 10_000 });
+    await expect.poll(() => activePage(page), { timeout: 15_000 }).toBe(1);
+    await expect.poll(() => paintedFaces(page), { timeout: 20_000 }).toBeGreaterThan(0);
+
+    const ignorable = /favicon|sw\.js|Service Worker|THREE\.WebGLRenderer|WebGL|GPU stall|api\.github\.com|pro-features|404/i;
+    expect(errors.filter((e) => !ignorable.test(e))).toEqual([]);
+  });
+
+  test('thumbnails, search and painted highlights still work without WebGL', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html?render=css&pdf=https://example.com/sample.pdf');
+    await expect(page.locator('#flipbookContainer .df-book-page').first()).toBeVisible({ timeout: 30_000 });
+
+    await page.evaluate(() => window.ZayaNavigator.open('thumbs'));
+    await expect(page.locator('#navPaneThumbs .df-vrow')).toHaveCount(3, { timeout: 20_000 });
+
+    await page.evaluate(() => window.ZayaNavigator.setTab('search'));
+    const input = page.locator('.df-search-input');
+    await expect(input).toBeVisible({ timeout: 15_000 });
+    await input.fill('zebra');
+    await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 20_000 });
+
+    await page.locator('.df-search-result').first().click();
+    await expect.poll(() => activePage(page), { timeout: 15_000 }).toBe(3);
+    // Marks are painted into the page texture, so the 2D pages get them exactly as the 3D ones do.
+    await expect.poll(() => page.evaluate(
+      () => window.dFlipBook.contentProvider.searchController.getHighlightRects(3, 'zebra').length
+    ), { timeout: 20_000 }).toBeGreaterThan(0);
+  });
+});
+
+test.describe('Search highlight geometry', () => {
+  const FIXTURES = new URL('./fixtures/', import.meta.url).pathname;
+
+  // A highlight box must sit on the run of glyphs it came from, never span the whole line.
+  test('Arabic hits are boxed on the matched word, in visual and logical order', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    for (const [file, terms] of [
+      ['sample-arabic.pdf', ['القراءة', 'الفصل', 'والمعرفة', 'الملحق']],
+      ['sample-arabic-logical.pdf', ['العقل', 'القراءة']]
+    ]) {
+      await openPanel(page, 'Document');
+      await page.setInputFiles('#pdfFile', FIXTURES + file);
+      await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe(file);
+      await waitForBook(page);
+      await page.evaluate(() => window.ZayaNavigator.open('search'));
+      await expect(page.locator('.df-search-input')).toBeVisible({ timeout: 15_000 });
+
+      for (const term of terms) {
+        await page.locator('.df-search-input').fill(term);
+        await expect(page.locator('.df-search-result').first()).toBeVisible({ timeout: 20_000 });
+
+        const checked = await page.evaluate((query) => {
+          const controller = window.dFlipBook.contentProvider.searchController;
+          const found = [];
+          for (let p = 1; p <= controller.numPages; p++) {
+            const entry = controller.pages[p];
+            if (!entry || !entry.spans || !entry.spans.length) continue;
+            for (const [x, y, w] of controller.getHighlightRects(p, query)) {
+              // The box must fall inside one indexed run, and be no wider than it.
+              const host = entry.spans.find((s) => x >= s.transform[4] - 1 &&
+                x + w <= s.transform[4] + s.width + 1 && Math.abs(s.transform[5] - y - 0.2 * (s.height || 1)) < 4);
+              found.push({ page: p, inside: !!host, share: host ? w / host.width : 0 });
+            }
+          }
+          return found;
+        }, term);
+
+        expect(checked.length, `${file} "${term}" produced no boxes`).toBeGreaterThan(0);
+        for (const box of checked) {
+          expect(box.inside, `${file} "${term}" box on page ${box.page} escaped its text run`).toBe(true);
+          // A word is a fraction of its line: a box covering the whole run would mean the
+          // proportional split had been lost.
+          expect(box.share, `${file} "${term}" box on page ${box.page} covers the whole run`).toBeLessThanOrEqual(1.001);
+        }
+      }
+    }
+  });
+});
