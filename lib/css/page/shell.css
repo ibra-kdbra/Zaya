@@ -1834,7 +1834,9 @@ h3 { font-size: 12px; line-height: 1.4; }
 
 @media (prefers-reduced-motion: reduce) {
   .drawer,
-  .drawer-scrim { transition: none !important; }
+  .drawer-scrim,
+  .modal-container,
+  .modal-content { transition: none !important; }
 }
 
 /* The panel must never freeze the book behind it on desktop */

@@ -43,8 +43,18 @@ async function scan(page, context) {
   }));
 }
 
+/** Wait until an element's fade has finished, so axe measures the settled colours, not a frame of it. */
+async function settled(page, selector) {
+  await page.waitForFunction((sel) => {
+    const el = document.querySelector(sel);
+    return !!el && getComputedStyle(el).opacity === '1';
+  }, selector);
+}
+
 async function openReader(page, lang, size) {
   await page.setViewportSize({ width: size.width, height: size.height });
+  // Motion is a hint, not content: with it off, every surface is scanned in its final state.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await stubNetwork(page);
   await page.goto(`/index.html?pdf=https://example.com/sample.pdf&lang=${lang}`);
   await waitForBook(page);
@@ -70,6 +80,8 @@ for (const lang of LANGUAGES) {
       await openPanel(page, 'Notes');
       await page.locator('#quotesToggleBtn').click();
       await expect(page.locator('#pdfSpecificQuotesModal')).toHaveClass(/open/);
+      await settled(page, '#pdfSpecificQuotesModal');
+      await settled(page, '#pdfSpecificQuotesModal .modal-content');
       found.push(...await scan(page, 'notes modal'));
       await page.locator('#pdfSpecificQuotesModal .modal-close').click();
 
@@ -77,6 +89,7 @@ for (const lang of LANGUAGES) {
       await openPanel(page, 'Settings');
       await page.locator('#openThemeSelectorBtn').click();
       await expect(page.locator('#themeSelectorOverlay')).toHaveClass(/active/);
+      await settled(page, '#themeSelectorOverlay');
       found.push(...await scan(page, 'theme picker'));
       await page.keyboard.press('Escape');
       await expect(page.locator('#themeSelectorOverlay')).not.toHaveClass(/active/);
