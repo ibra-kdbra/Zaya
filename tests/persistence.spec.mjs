@@ -711,6 +711,35 @@ test.describe('Drawer state in AppState', () => {
   });
 });
 
+test.describe('Stiff pages', () => {
+  test('the hard-cover choice persists across a reload and reaches the flipbook options', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    expect(await page.evaluate(() => window.dFlipBook.options.hard)).toBe('none');
+
+    await openPanel(page, 'Settings');
+    await page.locator('#hardCoverCover').click();
+    await expect(page.locator('#hardCoverCover')).toHaveAttribute('aria-selected', 'true');
+    // Changing it reopens the document, so wait for the new book before reading its options.
+    await waitForBook(page);
+    await expect.poll(() => page.evaluate(() => window.dFlipBook.options.hard), { timeout: 30_000 }).toBe('cover');
+    expect(await page.evaluate(() => localStorage.getItem('hardCover'))).toBe('cover');
+
+    await page.reload();
+    await waitForBook(page);
+    expect(await page.evaluate(() => window.appState.get('hardCover'))).toBe('cover');
+    await expect.poll(() => page.evaluate(() => window.dFlipBook.options.hard), { timeout: 30_000 }).toBe('cover');
+
+    // A hand-edited value from another release falls back to the default.
+    await page.evaluate(() => localStorage.setItem('hardCover', 'granite'));
+    await page.reload();
+    await waitForBook(page);
+    expect(await page.evaluate(() => window.appState.get('hardCover'))).toBe('none');
+  });
+});
+
 test.describe('Deploy guard', () => {
   test('a script from another release than the markup purges caches and recovers', async ({ page, context }) => {
     // Serve index.html stamped with a different release than app.js reports.

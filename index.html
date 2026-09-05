@@ -26,6 +26,8 @@
   <!-- App shell (header, drawers, tabs): loaded last so it wins by order, not by !important -->
   <link rel="stylesheet" href="lib/css/page/shell.css?v=6.2.0">
   <link rel="stylesheet" href="lib/css/page/storage.css?v=6.2.0">
+  <!-- Print sheet: screen-invisible, and the only thing left on the page when printing -->
+  <link rel="stylesheet" href="lib/css/page/print.css?v=6.2.0">
 
   <!-- Per-deployment settings (default PDF, etc.) live in config.js -->
   <script src="config.js"></script>
@@ -322,6 +324,22 @@
             </div>
 
             <div class="panel-group">
+              <h3 class="panel-section-title">Pages</h3>
+              <p class="panel-note">Stiff pages turn as one board instead of bending. The document reopens when this changes.</p>
+              <div class="segmented segmented-sm" id="hardCoverSwitch" role="group" aria-label="Stiff pages">
+                <button id="hardCoverNone" type="button" class="seg-btn" data-hard-cover="none" aria-selected="true">
+                  <span>Soft</span>
+                </button>
+                <button id="hardCoverCover" type="button" class="seg-btn" data-hard-cover="cover" aria-selected="false">
+                  <span>Hard cover</span>
+                </button>
+                <button id="hardCoverAll" type="button" class="seg-btn" data-hard-cover="all" aria-selected="false">
+                  <span>All pages</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="panel-group">
               <h3 class="panel-section-title">Backup</h3>
               <p class="panel-note">Notes and preferences live in this browser. Keep a copy as a JSON file.</p>
               <div class="btn-pair">
@@ -341,6 +359,7 @@
                 <div class="shortcut"><dt>Turn page</dt><dd><kbd>&larr;</kbd><kbd>&rarr;</kbd></dd></div>
                 <div class="shortcut"><dt>Search in document</dt><dd><kbd>Ctrl</kbd><kbd>F</kbd></dd></div>
                 <div class="shortcut"><dt>Control panel</dt><dd><kbd>Ctrl</kbd><kbd>K</kbd></dd></div>
+                <div class="shortcut"><dt>Print pages</dt><dd><kbd>Ctrl</kbd><kbd>P</kbd></dd></div>
                 <div class="shortcut"><dt>Fullscreen</dt><dd><kbd>F</kbd></dd></div>
                 <div class="shortcut"><dt>Close panel or drawer</dt><dd><kbd>Esc</kbd></dd></div>
               </dl>
@@ -420,6 +439,10 @@
             <i class="fas fa-download"></i>
             <span>Download PDF</span>
           </button>
+          <button class="more-menu-item" id="menuPrintBtn">
+            <i class="fas fa-print"></i>
+            <span>Print…</span>
+          </button>
           <button class="more-menu-item" id="menuPageModeBtn">
             <i class="fas fa-file-alt"></i>
             <span>Single Page Mode</span>
@@ -459,6 +482,65 @@
     <p class="doc-loading-name"><span data-pdf-info></span></p>
     <p class="doc-loading-text">Opening document…</p>
   </div>
+
+  <!-- Print dialog: choose a range, then render those pages into #printSheet -->
+  <div id="printDialog" class="print-overlay" hidden>
+    <div class="print-panel" id="printDialogPanel" role="dialog" aria-modal="true" aria-labelledby="printDialogTitle">
+      <div class="print-panel-head">
+        <h2 class="print-title" id="printDialogTitle">Print pages</h2>
+        <button id="printCloseBtn" class="print-close" type="button" title="Close" aria-label="Close">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="print-panel-body">
+        <div class="segmented segmented-sm" id="printRangeSwitch" role="group" aria-label="Pages to print">
+          <button id="printRangeCurrent" type="button" class="seg-btn" data-print-range="current" aria-selected="true">
+            <span>Current page(s)</span>
+          </button>
+          <button id="printRangeAll" type="button" class="seg-btn" data-print-range="all" aria-selected="false">
+            <span>All pages</span>
+          </button>
+          <button id="printRangeCustom" type="button" class="seg-btn" data-print-range="custom" aria-selected="false">
+            <span>Custom</span>
+          </button>
+        </div>
+
+        <div class="print-field" id="printCustomField" hidden>
+          <label class="print-label" for="printRangeInput">Pages to print</label>
+          <input id="printRangeInput" class="panel-input print-input" type="text" inputmode="numeric"
+                 placeholder="3-7, 10, 12-14" autocomplete="off"
+                 aria-describedby="printRangeHint" aria-invalid="false">
+          <p class="print-hint" id="printRangeHint">Single pages and ranges, separated by commas.</p>
+          <p class="print-error" id="printRangeError" role="alert" hidden></p>
+        </div>
+
+        <p class="print-summary" id="printSummary">1 page</p>
+
+        <div class="panel-row">
+          <span class="panel-row-label">Include search marks</span>
+          <label class="toggle-switch-modern">
+            <input type="checkbox" id="printMarksToggle">
+            <span class="slider-modern"></span>
+            <span class="sr-only">Include search marks on the printed pages</span>
+          </label>
+        </div>
+
+        <p class="print-warning" id="printWarning" hidden></p>
+        <p class="print-progress" id="printProgress" role="status" aria-live="polite" hidden></p>
+      </div>
+
+      <div class="print-panel-foot">
+        <button id="printCancelBtn" class="ui-btn ui-btn-quiet" type="button">Cancel</button>
+        <button id="printConfirmBtn" class="ui-btn ui-btn-primary" type="button">
+          <i class="fas fa-print" aria-hidden="true"></i><span id="printConfirmLabel">Print</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- The rendered pages. Hidden on screen; the only thing @media print leaves visible. -->
+  <div id="printSheet" aria-hidden="true"></div>
 
   <!-- PDF-Specific Quotes Modal -->
   <div id="pdfSpecificQuotesModal" class="modal-container" role="dialog" aria-modal="true" aria-labelledby="pdfQuotesModalTitle">

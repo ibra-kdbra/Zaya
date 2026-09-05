@@ -1,0 +1,60 @@
+/*
+ * The print sheet: one <img> per selected page inside #printSheet.
+ * On screen the sheet is never shown. When printing, it is the only thing left on the page --
+ * no theme colours, no chrome, one page per sheet, on white.
+ */
+
+#printSheet {
+  display: none;
+}
+
+@media print {
+  /* Everything the reader was looking at steps aside; only the rendered pages print. */
+  body > * {
+    display: none !important;
+  }
+
+  body > #printSheet {
+    display: block !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    /* Themes tint the page through a backdrop filter; a printed sheet has neither. */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
+  /* One page per sheet, fitted to it, keeping the page's own aspect ratio. */
+  #printSheet .print-page {
+    display: block;
+    box-sizing: border-box;
+    /* Fitted to the sheet, never cropped and never stretched: the page keeps its own ratio. */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100vh;
+    margin: 0 auto;
+    background: #fff;
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #printSheet .print-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+}

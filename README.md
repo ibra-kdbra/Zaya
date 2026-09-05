@@ -21,6 +21,10 @@ and it works offline as a PWA.
 - **Text recognition for scanned books**: pages without a text layer are recognised on the reader's
   device (Tesseract in WebAssembly, Arabic and English packs vendored), kept per document in the
   browser, and searched and highlighted like real text. Nothing is uploaded.
+- **Print page ranges**: pick the current page, the whole document or a range like `3-7, 10, 12-14`
+  (`Ctrl/Cmd+P`); the pages are rendered at about 150 dpi, one per sheet, optionally with the
+  current search marks painted on them
+- Stiff pages: soft, hard cover, or every page as a board (Settings → Pages)
 - Thumbnails and outline/bookmark side panels that overlay the book on narrow screens
 - 50+ colour themes built on one set of design tokens (see `DESIGN.md`)
 - Quotes notebook stored locally in IndexedDB, and the last page remembered per document
@@ -41,6 +45,7 @@ and it works offline as a PWA.
 | `Ctrl/Cmd + F` | open in-document search |
 | `F` | toggle fullscreen |
 | `Ctrl/Cmd + K` | toggle control panel |
+| `Ctrl/Cmd + P` | print a range of pages |
 | `Esc` | close panel / leave fullscreen |
 
 ## Development
