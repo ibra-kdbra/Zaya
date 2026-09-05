@@ -52,8 +52,11 @@ body {
   gap: 6px;
   height: 44px;
   min-width: 0;
-  padding: 0 12px 0 4px;
+  padding-block: 0;
+  padding-inline: 4px 12px;
   white-space: nowrap;
+  /* "12 / 199" is a number pair, not prose: it keeps its own order in a mirrored interface */
+  direction: ltr;
   font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 500;
@@ -104,10 +107,13 @@ body {
 
 /* Side panels (thumbnails, outline, search) */
 .df-sidemenu {
-  border-radius: 0 12px 12px 0 !important;
-  border-left: none !important;
-  border-right: 1px solid var(--border-primary) !important;
-  box-shadow: 12px 0 32px rgba(0, 0, 0, 0.3) !important;
+  border-start-start-radius: 0 !important;
+  border-end-start-radius: 0 !important;
+  border-start-end-radius: 12px !important;
+  border-end-end-radius: 12px !important;
+  border-inline-start: none !important;
+  border-inline-end: 1px solid var(--border-primary) !important;
+  box-shadow: calc(12px * var(--flip)) 0 32px rgba(0, 0, 0, 0.3) !important;
 }
 .df-outline-item { color: var(--text-primary) !important; font-family: var(--font-sans); font-size: 13px !important; }
 .df-search-result-head { font-family: var(--font-sans); }
@@ -115,7 +121,7 @@ body {
 .df-vrow div { font-family: var(--font-mono) !important; font-size: 12px !important; }
 
 /* Control panel */
-.panel-container { box-shadow: -12px 0 32px rgba(0, 0, 0, 0.3); }
+.panel-container { box-shadow: calc(-12px * var(--flip)) 0 32px rgba(0, 0, 0, 0.3); }
 .panel-header { background: transparent; }
 .panel-section-title { letter-spacing: 0.08em; font-size: 12px; }
 .panel-button {
@@ -146,7 +152,7 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   #customControlBar { width: calc(100vw - 16px); padding: 8px; gap: 2px; }
   .bar-sep { margin: 0 4px; }
   .custom-ui-btn { width: 44px; height: 44px; }
-  .page-indicator { font-size: 14px; padding: 0 10px 0 4px; min-width: 0; }
+  .page-indicator { font-size: 14px; padding-inline: 4px 10px; min-width: 0; }
 }
 
 /* Narrow phones: the bar spans the screen and the least-used control folds into the More menu */
@@ -160,11 +166,12 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
     border-right: none;
     padding: 8px 6px;
     justify-content: space-between;
+    inset-inline: 0;
   }
   #customControlBar.visible, #customControlBar.always-shown { transform: translateY(0) !important; }
   .bar-sep { display: none; }
   .custom-ui-btn { width: 42px; height: 42px; }
-  .page-indicator { height: 42px; gap: 4px; padding: 0 8px 0 3px; font-size: 13px; }
+  .page-indicator { height: 42px; gap: 4px; padding-inline: 3px 8px; font-size: 13px; }
   .page-input-custom { min-width: 40px !important; height: 34px !important; font-size: 13px !important; }
   #customFullscreenBtn { display: none; }
 }
@@ -172,18 +179,18 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 /* Side panels are opaque: the page must never bleed through the list you are reading */
 .df-sidemenu { background: var(--bg-primary) !important; }
 .df-thumb-container, .df-outline-container, .df-search-container { padding-top: 56px !important; }
-.df-search-wrapper { inset: 56px 8px 8px 8px; }
+.df-search-wrapper { inset: 56px 8px 8px; }
 .df-search-input:focus, .df-search-input:focus-visible { outline: none; }
 .df-outline-wrapper { padding: 0 6px; }
 .df-outline-item { padding: 10px 12px !important; line-height: 1.35; }
 .df-outline-toggle { color: var(--text-secondary) !important; }
-.df-ui-sidemenu-close { top: 12px !important; right: 12px !important; width: 36px !important; height: 36px !important; }
+.df-ui-sidemenu-close { top: 12px !important; inset-inline-end: 12px !important; width: 36px !important; height: 36px !important; }
 
 /* Outline expand/collapse: a chevron, not a grey box */
 .df-outline-toggle {
   width: 24px !important;
   height: 24px !important;
-  margin-left: -26px !important;
+  margin-inline-start: -26px !important;
   padding: 0 !important;
   display: inline-flex !important;
   align-items: center;
@@ -195,8 +202,8 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 }
 .df-outline-toggle:hover { background: var(--bg-tertiary) !important; color: var(--text-primary) !important; }
 .df-outline-toggle:before { color: inherit !important; }
-.df-outline-item { margin-left: 26px; }
-.df-outline-wrapper { padding: 0 6px 0 30px; }
+.df-outline-item { margin-inline-start: 26px; }
+.df-outline-wrapper { padding-block: 0; padding-inline: 30px 6px; }
 
 
 /* Toasts: the panel surface, status colour arrives inline from the caller; never over the bar on phones */
