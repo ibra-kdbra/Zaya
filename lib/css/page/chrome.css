@@ -197,3 +197,61 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 .df-outline-toggle:before { color: inherit !important; }
 .df-outline-item { margin-left: 26px; }
 .df-outline-wrapper { padding: 0 6px 0 30px; }
+
+
+/* Toasts: the panel surface, status colour arrives inline from the caller; never over the bar on phones */
+.toastify {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+@media (max-width: 768px) {
+  .toastify.toastify-bottom { bottom: calc(var(--shell-bar-h, 64px) + 12px + env(safe-area-inset-bottom)); }
+}
+
+/* Empty states read at full contrast */
+#quoteList:empty::before, #modalQuoteList:empty::before, .no-quotes, .no-quotes-modal p { color: var(--text-secondary); opacity: 1; }
+
+/* Engine status text (progress and errors) */
+.df-container .loading-info {
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+  max-width: min(420px, 80vw) !important;
+  max-height: none !important;
+  white-space: normal !important;
+  text-align: center !important;
+}
+
+/* Document error state */
+.doc-error {
+  position: fixed;
+  inset: var(--shell-header-h, 52px) 0 var(--shell-bar-h, 64px) 0;
+  z-index: 1200; /* above both drawers, below toasts */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: var(--bg-primary);
+  text-align: center;
+}
+.doc-error[hidden] { display: none; }
+.doc-error h2 { margin: 0; font-family: var(--font-sans); font-size: 18px; font-weight: 600; color: var(--text-error); }
+.doc-error p { margin: 0; max-width: 46ch; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+.doc-error-source { font-family: var(--font-mono); font-size: 12px; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-error-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+.doc-error-actions button {
+  min-height: 44px; padding: 0 18px; border-radius: 10px; font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+  background: transparent; color: var(--text-primary); border: 1px solid var(--border-primary); cursor: pointer;
+}
+.doc-error-actions button.primary { background: var(--bg-accent-active); border-color: var(--border-accent); color: var(--text-accent); }

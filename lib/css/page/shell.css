@@ -1017,6 +1017,12 @@ h3 { font-size: 12px; line-height: 1.4; }
   to { left: 100%; }
 }
 
+.doc-loading-text {
+  margin: 6px 0 0 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
 .doc-loading-name {
   margin: 0;
   font-family: var(--font-sans);

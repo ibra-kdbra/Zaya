@@ -49,10 +49,6 @@
               aria-expanded="false" aria-controls="unifiedPanel">
         <i class="fas fa-sliders-h"></i>
       </button>
-      <a class="header-btn header-btn-quiet" href="https://github.com/ibra-kdbra/Zaya" target="_blank"
-         rel="noopener" title="GitHub Repository">
-        <i class="fab fa-github"></i>
-      </a>
     </div>
   </header>
 
@@ -89,7 +85,7 @@
   </aside>
 
   <!-- RIGHT DRAWER: control panel -->
-  <div id="unifiedPanel" class="panel-container drawer drawer-right" role="dialog" aria-label="Control panel" aria-hidden="true">
+  <div id="unifiedPanel" inert class="panel-container drawer drawer-right" role="dialog" aria-label="Control panel" aria-hidden="true">
     <div class="panel-header">
       <div class="panel-head-text">
         <h2 class="panel-doc-name"><span data-pdf-info>Zaya</span></h2>
@@ -404,11 +400,11 @@
           </button>
           <button class="more-menu-item" id="menuFirstPageBtn">
             <i class="fas fa-angle-double-left"></i>
-            <span>Goto First Page</span>
+            <span>First page</span>
           </button>
           <button class="more-menu-item" id="menuLastPageBtn">
             <i class="fas fa-angle-double-right"></i>
-            <span>Goto Last Page</span>
+            <span>Last page</span>
           </button>
           <div class="more-menu-sep"></div>
           <button class="more-menu-item" id="menuFullscreenBtn">
@@ -417,8 +413,12 @@
           </button>
           <button class="more-menu-item" id="menuSoundBtn">
             <i class="fas fa-volume-up"></i>
-            <span>Sound: On</span>
+            <span>Page-turn sound on</span>
           </button>
+          <a class="more-menu-item" href="https://github.com/ibra-kdbra/Zaya" target="_blank" rel="noopener">
+            <i class="fab fa-github"></i>
+            <span>Zaya on GitHub</span>
+          </a>
         </div>
       </div>
     </div>
@@ -431,6 +431,7 @@
   <div id="docLoadingState" class="doc-loading" role="status" aria-live="polite">
     <span class="doc-loading-bar" aria-hidden="true"></span>
     <p class="doc-loading-name"><span data-pdf-info></span></p>
+    <p class="doc-loading-text">Opening document…</p>
   </div>
 
   <!-- PDF-Specific Quotes Modal -->
