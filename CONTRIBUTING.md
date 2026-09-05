@@ -43,6 +43,26 @@ Core emits `zaya:init`, `zaya:pdfLoaded`, `zaya:pageChanged`, `zaya:themeChanged
 UI slots are exposed on `window.ZayaUI` (`registerToolbarButton`, `registerPanelTab`) and plugins register through `window.ZayaPlugins.register({ id, name, init })`.
 Prefer building on these hooks over editing core files, so features stay independently testable.
 
+## Adding a user-visible string
+
+Every word a reader sees is translated. To add one:
+
+1. Put the key in **both** `lib/js/i18n/en.js` and `lib/js/i18n/ar.js`. Keys are dotted and stable
+   (`panel.document.openFile`, `search.placeholder`); the value is a string, or an object of plural
+   forms for anything counted — `{ one, other }` in English, `{ zero, one, two, few, many, other }`
+   in Arabic. Placeholders are `{name}` and are filled by the caller.
+2. In markup, name the key on the element: `data-i18n` for its text, `data-i18n-title`,
+   `data-i18n-placeholder`, `data-i18n-aria-label` or `data-i18n-empty` for those attributes.
+   `ZayaI18n.apply()` fills them in, on load and on every language switch.
+3. In a script, call `t('the.key', { n: 3 })` — most modules define
+   `const t = (key, vars) => (window.ZayaI18n ? window.ZayaI18n.t(key, vars) : key);` at the top.
+   If the string is drawn by your own code rather than by `apply()`, redraw it on the
+   `zaya:languageChanged` event.
+
+British English for the English strings; natural Modern Standard Arabic, short labels rather than
+literal translations, for the Arabic ones. Anything positional in the CSS that goes with the string
+should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`).
+
 ## Coding conventions
 
 - Vanilla ES2020+, no framework. jQuery is still present for the flipbook engine and legacy UI; new code should not add new jQuery usage.

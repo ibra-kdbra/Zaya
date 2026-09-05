@@ -92,6 +92,33 @@ switcher sits.
 - **Surfaces.** Drawers are `--bg-primary` with a 1px `--border-primary` edge, never
   `--bg-secondary` — that token is 94–95% opaque and the page used to bleed through it.
 
+## Language and direction
+
+The interface is available in English and Arabic. One module owns both: `lib/js/i18n/i18n.js`,
+with the strings in `en.js` and `ar.js` as flat objects of dotted keys. Static markup names its key
+in `data-i18n` (or `data-i18n-title` / `-placeholder` / `-aria-label` / `-empty`) and `apply()`
+translates it; anything a script builds goes through `t(key, vars)` and redraws on
+`zaya:languageChanged`. Counted strings hold plural forms and are selected with `Intl.PluralRules`,
+so Arabic gets its six categories rather than a bolted-on "s". Numbers stay in Western digits.
+
+- **`lang` and `dir` live on `<html>`.** `setLanguage()` sets both, so the direction is a property
+  of the document, not of a body class, and every logical property below follows it for free.
+- **Logical properties, not a mirrored stylesheet.** `margin-inline-start`, `inset-inline-end`,
+  `border-inline-end`, `text-align: start`, `border-start-end-radius`. There is no `[dir=rtl]`
+  copy of the layout to keep in step. Two things a logical property cannot express — a transform
+  and a `calc()` that has to know which way "outwards" points — read `--flip` (`1`, or `-1` under
+  `dir="rtl"`). The drawers keep their `.drawer-left` / `.drawer-right` names: those name the two
+  drawers, not two sides of the screen, and in Arabic the Navigator opens from the right.
+- **Directional glyphs turn over, decorative ones do not.** Chevrons and page arrows are flipped
+  with `scaleX(-1)`; a cog, a file or a quotation mark is not. Prev and next keep their spatial
+  meaning: whichever button sits on the left points left.
+- **Arabic type.** IBM Plex Sans carries no Arabic, so `:root[lang="ar"]` swaps `--font-sans` for
+  a system stack (`Segoe UI`, `Noto Naskh Arabic`, `Noto Sans Arabic`, `Geeza Pro`, Tahoma) and
+  raises the line height to 1.7: Arabic glyphs are taller at the same size and crowd otherwise.
+- **The interface direction and the document's are separate.** `AppState.isRTL` is the book's
+  reading direction and belongs to the document; `AppState.language` is the interface. An Arabic
+  interface over a left-to-right book is a normal combination and neither setting touches the other.
+
 ## Checks
 
 `npx impeccable detect index.html changelog.html lib/css/page lib/css/themes` runs the

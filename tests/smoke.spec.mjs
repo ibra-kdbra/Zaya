@@ -187,7 +187,7 @@ test.describe('URL options and backup', () => {
 
     // Rejects a foreign JSON file
     const err = await page.evaluate(() => window.ZayaBackup.importBackup(new File(['{"hello":1}'], 'x.json')).catch((e) => e.message));
-    expect(err).toMatch(/Not a Zaya backup/);
+    expect(err).toMatch(/not a Zaya backup/);
   });
 
   test('quotes modal traps focus and closes on Escape', async ({ page }) => {

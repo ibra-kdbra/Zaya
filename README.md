@@ -27,9 +27,14 @@ and it works offline as a PWA.
 - Built-in media player: YouTube videos and playlists or local audio, with loop
 - Backup and restore: export every quote and preference to JSON and import it on another device
   (Settings → Backup)
-- Shareable links: `?theme=`, `?mode=`, `?search=`, `?rtl=` presets for embedding
+- **English and Arabic interface**: every label, message and tooltip is translated, and Arabic
+  mirrors the whole layout — drawers, icon rail, bottom bar, text alignment and directional arrows.
+  The language is picked up from the browser on a first visit, chosen in Settings, or set with
+  `?lang=`. The document's own reading direction stays a separate setting.
+- Shareable links: `?theme=`, `?mode=`, `?search=`, `?rtl=`, `?lang=` presets for embedding
 - Touch-first: pinned bottom bar with page numbers, tap-to-turn, swipes, 44px controls
-- Keyboard accessible dialogs (focus trapping, Escape) and labelled controls
+- Keyboard accessible dialogs (focus trapping, Escape) and labelled controls, checked against
+  axe-core in both languages and at both desk and phone widths (`npm test`)
 - Works offline as a PWA; every third-party asset is vendored
 - Strict Content-Security-Policy, validated URLs and escaped output
 
@@ -94,6 +99,7 @@ https://your-site.com/index.html?pdf=https://example.com/document.pdf&page=5
 | `mode` | `&mode=single` | `single` or `double` page layout |
 | `search` | `&search=invoice` | open the search panel with a query |
 | `rtl` | `&rtl=1` | right-to-left reading direction |
+| `lang` | `&lang=ar` | interface language: `en` or `ar` (Arabic also mirrors the layout) |
 
 > **Note:** remote PDFs must have CORS enabled on their server for cross-origin loading to work. If
 > pages stay blank for a linked PDF, that is almost always the cause.
