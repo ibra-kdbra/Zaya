@@ -148,6 +148,15 @@
               <input id="pdfFile" type="file" accept="application/pdf" class="sr-only-input">
             </div>
 
+            <div class="panel-group" id="recentDocsGroup" hidden>
+              <div class="panel-group-head">
+                <h3 class="panel-section-title">Recent</h3>
+                <button id="clearRecentBtn" class="ui-btn ui-btn-quiet ui-btn-small" type="button" title="Clear the recent list">Clear</button>
+              </div>
+              <p class="panel-note">Files opened from this device are kept in this browser so they reopen after a reload.</p>
+              <ul id="recentDocsList" class="recent-list" aria-label="Recent documents"></ul>
+            </div>
+
             <div class="panel-group">
               <h3 class="panel-section-title">Reading</h3>
               <div class="panel-row">

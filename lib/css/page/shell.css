@@ -1286,3 +1286,72 @@ h3 { font-size: 12px; line-height: 1.4; }
 /* The panel must never freeze the book behind it on desktop */
 body.panel-open { overflow: hidden; }
 body.panel-open #flipbookContainer { pointer-events: auto; opacity: 1; }
+
+/* --- Recent documents (Document tab) ------------------------------------------------------ */
+.recent-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.recent-item {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.recent-item:last-child { border-bottom: none; }
+.recent-open {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+.recent-open:hover:not(:disabled) { background: var(--bg-tertiary); }
+.recent-open:disabled { cursor: default; }
+.recent-open > i { flex: none; width: 18px; text-align: center; font-size: 15px; color: var(--text-secondary); }
+.recent-item.is-current .recent-open > i { color: var(--text-accent); }
+.recent-text { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.recent-name {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recent-meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recent-remove {
+  flex: none;
+  width: 44px;
+  min-height: 44px;
+  align-self: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms ease, color 150ms ease, background-color 150ms ease;
+}
+.recent-item:hover .recent-remove,
+.recent-item:focus-within .recent-remove,
+.recent-remove:focus-visible { opacity: 1; }
+.recent-remove:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+@media (hover: none) and (pointer: coarse) { .recent-remove { opacity: 1; } }
+
+.panel-group[hidden] { display: none; }

@@ -81,7 +81,7 @@ test.describe('Page memory', () => {
 });
 
 test.describe('Local files', () => {
-  test('a local file is remembered by name, asks for a re-pick after reload and restores its page', async ({ page }) => {
+  test('a local file is kept in the browser and reopens on the same page after a reload', async ({ page }) => {
     await stubNetwork(page);
     await page.goto('/index.html');
     await waitForBook(page);
@@ -96,15 +96,22 @@ test.describe('Local files', () => {
     const state = await readState(page);
     expect(state.storedPdf).toBe('sample.pdf');
     expect(state.storedType).toBe('local');
+    await expect.poll(() => page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf').then((r) => !!r)), { timeout: 10_000 }).toBe(true);
 
-    // After a reload the blob is gone: the default document opens and the reader is prompted.
+    // After a reload the file comes back from IndexedDB, on the page where the reader left off.
+    await page.reload();
+    await waitForBook(page);
+    expect(await page.evaluate(() => window.appState.get('currentPdfType'))).toBe('local');
+    expect(await page.evaluate(() => window.appState.get('currentPdfName'))).toBe('sample.pdf');
+    await expect.poll(() => activePage(page), { timeout: 20_000 }).toBe(2);
+    await expect(page.locator('.app-doc-name')).toHaveText('sample.pdf');
+
+    // Without the stored copy the reader is asked to pick the file again and the default opens.
+    await page.evaluate(() => window.ZayaLocalDocs.deleteFile('sample.pdf'));
     await page.reload();
     await waitForBook(page);
     await expect(page.locator('.toastify')).toContainText('Please re-select it', { timeout: 10_000 });
-    expect(await activePage(page)).toBe(1);
-    // The default document keeps its own memory; the local file's page is untouched by it.
-    const defaultKey = await page.evaluate(() => window.appState.constructor.getDefaultPdfUrl());
-    expect(await page.evaluate((k) => window.getLastPage(k), defaultKey)).toBe(1);
+    expect(await page.evaluate(() => window.appState.get('currentPdfType'))).toBe('url');
     expect(await page.evaluate(() => window.getLastPage('sample.pdf'))).toBe(2);
 
     // Re-picking the same file restores where the reader left off.
@@ -112,6 +119,40 @@ test.describe('Local files', () => {
     await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
     await waitForBook(page);
     await expect.poll(() => activePage(page), { timeout: 20_000 }).toBe(2);
+  });
+
+  test('recent documents list links and files and reopens a file from the store', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
+    await waitForBook(page);
+    await page.locator('#pdfUrl').fill(REMOTE_PDF);
+    await page.locator('#loadPdfUrlBtn').click();
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdf')), { timeout: 20_000 }).toBe(REMOTE_PDF);
+    await waitForBook(page);
+
+    const items = page.locator('#recentDocsList .recent-item');
+    await expect(items).toHaveCount(2, { timeout: 10_000 });
+    await expect(items.nth(0)).toHaveClass(/is-current/);
+    await expect(items.nth(0).locator('.recent-name')).toHaveText('example.com');
+    await expect(items.nth(1).locator('.recent-name')).toHaveText('sample.pdf');
+
+    // Reopening the file needs no picker: it comes from IndexedDB.
+    await items.nth(1).locator('.recent-open').click();
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe('sample.pdf');
+    await waitForBook(page);
+    await expect(items.nth(0)).toHaveClass(/is-current/);
+
+    // Removing an entry forgets it and drops the stored copy.
+    await page.locator('#recentDocsList .recent-item').nth(1).locator('.recent-remove').click({ force: true });
+    await expect(items).toHaveCount(1);
+    await page.locator('#clearRecentBtn').click();
+    await expect(page.locator('#recentDocsGroup')).toBeHidden();
+    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf'))).toBeNull();
   });
 
   test('switching documents disposes the book once and revokes the blob URL', async ({ page }) => {

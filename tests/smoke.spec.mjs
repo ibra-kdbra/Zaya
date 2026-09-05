@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openPanel } from './helpers.mjs';
+import { openPanel, waitForBook } from './helpers.mjs';
 import { readFileSync } from 'node:fs';
 
 const SAMPLE_PDF = readFileSync(new URL('./fixtures/sample.pdf', import.meta.url));
@@ -201,5 +201,62 @@ test.describe('URL options and backup', () => {
     await expect(modal).toHaveAttribute('aria-modal', 'true');
     await page.keyboard.press('Escape');
     await expect(modal).toBeHidden();
+  });
+});
+
+test.describe('Documents and languages', () => {
+  const FIXTURES = new URL('./fixtures/', import.meta.url).pathname;
+
+  test('the Navigator rebuilds its pages and outline for a newly opened document', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', FIXTURES + 'sample-outline.pdf');
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe('sample-outline.pdf');
+    await waitForBook(page);
+    await page.evaluate(() => window.ZayaNavigator.open('outline'));
+    await expect(page.locator('#navPaneOutline .df-outline-item').first()).toBeVisible({ timeout: 15_000 });
+    const outlineCount = await page.locator('#navPaneOutline .df-outline-item').count();
+    expect(outlineCount).toBeGreaterThan(0);
+    await page.evaluate(() => window.ZayaNavigator.setTab('thumbs'));
+    await expect(page.locator('#navPaneThumbs .df-vrow')).toHaveCount(3, { timeout: 15_000 });
+
+    // A document without an outline replaces the previous panels; nothing from the old book lingers.
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', FIXTURES + 'sample.pdf');
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe('sample.pdf');
+    await waitForBook(page);
+    await page.evaluate(() => window.ZayaNavigator.open('outline'));
+    await expect(page.locator('#navPaneOutline .df-outline-item')).toHaveCount(0, { timeout: 15_000 });
+    await expect(page.locator('#navEmptyState')).toContainText('no outline');
+    expect(await page.locator('.df-outline-container').count()).toBe(1);
+    expect(await page.locator('.df-thumb-container').count()).toBeLessThanOrEqual(1);
+    await page.evaluate(() => window.ZayaNavigator.setTab('search'));
+    expect(await page.locator('.df-search-container').count()).toBe(1);
+  });
+
+  test('search finds Arabic words, with or without vowel marks', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', FIXTURES + 'sample-arabic.pdf');
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfName')), { timeout: 20_000 }).toBe('sample-arabic.pdf');
+    await waitForBook(page);
+
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    const input = page.locator('.df-search-input');
+    await expect(input).toBeVisible({ timeout: 15_000 });
+    await input.fill('القراءة');
+    await expect(page.locator('.df-search-status')).toContainText(/2 matches on 2 pages/, { timeout: 20_000 });
+    await input.fill('الْقِرَاءَة'); // vowelled query matches the unvowelled page
+    await expect(page.locator('.df-search-status')).toContainText(/2 matches on 2 pages/, { timeout: 20_000 });
+    await input.fill('الفصل');
+    await expect(page.locator('.df-search-result')).toHaveCount(2, { timeout: 20_000 });
+    await input.fill('الملحق');
+    await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 20_000 });
+    await expect(page.locator('.df-search-result').first()).toContainText('Page 3');
   });
 });
