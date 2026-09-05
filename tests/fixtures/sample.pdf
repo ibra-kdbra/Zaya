@@ -1,0 +1,54 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Length 99 >>
+stream
+BT /F1 18 Tf 50 700 Td (Zaya smoke test document. Page one talks about flipbooks and search.) Tj ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 3 0 R >>
+endobj
+5 0 obj
+<< /Length 119 >>
+stream
+BT /F1 18 Tf 50 700 Td (Second page. The quick brown fox jumps over the lazy dog. Search for flipbooks here too.) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 95 >>
+stream
+BT /F1 18 Tf 50 700 Td (Third and final page. Nothing to see here except the word zebra.) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000000148 00000 n 
+0000000297 00000 n 
+0000000423 00000 n 
+0000000593 00000 n 
+0000000719 00000 n 
+0000000864 00000 n 
+0000000990 00000 n 
+trailer
+<< /Size 10 /Root 9 0 R >>
+startxref
+1039
+%%EOF

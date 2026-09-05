@@ -1,0 +1,257 @@
+/*
+ * Page chrome: the fixed controls around the book.
+ * Principles (see DESIGN.md): quiet surfaces, one accent, neutral elevation, no lift-on-hover,
+ * 44px touch targets, text never below 12px, motion only where it explains a state change.
+ */
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Bottom control bar: one surface, flat buttons, accent only on the active/focused control */
+#customControlBar {
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.28);
+}
+
+
+.custom-ui-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 16px;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.custom-ui-btn:hover,
+.custom-ui-btn:focus-visible {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  box-shadow: none;
+  transform: none;
+  outline: none;
+}
+.custom-ui-btn.active {
+  background: var(--bg-accent);
+  border-color: var(--border-accent);
+  color: var(--text-accent);
+}
+.custom-ui-btn:active { transform: none; background: var(--bg-accent-active); }
+
+.page-indicator {
+  /* One pill, one line: [ 12 ] / 199 */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  min-width: 0;
+  padding: 0 12px 0 4px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+}
+.page-sep { color: var(--text-secondary); opacity: 0.6; }
+#customTotalPages { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.page-input-custom {
+  font-family: var(--font-mono) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-variant-numeric: tabular-nums;
+  height: 36px !important;
+  width: 3.2ch !important;
+  min-width: 44px !important;
+  padding: 0 6px !important;
+  text-align: center !important;
+  background: var(--bg-tertiary) !important;
+  border: 1px solid transparent !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  margin: 0 !important;
+  -moz-appearance: textfield;
+}
+.page-input-custom:focus {
+  background: var(--bg-tertiary) !important;
+  border-color: var(--text-accent) !important;
+  box-shadow: none !important;
+}
+
+/* More menu: same surface as the bar, no arrow, no card-in-card */
+#customMoreMenu {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-primary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.more-menu-item { color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; min-height: 44px; }
+.more-menu-item:hover, .more-menu-item:focus-visible { background: var(--bg-tertiary); color: var(--text-primary); outline: none; }
+.more-menu-item i { color: var(--text-secondary); }
+.more-menu-item:hover i { color: var(--text-accent); }
+.more-menu-sep { height: 1px; background: var(--border-secondary); margin: 4px 6px; }
+
+/* Side panels (thumbnails, outline, search) */
+.df-sidemenu {
+  border-radius: 0 12px 12px 0 !important;
+  border-left: none !important;
+  border-right: 1px solid var(--border-primary) !important;
+  box-shadow: 12px 0 32px rgba(0, 0, 0, 0.3) !important;
+}
+.df-outline-item { color: var(--text-primary) !important; font-family: var(--font-sans); font-size: 13px !important; }
+.df-search-result-head { font-family: var(--font-sans); }
+.df-search-result-count { font-family: var(--font-mono); }
+.df-vrow div { font-family: var(--font-mono) !important; font-size: 12px !important; }
+
+/* Control panel */
+.panel-container { box-shadow: -12px 0 32px rgba(0, 0, 0, 0.3); }
+.panel-header { background: transparent; }
+.panel-section-title { letter-spacing: 0.08em; font-size: 12px; }
+.panel-button {
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.panel-button:hover, .panel-button:focus-visible {
+  background: var(--bg-tertiary);
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+  box-shadow: none;
+  transform: none;
+  outline: none;
+}
+
+/* Keyboard focus is visible everywhere, with the accent, never a glow */
+:focus-visible { outline: 2px solid var(--text-accent); outline-offset: 2px; }
+button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
+
+/* Reduced motion: keep state changes, drop the movement */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
+
+@media (max-width: 768px) {
+  #customControlBar { width: calc(100vw - 16px); padding: 8px; gap: 2px; }
+  .bar-sep { margin: 0 4px; }
+  .custom-ui-btn { width: 44px; height: 44px; }
+  .page-indicator { font-size: 14px; padding: 0 10px 0 4px; min-width: 0; }
+}
+
+/* Narrow phones: the bar spans the screen and the least-used control folds into the More menu */
+@media (max-width: 430px) {
+  #customControlBar {
+    width: 100vw;
+    left: 0;
+    transform: translateY(100%);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 8px 6px;
+    justify-content: space-between;
+  }
+  #customControlBar.visible, #customControlBar.always-shown { transform: translateY(0) !important; }
+  .bar-sep { display: none; }
+  .custom-ui-btn { width: 42px; height: 42px; }
+  .page-indicator { height: 42px; gap: 4px; padding: 0 8px 0 3px; font-size: 13px; }
+  .page-input-custom { min-width: 40px !important; height: 34px !important; font-size: 13px !important; }
+  #customFullscreenBtn { display: none; }
+}
+
+/* Side panels are opaque: the page must never bleed through the list you are reading */
+.df-sidemenu { background: var(--bg-primary) !important; }
+.df-thumb-container, .df-outline-container, .df-search-container { padding-top: 56px !important; }
+.df-search-wrapper { inset: 56px 8px 8px 8px; }
+.df-search-input:focus, .df-search-input:focus-visible { outline: none; }
+.df-outline-wrapper { padding: 0 6px; }
+.df-outline-item { padding: 10px 12px !important; line-height: 1.35; }
+.df-outline-toggle { color: var(--text-secondary) !important; }
+.df-ui-sidemenu-close { top: 12px !important; right: 12px !important; width: 36px !important; height: 36px !important; }
+
+/* Outline expand/collapse: a chevron, not a grey box */
+.df-outline-toggle {
+  width: 24px !important;
+  height: 24px !important;
+  margin-left: -26px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  border-radius: 6px;
+  transition: transform 150ms ease, color 150ms ease;
+}
+.df-outline-toggle:hover { background: var(--bg-tertiary) !important; color: var(--text-primary) !important; }
+.df-outline-toggle:before { color: inherit !important; }
+.df-outline-item { margin-left: 26px; }
+.df-outline-wrapper { padding: 0 6px 0 30px; }
+
+
+/* Toasts: the panel surface, status colour arrives inline from the caller; never over the bar on phones */
+.toastify {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+@media (max-width: 768px) {
+  .toastify.toastify-bottom { bottom: calc(var(--shell-bar-h, 64px) + 12px + env(safe-area-inset-bottom)); }
+}
+
+/* Empty states read at full contrast */
+#quoteList:empty::before, #modalQuoteList:empty::before, .no-quotes, .no-quotes-modal p { color: var(--text-secondary); opacity: 1; }
+
+/* Engine status text (progress and errors) */
+.df-container .loading-info {
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+  max-width: min(420px, 80vw) !important;
+  max-height: none !important;
+  white-space: normal !important;
+  text-align: center !important;
+}
+
+/* Document error state */
+.doc-error {
+  position: fixed;
+  inset: var(--shell-header-h, 52px) 0 var(--shell-bar-h, 64px) 0;
+  z-index: 1200; /* above both drawers, below toasts */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: var(--bg-primary);
+  text-align: center;
+}
+.doc-error[hidden] { display: none; }
+.doc-error h2 { margin: 0; font-family: var(--font-sans); font-size: 18px; font-weight: 600; color: var(--text-error); }
+.doc-error p { margin: 0; max-width: 46ch; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+.doc-error-source { font-family: var(--font-mono); font-size: 12px; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-error-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+.doc-error-actions button {
+  min-height: 44px; padding: 0 18px; border-radius: 10px; font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+  background: transparent; color: var(--text-primary); border: 1px solid var(--border-primary); cursor: pointer;
+}
+.doc-error-actions button.primary { background: var(--bg-accent-active); border-color: var(--border-accent); color: var(--text-accent); }

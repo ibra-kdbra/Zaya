@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('vendor/fonts.css');
 
 /* Core Library & Icons */
 @import url('min.css');
@@ -12,3 +12,4 @@
 @import url('page/panel.css');
 @import url('page/quotes.css');
 @import url('page/custom-ui.css');
+@import url('page/chrome.css');

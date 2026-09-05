@@ -1,0 +1,44 @@
+name: Bug report
+description: Something is broken in the flipbook, controls, media player or quotes
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Describe the bug and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open https://zaya.vercel.app/?pdf=...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: input
+    id: pdf
+    attributes:
+      label: PDF that triggers it (public URL if possible)
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device / browser
+      options:
+        - Desktop Chrome / Edge
+        - Desktop Firefox
+        - Desktop Safari
+        - Android Chrome
+        - Android Samsung Internet
+        - iOS Safari
+        - Other (say which below)
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Browser console output
+      render: text

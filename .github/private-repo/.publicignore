@@ -1,0 +1,7 @@
+# Paths stripped before syncing to the public repo (rsync --exclude-from)
+pro/
+lib/js/pro-features/
+docs/
+.github/workflows/sync_public.yml
+.github/private-repo/
+.env*

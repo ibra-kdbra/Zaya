@@ -1,173 +1,253 @@
-# 📋 ZAYA - PDF FLIPBOOK CHANGELOG
+# Changelog
 
-## 🎯 Recent Updates (Latest commits)
+All notable changes to Zaya are documented in this file.
 
-- `core-perf` - 60fps Theme Engine & Vanilla JS Refactor (2026-07-25)
-- `plugin-arch` - Added ZayaPlugins & ZayaUI Slot API (2026-07-25)
-- `keyboard-nav` - Arrow keys navigation & Fullscreen shortcuts (2026-07-25)
-- `zaya-rebrand` - Global rebranding to Zaya (2026-04-03)
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### ✨ Latest Major Update - v5.4.0 Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
+## [Unreleased]
 
-- **Theme Engine Optimization**: Completely removed `$('*')` DOM tree class manipulation in `manager.js`. Themes now apply to root `document.documentElement` (`<html class="theme-...">`) for zero layout reflow lag and 60fps instant theme transitions via CSS custom properties.
-- **Theme Selector Performance Refactoring**: Pre-calculated and cached theme palette colors in `selector.js`, eliminating temporary `$('<div class="theme-...">')` DOM insertion loops during theme search. Refactored modal to pure Vanilla JS with 100ms search input debouncing.
-- **Zaya Core Plugin Registry (`ZayaPlugins`)**: Introduced an event-driven plugin extension system in `app-state.js` emitting standardized events: `zaya:pdfLoaded`, `zaya:pageChanged`, `zaya:themeChanged`, `zaya:toolbarReady`, and `zaya:init`.
-- **Zaya UI Extension Slots (`ZayaUI`)**: Implemented `ZayaUI.registerToolbarButton()` and `ZayaUI.registerPanelTab()` slot APIs in `controls.js` to allow Pro/private plugins to inject UI components cleanly without touching core HTML/JS.
-- **Keyboard Navigation Shortcuts**: Added Left (`←`) and Right (`→`) arrow keys for page turns, `F` key for Fullscreen toggle, and `Cmd+K` for the control panel.
-- **Optional Pro Loader**: Integrated a non-blocking script loader in `app.js` (`lib/js/pro-features/index.js`) for seamless private repository feature integration.
+## [6.1.0] - 2026-09-05
 
-### ✨ Previous Major Update - v5.3.0 The Zaya Transition (2026-04-03)
+Two weeks of reader feedback on the 6.0 preview: the drawers now behave differently on a desk, a
+tablet and a phone; files opened from disk come back after a reload; and Arabic is a first-class
+citizen in search, including scanned books, which are recognised on the device.
 
-- **Global Rebranding**: Complete transition from Paginis to **Zaya**, including a new logo and a centralized naming convention for all variables and assets.
-- **Integrated Media Loop**: Added persistent "Auto Repeat" controls directly within the Audio player and Video control modals for better contextual access.
-- **Architectural Clarity**: Refactored the Service Worker system into a distinct `sw-manager.js` (UI-thread manager) and `sw.js` (background worker) for improved reliability and developer clarity.
-- **Enhanced Configuration**: Implemented support for `window.ZAYA_DEFAULT_PDF` and URL-based PDF loading (`?pdf=`) for easier deployment.
-- **Critical Stability Fixes**:
-  - Resolved `ReferenceError` crashes during local file imports in `media.js`.
-  - Fixed 404 errors for the root Service Worker file that prevented offline support.
-  - Eliminated race conditions during IndexedDB initialization in `db.js`.
+### Added
+- **Navigation model by device class**: on screens 1200px and wider the drawers dock beside the book, which re-centres in the remaining space, and both can stay open; between 768px and 1199px they overlay with a scrim and never stack; below 768px each is a full-width sheet. The section switcher is a vertical icon rail on the drawer's outer edge at desk sizes and a thumb-reachable bottom tab bar on phones. Drawer surfaces are fully opaque in every theme, and the tab lists carry `role=tablist` with arrow-key navigation in both axes.
+- **Local files survive a reload**: a PDF opened from this device is kept in the browser (IndexedDB, the six most recent files up to 120 MB each) and reopens on the same page next time, instead of falling back to the default document with a "re-select it" prompt. A **Recent** list in the Document tab shows links and files opened before; a file reopens from the store, a link from the network, and entries can be removed or cleared.
+- **Arabic search**: queries and page text are normalised the same way (Unicode NFKC, so the shaped presentation forms many Arabic PDFs expose as text match the letters you type; vowel marks, tatweel and alef variants are folded), glyph-split runs are glued back into words, a right-to-left query is also looked for in reverse (some producers store Arabic in the opposite order), and highlights on right-to-left runs are mirrored correctly. When a document has no text layer or its text is unmapped glyph codes, the search panel says so instead of a bare "No matches".
+- **Text recognition for scanned pages (OCR)**: when a document has no text layer, the search pane offers to recognise its pages on the device with Tesseract (WebAssembly; Arabic and English language packs are vendored, so it works offline and nothing is uploaded). Recognition runs several pages at once (one worker per spare core, fewer on phones), skips the engine's slow inverted-image retry and sizes the page image to what the model needs, so a 200-page book takes minutes rather than tens of minutes on a laptop. It starts at the page being read, shows which pages are in flight and how long is left, can be stopped at any time, and recognised text (blank pages included) is kept per document in IndexedDB so a book is only processed once. Results and on-page highlights appear as each page completes.
 
-### ✨ Previous Major Update - v5.1.1 Feature Expansion & Navigation Polish (2026-02-06)
+### Changed
+- **Changelog page header**: one row that never wraps; the brand links to the repository with a small GitHub mark, the back link is plain accent text, and the version moved out of the header into a "Latest release" line above the title.
+- **Reader header**: the Zaya wordmark links to the repository (the More menu entry stays).
+- **Service worker**: scripts and stylesheets are always fetched from the network while online, even when their URL carries the release version; only fonts, images, sounds, CMaps and the OCR engine are served cache-first. A deploy within one version can no longer run new markup on old code or styles.
+- **Search status**: when nothing matches because the document has no text layer or its text is unmapped glyph codes, the panel says so.
+- **Recognition language** is a three-way segmented control (Arabic + English, Arabic, English) instead of a native dropdown, which several browsers refused to open inside the drawer. One language is about twice as fast as two, and the panel says so.
 
-- **Cinematic Single Page Mode**: Fixed 3D camera centering and implemented synchronized dynamic lighting to ensure focused pages are perfectly illuminated.
-- **Unified Media Player**: Redesigned the media section with a sleek mode switcher and custom themed audio player, eliminating unnecessary windows for audio content.
-- **Local Audio Support**: Integrated local file imports for audio playback, featuring real-time progress tracking and synchronized volume controls.
-- **Restored Navigation**: Resolved issues with UI arrows and keyboard shortcuts by implementing missing navigation methods in the modular factory.
-- **Intelligent Device Adaptation**: Added automatic device detection to choose the optimal display mode (Booklet vs. Zoom) for mobile and desktop users.
+### Fixed
+- **Navigator stale after opening another document**: the previous book was never disposed, so its Pages, Outline and Search panels stayed in the drawer and the new document's panels were hidden behind them. The engine is now torn down properly and the drawer replaces its panels with the new document's.
+- **Changelog page empty on Vercel**: `.vercelignore` excluded every Markdown file, so `CHANGELOG.md` was a 404 on deploys. It is now shipped, and the version badge stays hidden until the log has loaded.
+- **Control-panel width on tablets**: a user-agent check forced the panel to the full viewport width on any tablet browser and never released it; the override now applies only below 768px.
 
-### ✨ Previous Major Update - v5.0.0 Core Modernization & UI Enhancement (2026-01-12)
+## [6.0.0] - 2026-09-04
 
-- **Library Modularization**: Completely refactored the DFlip core library into a modular ES6 structure, enabling easier bug fixing and feature development.
-- **Critical Scroll Fix**: Resolved a major conflict where scrolling through the thumbnail or bookmark lists would accidentally trigger the flipbook's zoom or page-turn logic.
-- **UI & Icon Modernization**: Replaced all legacy emojis with a cohesive set of colored Font Awesome icons for a professional, consistent look.
-- **Theme System Overhaul**: Implemented universal theme toggling that works across the entire project structure, ensuring visual consistency in all modes.
-- **Control Panel Redesign**: Major restyling of the right-side control panel and quotes module for better UX and modern aesthetics.
-- **Bottom Panel Enhancement**: Applied a new theme and integrated advanced controls into the bottom bar, including the new page number entry system.
-- **Style Refactoring**: Eliminated technical debt by removing absolute paths and consolidated persistent styles into a central, modular entry point.
-- **Performance Analytics**: Integrated a real-time dashboard into the changelog, providing live metrics and optimization suggestions.
-- **Code Cleanup**: Removed legacy unused code and deprecated event listeners to streamline the application skeleton.
+The reading interface was rebuilt around the document: a quieter theme, a real search, and a
+touch-first layout. The version number jumps to 6.0.0 because the look, the layout rules and the
+navigation model all changed.
 
-### ✨ Previous Major Update - v4.5.0 UI Modernization & Architecture Refinement (2026-01-03)
+### Added
+- **Navigator and control panel**: the two side drawers were rebuilt: a titled Navigator with Pages (tile grid, two columns on phones), Outline (tree with indent lines) and Search tabs; a control panel with Document / Notes / Media / Settings tabs whose actions are labelled and show their state, a document header with page count, and a footer with the version.
+- **Theme picker**: grouped into Dark / Light / Coloured / Editors, compact tiles with a single swatch strip, search, keyboard navigation and a close button.
+- **Error state**: a plain-language message with "Try again" and "Open another document" replaces the raw engine error; a document you opened yourself that fails no longer silently swaps in the default document.
 
-- **UI Overhaul & Modernization**: Replaced legacy color schemes with a dynamic, theme-aware system.
-- **Bottom Panel Integration**: Migrated flipbook controls directly into the bottom panel for a unified experience.
-- **Robust Persistence**: Fixed theme and PDF state management to ensure preferences are preserved across reloads.
-- **Technical Debt Removal**: Eliminated hardcoded hex colors in favor of modular CSS custom properties.
+- **Full-text search (#16)**: a search panel beside thumbnails and outline. Text is extracted once
+  per document with a small concurrency pool and cancellation, every matching page is listed with a
+  highlighted snippet, and clicking a result jumps to that page. `Ctrl/Cmd+F` opens it.
+- **Search hits on the page**: matches are painted onto the rendered page itself in both the 3D and
+  the 2D renderer, not only listed in the panel. Marks follow what you type and clear when the panel
+  closes.
+- **Backup and restore**: Settings → Backup writes every quote plus your preferences (theme,
+  direction, volume, loop, bottom-bar mode) to a JSON file, and imports such a file with validation
+  and de-duplication.
+- **Shareable link presets**: `?theme=`, `?mode=single|double`, `?search=` and `?rtl=` for embedding
+  and sharing. Values are allow-listed.
+- **Project tooling**: `npm run check` (syntax), `npm run lint` (ESLint), `npm test` (Playwright
+  smoke tests including a mobile emulation), GitHub Actions CI, issue and pull-request templates,
+  `SECURITY.md`, `CONTRIBUTING.md`, `THIRD_PARTY_NOTICES.md` and `ROADMAP.md`.
 
----
+### Changed
 
-## 🚀 Major Features & Improvements
+- **Visual refresh**: a quieter, warmer default theme — ink-dark tinted neutrals, one brass accent,
+  neutral shadows. Self-hosted IBM Plex Sans and Mono replace Inter, controls are flat and 44px,
+  nothing lifts or glows on hover, no interface text sits below 12px, keyboard focus is visible and
+  reduced-motion preferences are respected. The rationale and the tokens live in `DESIGN.md`; the
+  other 53 themes keep their palettes with neutralised shadows.
+- **Mobile layout (#11, #8)**: page mode follows the viewport rather than the user-agent string.
+  Portrait phones get a single page filling the width; landscape tablets and desktops get the
+  spread. An explicit choice from the menu or `?mode=` still wins. The version label no longer hides
+  under the control bar on small screens.
+- **Touch controls (#11, #8)**: the bottom bar and its page numbers stay pinned on touch devices
+  instead of waiting for a mouse hover. Tap-to-turn works, swipes are measured from the gesture
+  origin with a direction check, and side panels overlay the book on narrow screens instead of
+  squeezing it and close on an outside tap.
+- **Thumbnail panel (#11)**: wheel and touchpad scrolling inside the panel no longer zooms the book
+  — it is guarded in the stage itself, not only in the app layer. Thumbnail rows are cached and
+  repainted from the image cache, so scrolling back never re-renders, and preloading starts earlier
+  with two parallel renders.
+- **Performance**: scripts are fetched in parallel and executed in order, the 845 KB pdf.js worker
+  is no longer executed on the main thread, per-load cache-busting is gone (assets are versioned per
+  release), Tailwind is precompiled instead of pulled from a runtime CDN, and the mousemove handler
+  is throttled with a narrower MutationObserver.
+- **Self-contained assets**: Toastify, marked, Font Awesome and the compiled Tailwind CSS are
+  vendored. The app has no runtime CDN dependency and works offline. Per-deployment settings moved
+  to `config.js`.
+- **Service worker**: a versioned cache name, best-effort precaching so one missing file cannot
+  block install, stale-while-revalidate for static assets, network-first for pages. PDFs and
+  cross-origin requests are never cached and the message handler replies safely.
+- **Storage robustness**: quotes database upgrades are additive so version bumps no longer drop
+  data, open errors resolve instead of hanging forever, delete failures are reported, page memory
+  retries after a failed open, and `localStorage` writes are guarded.
+- **Accessibility**: focus trapping and Escape handling for the quotes and theme dialogs,
+  `role` and `aria-label` on side panels and the control panel, and icon-only buttons take their
+  `aria-label` from their tooltip.
+- **Changelog page**: rebuilt on the reader's own theme tokens and typography. It reads this file
+  and renders a release timeline with a version index; the fake telemetry dashboard and the
+  commit counter are gone.
 
-### ⚡ Performance & Analytics
+### Fixed
 
-- **Live Monitoring**: Real-time tracking of memory usage and rendering performance via `PerformanceMonitor`.
-- **Optimization Layer**: Automatic application of rendering optimizations for smoother flip transitions.
-- **Core Refactoring**: Complete modernization of the DFlip core into ES6 modules for improved reliability.
-- **Standardized Events**: Modern `wheel` event implementation for conflict-free sidebar scrolling.
+- `loadFlipbook` threw a `ReferenceError` after every successful load, which also left the loading
+  lock stuck.
+- `AppState.updatePdfContext` passed the new state as the previous state, so no listener and no
+  `zaya:pdfLoaded` event ever fired.
+- `zaya:pageChanged` is now emitted on page turns.
+- The arrow-key handler no longer steals keystrokes while you are typing in an input.
+- Closing a side panel could leave the book frozen; orbit controls now follow panel state.
+- A duplicate gesture handler that clicked non-existent buttons was removed.
+- The theme manager imported the quotes database from the wrong relative path, so theme changes were
+  never persisted to IndexedDB.
 
-### 📱 Mobile & UX Experience
+### Security
 
-- **Multi-Modal Media**: Unified YouTube and Local Audio player with a sleek switcher UI.
-- **Touch Gesture Support**: Optimized swipe navigation for tablets and smartphones.
-- **Smart Sidebars**: Hover-aware sidebars that prevent accidental interactions while providing quick access.
-- **Custom Loaders**: Themed "flipping book" loading indicators for a branded experience.
-- **Haptic Feedback**: Vibration support for mobile navigation events.
+- A strict Content-Security-Policy on both pages: no `unsafe-eval`, no inline scripts.
+- pdf.js is loaded with `isEvalSupported: false`, and the `eval()`-based feature probes were removed.
+- `?pdf=` and stored URLs are restricted to `http(s)`; download links to `http(s)` and `blob:`.
+- All user-controlled text is escaped before rendering — quotes were a stored-XSS vector — and
+  YouTube IDs are URL-encoded.
 
-### ✨ Icon & Theme System
+### Removed
 
-- **Icon Conversion**: Full migration from emojis to colored Font Awesome icon sets for all controls and headers.
-- **Dynamic Variables**: Comprehensive CSS custom property system for effortless theme switching.
-- **Relative Pathing**: Robust asset loading compatible with any deployment environment (local or server).
+- The 214 KB `flipbook.js.bak`, the dead cache-purge code, the unused `#storedPage` writes and
+  `premium-plan.md` (moved to the private repository).
+- The GitHub API call and the changelog bundle from the reader page.
 
----
+## [5.4.0] - 2026-07-25
 
-## 🔧 Technical Improvements
+### Added
 
-### 🛡️ Security & Architecture
+- **Plugin registry (`ZayaPlugins`)**: an event-driven extension system in `app-state.js` emitting
+  `zaya:pdfLoaded`, `zaya:pageChanged`, `zaya:themeChanged`, `zaya:toolbarReady` and `zaya:init`.
+- **UI extension slots (`ZayaUI`)**: `ZayaUI.registerToolbarButton()` and `ZayaUI.registerPanelTab()`
+  in `controls.js`, so private plugins can inject UI without touching core HTML or JS.
+- **Keyboard shortcuts**: `←` and `→` turn pages, `F` toggles fullscreen, `Cmd/Ctrl+K` opens the
+  control panel.
+- **Optional Pro loader**: a non-blocking loader in `app.js` for `lib/js/pro-features/index.js`.
 
-- **Input Validation Framework**: Comprehensive sanitization for all URLs and file uploads.
-- **State Management System**: Centralized, event-driven `AppState` class replacing global variables.
-- **Modular Refactoring**: Clean separation of concerns with feature-based folder organization.
-- **Browser Compatibility**: Robust feature detection and graceful degradation across all modules.
+### Changed
 
-### ⚡ Performance Optimization
+- **Theme engine**: `$('*')` class manipulation across the DOM tree is gone from `manager.js`.
+  Themes apply to `document.documentElement` instead, so switching is a custom-property change with
+  no layout reflow.
+- **Theme selector**: palette colours are pre-calculated and cached in `selector.js`, removing the
+  temporary `<div class="theme-...">` insertion loop during search. The modal is plain JavaScript
+  with a 100ms input debounce.
 
-- **Memory Management**: Automatic resource cleanup for heavy PDF and YouTube instances.
-- **Rendering Efficiency**: Applied Three.js and DFlip optimizations to fix rendering/loading stalls.
-- **Script Loading**: Sequentially loaded dynamic scripts with cache-busting and error handling.
+## [5.3.0] - 2026-04-03
 
----
+### Added
 
-## 🐛 Bug Fixes & Maintenance
+- **Media loop**: persistent "Auto Repeat" controls inside the audio player and the video modal.
+- **Configuration**: support for `window.ZAYA_DEFAULT_PDF` and URL-based loading via `?pdf=`.
 
-### ✅ Critical Bug Fixes
+### Changed
 
-- **Zoom Conflict**: Fixed major issue where scrolling thumbnail/bookmark lists triggered book zooming.
-- **CORS Issues**: Finalized resolution for cross-origin PDF loading across different environments.
-- **Persistence Bugs**: Fixed theme and PDF state loss during page transitions.
-- **Synchronization**: Resolved RTL/LTR toggle state desync issues.
-- **Modal Layering**: Fixed z-index and race conditions for nested modal displays.
+- **Rebranding**: the complete transition from Paginis to Zaya, with a new logo and a single naming
+  convention across variables and assets.
+- **Service worker**: split into `sw-manager.js` (UI thread) and `sw.js` (background worker).
 
----
+### Fixed
 
-## 🔄 Version History
+- `ReferenceError` crashes during local file imports in `media.js`.
+- 404 errors for the root service-worker file, which had disabled offline support.
+- Race conditions during IndexedDB initialisation in `db.js`.
 
-### v5.4.0 - Core Performance Overhaul & Plugin Extension Architecture (2026-07-25)
+## [5.1.1] - 2026-02-06
 
-- 60fps Theme Engine refactoring with root CSS variable cascading
-- Pure Vanilla JS Theme Selector with cached palette rendering and 100ms debouncing
-- Zaya Core Plugin Registry (`ZayaPlugins`) & UI Slot APIs (`ZayaUI`)
-- Arrow keys navigation & Fullscreen shortcuts
+### Added
 
-### v5.3.0 - Zaya Rebrand & Media Polish (2026-04-03)
+- **Local audio**: local file import for audio playback with progress tracking and synchronised
+  volume controls.
+- **Device adaptation**: automatic detection choosing booklet or zoom mode for the device.
 
-- Global rebranding to Zaya
-- Integrated Media Loop for Audio/Video
-- Service Worker system refactored into `sw-manager.js`
+### Changed
 
-### v5.1.1 - Feature Expansion (2026-02-06)
+- **Media player**: redesigned around a mode switcher and a themed audio player, so audio no longer
+  opens a separate window.
 
-- Implemented Cinematic Single Page centering
-- Added Unified Media Player with Local Audio support
-- Fixed UI Arrow and Keyboard navigation
-- Synchronized lighting with camera movement
+### Fixed
 
-### v5.0.0 - Core Modernization (2026-01-12)
+- 3D camera centring in single-page mode, with lighting synchronised to the focused page.
+- UI arrows and keyboard shortcuts, by restoring the navigation methods missing from the modular
+  factory.
 
-- Modularized DFlip core for better maintainability
-- Fixed scroll conflicts in sidebars
-- Restyled control panel and bottom bar
-- Implemented universal theme toggling
-- Modernized all icons to Font Awesome
-- Added performance analytics dashboard
+## [5.0.0] - 2026-01-12
 
-### v4.5.0 - UI Modernization (2026-01-03)
+### Added
 
-- Replaced legacy color scheme with theme-aware system
-- Integrated controls into bottom panel
-- Fixed theme persistence bugs
+- **Page number entry** in the bottom bar.
+- **Performance dashboard** on the changelog page (removed again in 6.0.0).
 
-### v4.4.0 - Architecture Cleanup (2025-12-22)
+### Changed
 
-- Enhanced PDF fallback system
-- Centralized configuration in `app-state.js`
-- Fixed RTL/LTR toggle synchronization
+- **Library modularisation**: the DFlip core was refactored into modular ES6 files.
+- **Icons**: legacy emoji replaced by a consistent Font Awesome set.
+- **Themes**: universal theme toggling across the whole project structure.
+- **Control panel and bottom bar**: restyled, including the quotes module.
+- **Styles**: absolute paths removed and persistent styles consolidated into one modular entry point.
 
-### v4.0.0 - Major Overhaul (2025-11-01)
+### Fixed
 
-- Security hardening and input validation
-- UX enhancement and mobile support
+- Scrolling the thumbnail or bookmark list no longer triggers zoom or a page turn.
 
-### v1.0.0 (2024-10-24)
+### Removed
 
-- Initial release with basic flipbook and core integration
+- Legacy unused code and deprecated event listeners.
 
----
+## [4.5.0] - 2026-01-03
 
-## 📝 Notes
+### Changed
 
-- All changes since January 2026 are included in the v5.0.0 milestone.
-- The project now follows a more modular, feature-oriented architecture.
-- Core library dependencies have been optimized for better rendering performance.
+- Legacy colour schemes replaced by a theme-aware system built on CSS custom properties.
+- Flipbook controls migrated into the bottom panel.
 
----
+### Fixed
+
+- Theme and PDF state are preserved across reloads.
+
+### Removed
+
+- Hardcoded hex colours.
+
+## [4.4.0] - 2025-12-22
+
+### Changed
+
+- Improved the PDF fallback system.
+- Configuration centralised in `app-state.js`.
+
+### Fixed
+
+- RTL/LTR toggle synchronisation.
+
+## [4.0.0] - 2025-11-01
+
+### Added
+
+- Mobile support: touch gesture navigation, hover-aware sidebars and haptic feedback.
+
+### Changed
+
+- Memory management: automatic cleanup of heavy PDF and YouTube instances.
+- Centralised, event-driven `AppState` replacing global variables.
+
+### Security
+
+- An input validation framework covering URLs and file uploads.
+
+## [1.0.0] - 2024-10-24
+
+### Added
+
+- Initial release: the basic flipbook and its core integration.
