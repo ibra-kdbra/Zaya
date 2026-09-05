@@ -6,6 +6,7 @@ playwright-report
 .github
 *.md
 !README.md
+!CHANGELOG.md
 eslint.config.mjs
 playwright.config.mjs
 tailwind.config.js

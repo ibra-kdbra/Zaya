@@ -76,6 +76,19 @@ a {
   font-size: 14px;
 }
 
+.cl-brand__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.cl-brand__link:hover { color: var(--text-accent); }
+.cl-brand__github { width: 15px; height: 15px; color: var(--text-secondary); }
+.cl-brand__link:hover .cl-brand__github { color: var(--text-accent); }
+
 .cl-brand__mark {
   width: 26px;
   height: 26px;
@@ -99,6 +112,8 @@ a {
 }
 
 /* The badge is a label, so it stays quiet; the accent belongs to the one action on this page. */
+.cl-badge:has(> :empty) { display: none; }
+
 .cl-badge {
   display: inline-flex;
   align-items: center;

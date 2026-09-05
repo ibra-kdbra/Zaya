@@ -96,7 +96,9 @@ h3 { font-size: 12px; line-height: 1.4; }
   letter-spacing: 0.01em;
 }
 
+.app-brand-github { font-size: 15px; color: var(--text-secondary); transition: color 150ms ease; }
 .app-brand:hover { color: var(--text-accent); }
+.app-brand:hover .app-brand-github { color: var(--text-accent); }
 
 .app-doc-title {
   flex: 1 1 auto;
