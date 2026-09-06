@@ -33,7 +33,7 @@ export function collectErrors(page) {
 export async function waitForBook(page) {
   await expect(page.locator('#flipbookContainer canvas, #flipbookContainer .df-book-page').first())
     .toBeVisible({ timeout: 30_000 });
-  await expect.poll(() => page.evaluate(() => !!(window.dFlipBook && window.dFlipBook.target)), { timeout: 15_000 })
+  await expect.poll(() => page.evaluate(() => !!(window.ZayaBook && window.ZayaBook.isReady)), { timeout: 15_000 })
     .toBe(true);
 }
 
@@ -49,12 +49,12 @@ export async function openPanel(page, tab = 'Document') {
 }
 
 export async function activePage(page) {
-  return page.evaluate(() => (window.dFlipBook && window.dFlipBook.target ? window.dFlipBook.target._activePage : null));
+  return page.evaluate(() => (window.ZayaBook && window.ZayaBook.current ? window.ZayaBook.current.activePage : null));
 }
 
 /** Turn to `n` and wait until page memory has stored it for `key`. */
 export async function goToPage(page, n, key) {
-  await page.evaluate((target) => window.dFlipBook.target.gotoPage(target), n);
+  await page.evaluate((target) => window.ZayaBook.current.gotoPage(target), n);
   await expect.poll(() => activePage(page), { timeout: 15_000 }).toBe(n);
   if (key) {
     await expect.poll(() => page.evaluate((k) => window.getLastPage(k), key), { timeout: 15_000 }).toBe(n);
