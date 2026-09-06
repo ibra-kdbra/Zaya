@@ -5,6 +5,11 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **The foundation of the MIT page-turn engine (issue #21)**: `engine-next/` is a clean-room replacement for the DearFlip-derived `engine/`, written from the interface the reader already uses rather than from the code it replaces. It loads a document with pdf.js 4 (`vendor/pdfjs/`), lays out single and double spreads in either reading direction, maps book pages to PDF pages including scans that carry two book pages per page, and turns a sheet with three.js r169 (`vendor/three/`) by moving the sheet's vertices so the paper curls — with a plain-DOM renderer of the same shape for machines without WebGL. `engine-next/demo.html` drives it on its own, under a copy of the deployment's Content-Security-Policy; `tests/engine-next.spec.mjs` covers both renderers. Nothing in the reader loads it yet: the switch-over is a later step, and until then `engine/` is still what runs.
+
 ## [6.3.0] - 2026-09-06
 
 ### Added
