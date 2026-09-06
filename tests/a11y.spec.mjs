@@ -106,6 +106,7 @@ for (const lang of LANGUAGES) {
       // The More menu on the bottom bar
       await page.locator('#customMoreBtn').click();
       await expect(page.locator('#customMoreMenu')).toHaveClass(/show/);
+      await settled(page, '#customMoreMenu');
       found.push(...await scan(page, 'more menu'));
 
       // The print dialog, opened from that same menu
