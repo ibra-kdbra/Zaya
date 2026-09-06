@@ -111,7 +111,7 @@ test.describe('Local files', () => {
     await page.evaluate(() => window.ZayaLocalDocs.deleteFile('sample.pdf'));
     await page.reload();
     await waitForBook(page);
-    await expect(page.locator('.toastify')).toContainText('Please re-select it', { timeout: 10_000 });
+    await expect(page.locator('.toastify')).toContainText('pick it again', { timeout: 10_000 });
     expect(await page.evaluate(() => window.appState.get('currentPdfType'))).toBe('url');
     expect(await page.evaluate(() => window.getLastPage('sample.pdf'))).toBe(2);
 
@@ -348,7 +348,7 @@ test.describe('Media player', () => {
     await openPanel(page, 'Media');
     await page.locator('#youtubeUrl').fill('https://vimeo.com/12345');
     await page.locator('#loadYoutubeBtn').click();
-    await expect(page.locator('.toastify')).toContainText('Not a valid YouTube URL', { timeout: 10_000 });
+    await expect(page.locator('.toastify')).toContainText('not a YouTube address', { timeout: 10_000 });
     expect(await page.evaluate(() => document.getElementById('youtubePlayer').getAttribute('src'))).toBe('');
   });
 

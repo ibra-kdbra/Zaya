@@ -39,18 +39,18 @@
 
   <!-- Top header strip: brand, document title, drawer toggles -->
   <header id="appHeader" class="app-header" role="banner">
-    <a class="app-brand" href="https://github.com/ibra-kdbra/Zaya" target="_blank" rel="noopener" title="Zaya on GitHub">
+    <a class="app-brand" href="https://github.com/ibra-kdbra/Zaya" target="_blank" rel="noopener" title="Zaya on GitHub" data-i18n-title="header.brandTitle">
       <img src="assets/zaya.svg" alt="" width="22" height="22" aria-hidden="true">
       <span class="app-brand-name">Zaya</span>
       <i class="fab fa-github app-brand-github" aria-hidden="true"></i>
     </a>
     <h1 class="app-doc-title"><span data-pdf-info class="app-doc-name"></span></h1>
     <div class="app-header-actions">
-      <button id="toggleNavigatorBtn" class="header-btn" type="button" title="Toggle navigator"
+      <button id="toggleNavigatorBtn" class="header-btn" type="button" title="Toggle the navigator" data-i18n-title="header.toggleNavigator"
               aria-expanded="false" aria-controls="navigatorDrawer">
         <i class="fas fa-list-ul"></i>
       </button>
-      <button id="toggleUnifiedPanelBtn" class="header-btn" type="button" title="Toggle Control Panel"
+      <button id="toggleUnifiedPanelBtn" class="header-btn" type="button" title="Toggle the control panel" data-i18n-title="header.togglePanel"
               aria-expanded="false" aria-controls="unifiedPanel">
         <i class="fas fa-sliders-h"></i>
       </button>
@@ -61,37 +61,37 @@
   <div id="drawerScrim" class="drawer-scrim" hidden></div>
 
   <!-- LEFT DRAWER: Navigator (thumbnails / outline / search) -->
-  <aside id="navigatorDrawer" class="drawer drawer-left" role="dialog" aria-label="Navigator" aria-hidden="true" inert>
+  <aside id="navigatorDrawer" class="drawer drawer-left" role="dialog" aria-label="Navigator" data-i18n-aria-label="nav.title" aria-hidden="true" inert>
     <div class="drawer-head">
       <div class="drawer-head-row">
         <div class="drawer-head-text">
-          <h2 class="drawer-title">Navigator</h2>
+          <h2 class="drawer-title" data-i18n="nav.title">Navigator</h2>
           <p class="drawer-subtitle">
-            <span id="navPageNow">1</span> of <span id="navPageCount">1</span> <span class="drawer-subtitle-unit">pages</span>
+            <span id="navPageNow">1</span> <span data-i18n="nav.pagesOf">of</span> <span id="navPageCount">1</span> <span class="drawer-subtitle-unit" data-i18n="nav.pagesUnit">pages</span>
           </p>
         </div>
-        <button id="closeNavigatorBtn" class="drawer-close" type="button" title="Close navigator" aria-label="Close navigator">
+        <button id="closeNavigatorBtn" class="drawer-close" type="button" title="Close the navigator" aria-label="Close the navigator" data-i18n-title="nav.close" data-i18n-aria-label="nav.close">
           <i class="fas fa-times" aria-hidden="true"></i>
         </button>
       </div>
     </div>
     <div class="drawer-main">
-      <div class="drawer-switch" role="tablist" aria-label="Navigator sections" aria-orientation="vertical">
+      <div class="drawer-switch" role="tablist" aria-label="Navigator sections" data-i18n-aria-label="nav.sections" aria-orientation="vertical">
         <button class="switch-btn" id="navTabThumbs" type="button" role="tab" data-nav-tab="thumbs"
-                title="Pages" aria-selected="true" aria-controls="navPaneThumbs">
-          <i class="fas fa-th-large" aria-hidden="true"></i><span class="switch-label">Pages</span>
+                title="Pages" data-i18n-title="nav.pages" aria-selected="true" aria-controls="navPaneThumbs">
+          <i class="fas fa-th-large" aria-hidden="true"></i><span class="switch-label" data-i18n="nav.pages">Pages</span>
         </button>
         <button class="switch-btn" id="navTabOutline" type="button" role="tab" data-nav-tab="outline"
-                title="Outline" aria-selected="false" tabindex="-1" aria-controls="navPaneOutline">
-          <i class="fas fa-stream" aria-hidden="true"></i><span class="switch-label">Outline</span>
+                title="Outline" data-i18n-title="nav.outline" aria-selected="false" tabindex="-1" aria-controls="navPaneOutline">
+          <i class="fas fa-stream" aria-hidden="true"></i><span class="switch-label" data-i18n="nav.outline">Outline</span>
         </button>
         <button class="switch-btn" id="navTabSearch" type="button" role="tab" data-nav-tab="search"
-                title="Search" aria-selected="false" tabindex="-1" aria-controls="navPaneSearch">
-          <i class="fas fa-search" aria-hidden="true"></i><span class="switch-label">Search</span>
+                title="Search" data-i18n-title="nav.search" aria-selected="false" tabindex="-1" aria-controls="navPaneSearch">
+          <i class="fas fa-search" aria-hidden="true"></i><span class="switch-label" data-i18n="nav.search">Search</span>
         </button>
         <button class="switch-btn" id="navTabText" type="button" role="tab" data-nav-tab="text"
-                title="Text" aria-selected="false" tabindex="-1" aria-controls="navPaneText">
-          <i class="fas fa-align-left" aria-hidden="true"></i><span class="switch-label">Text</span>
+                title="Text" data-i18n-title="nav.text" aria-selected="false" tabindex="-1" aria-controls="navPaneText">
+          <i class="fas fa-align-left" aria-hidden="true"></i><span class="switch-label" data-i18n="nav.text">Text</span>
         </button>
       </div>
       <div class="drawer-col">
@@ -103,38 +103,38 @@
   </aside>
 
   <!-- RIGHT DRAWER: control panel -->
-  <div id="unifiedPanel" inert class="panel-container drawer drawer-right" role="dialog" aria-label="Control panel" aria-hidden="true">
+  <div id="unifiedPanel" inert class="panel-container drawer drawer-right" role="dialog" aria-label="Control panel" data-i18n-aria-label="panel.title" aria-hidden="true">
     <div class="drawer-head panel-header">
       <div class="drawer-head-row">
         <div class="drawer-head-text">
           <h2 class="drawer-title panel-doc-name"><span data-pdf-info>Zaya</span></h2>
           <p class="drawer-subtitle panel-doc-meta">
-            <span id="panelPageNow">1</span> of <span id="panelPageCount">1</span> <span class="drawer-subtitle-unit">pages</span>
+            <span id="panelPageNow">1</span> <span data-i18n="nav.pagesOf">of</span> <span id="panelPageCount">1</span> <span class="drawer-subtitle-unit" data-i18n="nav.pagesUnit">pages</span>
           </p>
         </div>
-        <button id="closeUnifiedPanelBtn" class="drawer-close panel-close" type="button" title="Close control panel" aria-label="Close control panel">
+        <button id="closeUnifiedPanelBtn" class="drawer-close panel-close" type="button" title="Close the control panel" aria-label="Close the control panel" data-i18n-title="panel.close" data-i18n-aria-label="panel.close">
           <i class="fas fa-times" aria-hidden="true"></i>
         </button>
       </div>
     </div>
 
     <div class="drawer-main">
-      <div class="drawer-switch panel-tabs" role="tablist" aria-label="Control panel sections" aria-orientation="vertical">
+      <div class="drawer-switch panel-tabs" role="tablist" aria-label="Control panel sections" data-i18n-aria-label="panel.sections" aria-orientation="vertical">
         <button class="switch-btn" id="panelTabDocument" type="button" role="tab" data-panel-tab="Document"
-                title="Document" aria-selected="true" aria-controls="panelPaneDocument">
-          <i class="fas fa-file-pdf" aria-hidden="true"></i><span class="switch-label">Document</span>
+                title="Document" data-i18n-title="panel.tab.document" aria-selected="true" aria-controls="panelPaneDocument">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i><span class="switch-label" data-i18n="panel.tab.document">Document</span>
         </button>
         <button class="switch-btn" id="panelTabNotes" type="button" role="tab" data-panel-tab="Notes"
-                title="Notes" aria-selected="false" tabindex="-1" aria-controls="panelPaneNotes">
-          <i class="fas fa-quote-left" aria-hidden="true"></i><span class="switch-label">Notes</span>
+                title="Notes" data-i18n-title="panel.tab.notes" aria-selected="false" tabindex="-1" aria-controls="panelPaneNotes">
+          <i class="fas fa-quote-left" aria-hidden="true"></i><span class="switch-label" data-i18n="panel.tab.notes">Notes</span>
         </button>
         <button class="switch-btn" id="panelTabMedia" type="button" role="tab" data-panel-tab="Media"
-                title="Media" aria-selected="false" tabindex="-1" aria-controls="panelPaneMedia">
-          <i class="fas fa-play-circle" aria-hidden="true"></i><span class="switch-label">Media</span>
+                title="Media" data-i18n-title="panel.tab.media" aria-selected="false" tabindex="-1" aria-controls="panelPaneMedia">
+          <i class="fas fa-play-circle" aria-hidden="true"></i><span class="switch-label" data-i18n="panel.tab.media">Media</span>
         </button>
         <button class="switch-btn" id="panelTabSettings" type="button" role="tab" data-panel-tab="Settings"
-                title="Settings" aria-selected="false" tabindex="-1" aria-controls="panelPaneSettings">
-          <i class="fas fa-cog" aria-hidden="true"></i><span class="switch-label">Settings</span>
+                title="Settings" data-i18n-title="panel.tab.settings" aria-selected="false" tabindex="-1" aria-controls="panelPaneSettings">
+          <i class="fas fa-cog" aria-hidden="true"></i><span class="switch-label" data-i18n="panel.tab.settings">Settings</span>
         </button>
       </div>
 
@@ -144,46 +144,47 @@
           <!-- Document -->
           <section class="panel-pane" id="panelPaneDocument" role="tabpanel" aria-labelledby="panelTabDocument" tabindex="0">
             <div class="panel-group">
-              <h3 class="panel-section-title">Open a document</h3>
+              <h3 class="panel-section-title" data-i18n="panel.document.openHeading">Open a document</h3>
               <div class="input-field">
-                <label class="sr-only" for="pdfUrl">PDF link</label>
-                <input id="pdfUrl" type="url" placeholder="Paste a PDF link" class="panel-input" autocomplete="off">
-                <button id="loadPdfUrlBtn" class="ui-btn ui-btn-primary" type="button" title="Open the PDF at this link">Open</button>
+                <label class="sr-only" for="pdfUrl" data-i18n="panel.document.linkLabel">PDF link</label>
+                <input id="pdfUrl" type="url" placeholder="Paste a PDF link" data-i18n-placeholder="panel.document.linkPlaceholder" class="panel-input" autocomplete="off">
+                <button id="loadPdfUrlBtn" class="ui-btn ui-btn-primary" type="button" title="Open the PDF at this link" data-i18n-title="panel.document.openLinkTitle" data-i18n="panel.document.openLink">Open</button>
               </div>
               <button id="loadPdfFileBtn" class="ui-btn ui-btn-quiet ui-btn-block" type="button">
-                <i class="fas fa-folder-open" aria-hidden="true"></i><span>Open a file from this device</span>
+                <i class="fas fa-folder-open" aria-hidden="true"></i><span data-i18n="panel.document.openFile">Open a file from this device</span>
               </button>
-              <input id="pdfFile" type="file" accept="application/pdf" class="sr-only-input">
+              <input id="pdfFile" type="file" accept="application/pdf" class="sr-only-input"
+                     aria-label="Open a file from this device" data-i18n-aria-label="panel.document.openFile">
             </div>
 
             <div class="panel-group" id="recentDocsGroup" hidden>
               <div class="panel-group-head">
-                <h3 class="panel-section-title">Recent</h3>
-                <button id="clearRecentBtn" class="ui-btn ui-btn-quiet ui-btn-small" type="button" title="Clear the recent list">Clear</button>
+                <h3 class="panel-section-title" data-i18n="recent.title">Recent</h3>
+                <button id="clearRecentBtn" class="ui-btn ui-btn-quiet ui-btn-small" type="button" title="Clear the recent list" data-i18n-title="recent.clearTitle" data-i18n="action.clear">Clear</button>
               </div>
-              <p class="panel-note">Files opened from this device are kept in this browser so they reopen after a reload.</p>
-              <ul id="recentDocsList" class="recent-list" aria-label="Recent documents"></ul>
+              <p class="panel-note" data-i18n="recent.note">Files opened from this device are kept in this browser so they reopen after a reload.</p>
+              <ul id="recentDocsList" class="recent-list" aria-label="Recent documents" data-i18n-aria-label="recent.listLabel"></ul>
             </div>
 
             <div class="panel-group">
-              <h3 class="panel-section-title">Reading</h3>
+              <h3 class="panel-section-title" data-i18n="panel.document.readingHeading">Reading</h3>
               <div class="panel-row">
-                <span class="panel-row-label">Reading direction</span>
+                <span class="panel-row-label" data-i18n="panel.document.direction">Reading direction</span>
                 <button id="toggleDirectionBtn" class="ui-btn ui-btn-quiet" type="button" aria-pressed="false"
                         title="Switch to right-to-left reading">
-                  <i class="fas fa-exchange-alt" aria-hidden="true"></i><span id="directionLabel">Left to right</span>
+                  <i class="fas fa-exchange-alt" aria-hidden="true"></i><span id="directionLabel" data-i18n="panel.document.ltr">Left to right</span>
                 </button>
               </div>
             </div>
 
             <div class="panel-group">
-              <h3 class="panel-section-title">This document</h3>
+              <h3 class="panel-section-title" data-i18n="panel.document.thisDocument">This document</h3>
               <div class="btn-pair">
                 <button id="panelShareBtn" class="ui-btn ui-btn-quiet" type="button">
-                  <i class="fas fa-share-alt" aria-hidden="true"></i><span>Share</span>
+                  <i class="fas fa-share-alt" aria-hidden="true"></i><span data-i18n="action.share">Share</span>
                 </button>
                 <button id="panelDownloadBtn" class="ui-btn ui-btn-quiet" type="button">
-                  <i class="fas fa-download" aria-hidden="true"></i><span>Download</span>
+                  <i class="fas fa-download" aria-hidden="true"></i><span data-i18n="action.download">Download</span>
                 </button>
               </div>
             </div>
@@ -192,82 +193,82 @@
           <!-- Notes -->
           <section class="panel-pane" id="panelPaneNotes" role="tabpanel" aria-labelledby="panelTabNotes" tabindex="0" hidden>
             <div class="panel-group">
-              <h3 class="panel-section-title">New note</h3>
+              <h3 class="panel-section-title" data-i18n="notes.newHeading">New note</h3>
               <div class="input-field quotes-input-container">
-                <label class="sr-only" for="quoteInput">Note text</label>
-                <input id="quoteInput" type="text" placeholder="Something worth keeping" class="panel-input">
-                <button id="addQuoteBtn" class="ui-btn ui-btn-primary" type="button" aria-label="Save this note"
-                        title="Save this note with the current page"><i class="fas fa-plus" aria-hidden="true"></i></button>
+                <label class="sr-only" for="quoteInput" data-i18n="notes.inputLabel">Note text</label>
+                <input id="quoteInput" type="text" placeholder="Something worth keeping" data-i18n-placeholder="notes.placeholder" class="panel-input">
+                <button id="addQuoteBtn" class="ui-btn ui-btn-primary" type="button" aria-label="Save this note" data-i18n-aria-label="notes.save"
+                        title="Save this note with the current page" data-i18n-title="notes.saveTitle"><i class="fas fa-plus" aria-hidden="true"></i></button>
               </div>
             </div>
 
             <div class="panel-group panel-group-flush">
               <div class="panel-group-head">
-                <h3 class="panel-section-title">Saved notes</h3>
+                <h3 class="panel-section-title" data-i18n="notes.savedHeading">Saved notes</h3>
                 <div class="btn-pair btn-pair-tight">
-                  <button id="quotesToggleBtn" class="ui-btn ui-btn-quiet ui-btn-sm" type="button" title="Show all notes for this document">
-                    <i class="fas fa-quote-left" aria-hidden="true"></i><span>All notes</span>
+                  <button id="quotesToggleBtn" class="ui-btn ui-btn-quiet ui-btn-sm" type="button" title="Show all notes for this document" data-i18n-title="notes.allTitle">
+                    <i class="fas fa-quote-left" aria-hidden="true"></i><span data-i18n="notes.all">All notes</span>
                   </button>
-                  <button id="exportQuotesBtn" class="ui-btn ui-btn-quiet ui-btn-sm" type="button" title="Export notes">
-                    <i class="fas fa-download" aria-hidden="true"></i><span>Export</span>
+                  <button id="exportQuotesBtn" class="ui-btn ui-btn-quiet ui-btn-sm" type="button" title="Export notes" data-i18n-title="notes.exportTitle">
+                    <i class="fas fa-download" aria-hidden="true"></i><span data-i18n="action.export">Export</span>
                   </button>
                 </div>
               </div>
-              <p class="panel-note">In <span id="currentPdfInfo">this document</span>, kept on this device.</p>
-              <div class="quotes-list" id="quoteList" data-empty="No notes yet. Anything you add is kept with this document, on this device."></div>
+              <p class="panel-note"><span data-i18n="notes.inDocPrefix">In </span><span id="currentPdfInfo">this document</span><span data-i18n="notes.inDocSuffix">, kept on this device.</span></p>
+              <div class="quotes-list" id="quoteList" data-i18n-empty="notes.emptyList" data-empty="No notes yet. Anything you add is kept with this document, on this device."></div>
             </div>
           </section>
 
           <!-- Media -->
           <section class="panel-pane" id="panelPaneMedia" role="tabpanel" aria-labelledby="panelTabMedia" tabindex="0" hidden>
             <div class="panel-group">
-              <h3 class="panel-section-title">Soundtrack</h3>
-              <div class="segmented segmented-sm media-switch" role="group" aria-label="Media source">
+              <h3 class="panel-section-title" data-i18n="media.heading">Soundtrack</h3>
+              <div class="segmented segmented-sm media-switch" role="group" aria-label="Media source" data-i18n-aria-label="media.source">
                 <button id="switchYoutubeMode" type="button" class="seg-btn media-mode-active">
-                  <i class="fab fa-youtube" aria-hidden="true"></i><span>YouTube</span>
+                  <i class="fab fa-youtube" aria-hidden="true"></i><span data-i18n="media.youtube">YouTube</span>
                 </button>
                 <button id="switchAudioMode" type="button" class="seg-btn">
-                  <i class="fas fa-music" aria-hidden="true"></i><span>Audio file</span>
+                  <i class="fas fa-music" aria-hidden="true"></i><span data-i18n="media.audioFile">Audio file</span>
                 </button>
               </div>
 
               <div id="youtubeInputGroup" class="youtube-input-container">
                 <div class="input-field">
-                  <label class="sr-only" for="youtubeUrl">YouTube link</label>
-                  <input id="youtubeUrl" type="url" placeholder="Paste a YouTube link" class="panel-input" autocomplete="off">
-                  <button id="loadYoutubeBtn" class="ui-btn ui-btn-primary" type="button" title="Play this video">Play</button>
+                  <label class="sr-only" for="youtubeUrl" data-i18n="media.youtubeLabel">YouTube link</label>
+                  <input id="youtubeUrl" type="url" placeholder="Paste a YouTube link" data-i18n-placeholder="media.youtubePlaceholder" class="panel-input" autocomplete="off">
+                  <button id="loadYoutubeBtn" class="ui-btn ui-btn-primary" type="button" title="Play this video" data-i18n-title="media.playTitle" data-i18n="media.play">Play</button>
                 </div>
-                <button id="loadPlaylistBtn" class="ui-btn ui-btn-quiet ui-btn-block" type="button" title="Load the whole playlist">
-                  <i class="fas fa-compact-disc" aria-hidden="true"></i><span>Load as playlist</span>
+                <button id="loadPlaylistBtn" class="ui-btn ui-btn-quiet ui-btn-block" type="button" title="Load the whole playlist" data-i18n-title="media.playlistTitle">
+                  <i class="fas fa-compact-disc" aria-hidden="true"></i><span data-i18n="media.playlist">Load as playlist</span>
                 </button>
               </div>
 
               <div id="audioInputGroup" class="local-audio-container hidden">
                 <input id="localAudioFile" type="file" accept="audio/*" class="sr-only-input">
                 <label for="localAudioFile" class="ui-btn ui-btn-quiet ui-btn-block panel-file-label">
-                  <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i><span>Choose an audio file</span>
+                  <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i><span data-i18n="media.chooseAudio">Choose an audio file</span>
                 </label>
                 <div id="localAudioFileName" class="media-filename hidden"></div>
               </div>
             </div>
 
             <div class="media-player-container">
-              <button id="closeMediaContainer" class="media-close hidden" type="button" title="Close media" aria-label="Close media">
+              <button id="closeMediaContainer" class="media-close hidden" type="button" title="Close the media player" aria-label="Close the media player" data-i18n-title="media.close" data-i18n-aria-label="media.close">
                 <i class="fas fa-times" aria-hidden="true"></i>
               </button>
 
               <div class="media-player-youtube" id="youtubePlayerContainer">
-                <iframe id="youtubePlayer" src="" title="YouTube player" frameborder="0" allowfullscreen
+                <iframe id="youtubePlayer" src="" title="YouTube player" data-i18n-title="media.youtubePlayer" frameborder="0" allowfullscreen
                         allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
               </div>
 
               <div id="customAudioPlayer" class="hidden media-card">
                 <div class="media-transport">
-                  <button id="audioPlayPauseBtn" class="media-play-btn" type="button" title="Play or pause" aria-label="Play or pause">
+                  <button id="audioPlayPauseBtn" class="media-play-btn" type="button" title="Play or pause" aria-label="Play or pause" data-i18n-title="media.playPause" data-i18n-aria-label="media.playPause">
                     <i class="fas fa-play"></i>
                   </button>
                   <div class="media-progress">
-                    <input type="range" id="audioProgressSlider" min="0" max="100" value="0" aria-label="Seek">
+                    <input type="range" id="audioProgressSlider" min="0" max="100" value="0" aria-label="Seek" data-i18n-aria-label="media.seek">
                     <div class="media-times">
                       <span id="audioCurrentTime">0:00</span>
                       <span id="audioTotalTime">0:00</span>
@@ -276,15 +277,15 @@
                 </div>
                 <div class="media-subrow">
                   <i class="fas fa-volume-down" aria-hidden="true"></i>
-                  <input type="range" id="volumeSlider" min="0" max="100" value="50" aria-label="Volume">
+                  <input type="range" id="volumeSlider" min="0" max="100" value="50" aria-label="Volume" data-i18n-aria-label="media.volume">
                   <i class="fas fa-volume-up" aria-hidden="true"></i>
                 </div>
                 <div class="panel-row">
-                  <span class="panel-row-label">Repeat when it ends</span>
+                  <span class="panel-row-label" data-i18n="media.repeat">Repeat when it ends</span>
                   <label class="toggle-switch-modern">
                     <input type="checkbox" id="mediaLoopToggle">
                     <span class="slider-modern"></span>
-                    <span class="sr-only">Repeat audio</span>
+                    <span class="sr-only" data-i18n="media.repeatAudio">Repeat the audio</span>
                   </label>
                 </div>
                 <audio id="localAudioPlayer" class="hidden"></audio>
@@ -293,14 +294,14 @@
               <div id="videoVolumeControl" class="media-buttons hidden media-card">
                 <div class="media-subrow volume-control">
                   <i class="fas fa-volume-up" aria-hidden="true"></i>
-                  <input type="range" id="videoVolumeSlider" min="0" max="100" value="50" class="volume-slider" aria-label="Video volume">
+                  <input type="range" id="videoVolumeSlider" min="0" max="100" value="50" class="volume-slider" aria-label="Video volume" data-i18n-aria-label="media.videoVolume">
                 </div>
                 <div class="panel-row">
-                  <span class="panel-row-label">Repeat when it ends</span>
+                  <span class="panel-row-label" data-i18n="media.repeat">Repeat when it ends</span>
                   <label class="toggle-switch-modern">
                     <input type="checkbox" id="videoMediaLoopToggle">
                     <span class="slider-modern"></span>
-                    <span class="sr-only">Repeat video</span>
+                    <span class="sr-only" data-i18n="media.repeatVideo">Repeat the video</span>
                   </label>
                 </div>
               </div>
@@ -310,73 +311,86 @@
           <!-- Settings -->
           <section class="panel-pane" id="panelPaneSettings" role="tabpanel" aria-labelledby="panelTabSettings" tabindex="0" hidden>
             <div class="panel-group">
-              <h3 class="panel-section-title">Appearance</h3>
+              <h3 class="panel-section-title" data-i18n="settings.appearance">Appearance</h3>
               <button id="openThemeSelectorBtn" class="setting-item-clickable" type="button">
                 <span class="item-left">Theme: Default</span>
                 <i class="fas fa-chevron-right chevron" aria-hidden="true"></i>
               </button>
               <div class="panel-row">
-                <span class="panel-row-label">Bottom bar</span>
+                <span class="panel-row-label" data-i18n="settings.bottomBar">Bottom bar</span>
                 <label class="switch-field">
                   <span class="switch-value" id="bottomBarModeLabel">Auto-hide</span>
                   <span class="toggle-switch-modern">
                     <input type="checkbox" id="bottomPanelAlwaysShown">
                     <span class="slider-modern"></span>
-                    <span class="sr-only">Keep the bottom bar always visible</span>
+                    <span class="sr-only" data-i18n="settings.bottomBarSr">Keep the bottom bar always visible</span>
                   </span>
                 </label>
               </div>
             </div>
 
             <div class="panel-group">
-              <h3 class="panel-section-title">Pages</h3>
-              <p class="panel-note">Stiff pages turn as one board instead of bending. The document reopens when this changes.</p>
-              <div class="segmented segmented-sm" id="hardCoverSwitch" role="group" aria-label="Stiff pages">
+              <h3 class="panel-section-title" data-i18n="settings.language">Language</h3>
+              <div id="languageSwitch" class="segmented segmented-sm" role="radiogroup"
+                   aria-label="Interface language" data-i18n-aria-label="settings.languageChoice">
+                <button id="languageEn" type="button" class="seg-btn" role="radio" data-language="en"
+                        aria-checked="true" lang="en">English</button>
+                <button id="languageAr" type="button" class="seg-btn" role="radio" data-language="ar"
+                        aria-checked="false" tabindex="-1" lang="ar">العربية</button>
+              </div>
+            </div>
+
+            <div class="panel-group">
+              <h3 class="panel-section-title" data-i18n="settings.pages">Pages</h3>
+              <p class="panel-note" data-i18n="settings.pagesNote">Stiff pages turn as one board instead of bending. The document reopens when this changes.</p>
+              <div class="segmented segmented-sm" id="hardCoverSwitch" role="group"
+                   aria-label="Stiff pages" data-i18n-aria-label="settings.stiffPages">
                 <button id="hardCoverNone" type="button" class="seg-btn" data-hard-cover="none" aria-selected="true">
-                  <span>Soft</span>
+                  <span data-i18n="settings.hardCoverNone">Soft</span>
                 </button>
                 <button id="hardCoverCover" type="button" class="seg-btn" data-hard-cover="cover" aria-selected="false">
-                  <span>Hard cover</span>
+                  <span data-i18n="settings.hardCoverCover">Hard cover</span>
                 </button>
                 <button id="hardCoverAll" type="button" class="seg-btn" data-hard-cover="all" aria-selected="false">
-                  <span>All pages</span>
+                  <span data-i18n="settings.hardCoverAll">All pages</span>
                 </button>
               </div>
             </div>
 
             <div class="panel-group">
-              <h3 class="panel-section-title">Backup</h3>
-              <p class="panel-note">Notes and preferences live in this browser. Keep a copy as a JSON file.</p>
+              <h3 class="panel-section-title" data-i18n="backup.heading">Backup</h3>
+              <p class="panel-note" data-i18n="backup.note">Notes and preferences live in this browser. Keep a copy as a JSON file.</p>
               <div class="btn-pair">
-                <button id="exportBackupBtn" class="ui-btn ui-btn-quiet" type="button" title="Export notes and preferences (JSON)">
-                  <i class="fas fa-file-export" aria-hidden="true"></i><span>Export</span>
+                <button id="exportBackupBtn" class="ui-btn ui-btn-quiet" type="button" title="Export notes and preferences (JSON)" data-i18n-title="backup.exportTitle">
+                  <i class="fas fa-file-export" aria-hidden="true"></i><span data-i18n="action.export">Export</span>
                 </button>
-                <button id="importBackupBtn" class="ui-btn ui-btn-quiet" type="button" title="Import a Zaya backup file">
-                  <i class="fas fa-file-import" aria-hidden="true"></i><span>Import</span>
+                <button id="importBackupBtn" class="ui-btn ui-btn-quiet" type="button" title="Import a Zaya backup file" data-i18n-title="backup.importTitle">
+                  <i class="fas fa-file-import" aria-hidden="true"></i><span data-i18n="action.import">Import</span>
                 </button>
-                <input id="importBackupFile" type="file" accept="application/json,.json" class="sr-only-input">
+                <input id="importBackupFile" type="file" accept="application/json,.json" class="sr-only-input"
+                       aria-label="Import a Zaya backup file" data-i18n-aria-label="backup.importTitle">
               </div>
             </div>
 
             <div class="panel-group panel-group-shortcuts">
-              <h3 class="panel-section-title">Keyboard shortcuts</h3>
+              <h3 class="panel-section-title" data-i18n="shortcuts.heading">Keyboard shortcuts</h3>
               <dl class="shortcut-list">
-                <div class="shortcut"><dt>Turn page</dt><dd><kbd>&larr;</kbd><kbd>&rarr;</kbd></dd></div>
-                <div class="shortcut"><dt>Search in document</dt><dd><kbd>Ctrl</kbd><kbd>F</kbd></dd></div>
-                <div class="shortcut"><dt>Control panel</dt><dd><kbd>Ctrl</kbd><kbd>K</kbd></dd></div>
-                <div class="shortcut"><dt>Print pages</dt><dd><kbd>Ctrl</kbd><kbd>P</kbd></dd></div>
-                <div class="shortcut"><dt>Fullscreen</dt><dd><kbd>F</kbd></dd></div>
-                <div class="shortcut"><dt>Close panel or drawer</dt><dd><kbd>Esc</kbd></dd></div>
+                <div class="shortcut"><dt data-i18n="shortcuts.turnPage">Turn page</dt><dd><kbd>&larr;</kbd><kbd>&rarr;</kbd></dd></div>
+                <div class="shortcut"><dt data-i18n="shortcuts.search">Search in document</dt><dd><kbd>Ctrl</kbd><kbd>F</kbd></dd></div>
+                <div class="shortcut"><dt data-i18n="shortcuts.panel">Control panel</dt><dd><kbd>Ctrl</kbd><kbd>K</kbd></dd></div>
+                <div class="shortcut"><dt data-i18n="shortcuts.print">Print pages</dt><dd><kbd>Ctrl</kbd><kbd>P</kbd></dd></div>
+                <div class="shortcut"><dt data-i18n="shortcuts.fullscreen">Fullscreen</dt><dd><kbd>F</kbd></dd></div>
+                <div class="shortcut"><dt data-i18n="shortcuts.close">Close panel or drawer</dt><dd><kbd>Esc</kbd></dd></div>
               </dl>
             </div>
           </section>
         </div>
 
       <footer class="panel-footer">
-        <a href="changelog.html" class="panel-version-link" title="View Changelog">
+        <a href="changelog.html" class="panel-version-link" title="View the changelog" data-i18n-title="panel.changelogTitle">
           <i class="fas fa-code-branch" aria-hidden="true"></i>
           <span id="currentVersion" data-original=""></span>
-          <span class="panel-version-word">changelog</span>
+          <span class="panel-version-word" data-i18n="panel.changelogWord">changelog</span>
         </a>
       </footer>
       </div>
@@ -386,92 +400,92 @@
   <!-- Custom Flipbook Control Bar -->
   <div class="hover-trigger" id="bottomHoverTrigger"></div>
   <div id="customControlBar" class="always-shown">
-    <button class="custom-ui-btn" id="customPrevBtn" title="Previous Page">
+    <button class="custom-ui-btn" id="customPrevBtn" type="button" title="Previous page" data-i18n-title="bar.prev">
       <i class="fas fa-chevron-left"></i>
     </button>
 
     <div class="page-indicator">
-      <input type="text" id="customCurrentPageInput" class="page-input-custom" inputmode="numeric" pattern="[0-9]*" aria-label="Current page"><span class="page-sep" aria-hidden="true">/</span><span id="customTotalPages" aria-label="Total pages">1</span>
+      <input type="text" id="customCurrentPageInput" class="page-input-custom" inputmode="numeric" pattern="[0-9]*" aria-label="Current page" data-i18n-aria-label="bar.currentPage"><span class="page-sep" aria-hidden="true">/</span><span id="customTotalPages" aria-label="Total pages" data-i18n-aria-label="bar.totalPages">1</span>
     </div>
 
-    <button class="custom-ui-btn" id="customNextBtn" title="Next Page">
+    <button class="custom-ui-btn" id="customNextBtn" type="button" title="Next page" data-i18n-title="bar.next">
       <i class="fas fa-chevron-right"></i>
     </button>
 
     <div class="bar-sep" aria-hidden="true"></div>
 
-    <button class="custom-ui-btn" id="customThumbnailBtn" title="Toggle Thumbnails">
+    <button class="custom-ui-btn" id="customThumbnailBtn" type="button" title="Toggle thumbnails" data-i18n-title="bar.thumbnails">
       <i class="fas fa-th-large"></i>
     </button>
 
-    <button class="custom-ui-btn" id="customOutlineBtn" title="Toggle Outline">
+    <button class="custom-ui-btn" id="customOutlineBtn" type="button" title="Toggle the outline" data-i18n-title="bar.outline">
       <i class="fas fa-stream"></i>
     </button>
 
-    <button class="custom-ui-btn" id="customSearchBtn" title="Search in document (Ctrl+F)">
+    <button class="custom-ui-btn" id="customSearchBtn" type="button" title="Search in document (Ctrl+F)" data-i18n-title="bar.search">
       <i class="fas fa-search"></i>
     </button>
 
     <div class="bar-sep mobile-hide" aria-hidden="true"></div>
 
-    <button class="custom-ui-btn mobile-hide" id="customZoomOutBtn" title="Zoom Out">
+    <button class="custom-ui-btn mobile-hide" id="customZoomOutBtn" type="button" title="Zoom out" data-i18n-title="bar.zoomOut">
       <i class="fas fa-search-minus"></i>
     </button>
 
-    <button class="custom-ui-btn mobile-hide" id="customZoomInBtn" title="Zoom In">
+    <button class="custom-ui-btn mobile-hide" id="customZoomInBtn" type="button" title="Zoom in" data-i18n-title="bar.zoomIn">
       <i class="fas fa-search-plus"></i>
     </button>
 
     <div class="bar-sep mobile-hide" aria-hidden="true"></div>
 
-    <button class="custom-ui-btn" id="customFullscreenBtn" title="Toggle Fullscreen">
+    <button class="custom-ui-btn" id="customFullscreenBtn" type="button" title="Toggle fullscreen" data-i18n-title="bar.fullscreen">
       <i class="fas fa-expand"></i>
     </button>
 
-    <button class="custom-ui-btn mobile-hide" id="customShareBtn" title="Share">
+    <button class="custom-ui-btn mobile-hide" id="customShareBtn" type="button" title="Share" data-i18n-title="bar.share">
       <i class="fas fa-share-alt"></i>
     </button>
 
     <div class="more-menu-anchor">
-      <button class="custom-ui-btn" id="customMoreBtn" title="More Options">
+      <button class="custom-ui-btn" id="customMoreBtn" type="button" title="More options" data-i18n-title="bar.more" aria-haspopup="true" aria-expanded="false" aria-controls="customMoreMenu">
         <i class="fas fa-ellipsis-h"></i>
       </button>
 
       <!-- More Menu Dropdown -->
-      <div id="customMoreMenu" class="more-menu" role="menu" aria-label="More options">
+      <div id="customMoreMenu" class="more-menu" role="menu" aria-label="More options" data-i18n-aria-label="more.label">
         <div class="more-menu-inner">
-          <button class="more-menu-item" id="menuDownloadBtn">
-            <i class="fas fa-download"></i>
-            <span>Download PDF</span>
+          <button class="more-menu-item" id="menuDownloadBtn" type="button" role="menuitem">
+            <i class="fas fa-download" aria-hidden="true"></i>
+            <span data-i18n="more.download">Download PDF</span>
           </button>
-          <button class="more-menu-item" id="menuPrintBtn">
-            <i class="fas fa-print"></i>
-            <span>Print…</span>
+          <button class="more-menu-item" id="menuPrintBtn" type="button" role="menuitem">
+            <i class="fas fa-print" aria-hidden="true"></i>
+            <span data-i18n="more.print">Print…</span>
           </button>
-          <button class="more-menu-item" id="menuPageModeBtn">
-            <i class="fas fa-file-alt"></i>
-            <span>Single Page Mode</span>
+          <button class="more-menu-item" id="menuPageModeBtn" type="button" role="menuitem">
+            <i class="fas fa-file-alt" aria-hidden="true"></i>
+            <span data-i18n="more.singlePage">Single page mode</span>
           </button>
-          <button class="more-menu-item" id="menuFirstPageBtn">
-            <i class="fas fa-angle-double-left"></i>
-            <span>First page</span>
+          <button class="more-menu-item" id="menuFirstPageBtn" type="button" role="menuitem">
+            <i class="fas fa-angle-double-left" aria-hidden="true"></i>
+            <span data-i18n="more.firstPage">First page</span>
           </button>
-          <button class="more-menu-item" id="menuLastPageBtn">
-            <i class="fas fa-angle-double-right"></i>
-            <span>Last page</span>
+          <button class="more-menu-item" id="menuLastPageBtn" type="button" role="menuitem">
+            <i class="fas fa-angle-double-right" aria-hidden="true"></i>
+            <span data-i18n="more.lastPage">Last page</span>
           </button>
-          <div class="more-menu-sep"></div>
-          <button class="more-menu-item" id="menuFullscreenBtn">
-            <i class="fas fa-expand"></i>
-            <span>Fullscreen</span>
+          <div class="more-menu-sep" role="separator"></div>
+          <button class="more-menu-item" id="menuFullscreenBtn" type="button" role="menuitem">
+            <i class="fas fa-expand" aria-hidden="true"></i>
+            <span data-i18n="more.fullscreen">Fullscreen</span>
           </button>
-          <button class="more-menu-item" id="menuSoundBtn">
-            <i class="fas fa-volume-up"></i>
-            <span>Page-turn sound on</span>
+          <button class="more-menu-item" id="menuSoundBtn" type="button" role="menuitem">
+            <i class="fas fa-volume-up" aria-hidden="true"></i>
+            <span data-i18n="more.soundOn">Page-turn sound on</span>
           </button>
-          <a class="more-menu-item" href="https://github.com/ibra-kdbra/Zaya" target="_blank" rel="noopener">
-            <i class="fab fa-github"></i>
-            <span>Zaya on GitHub</span>
+          <a class="more-menu-item" href="https://github.com/ibra-kdbra/Zaya" target="_blank" rel="noopener" role="menuitem">
+            <i class="fab fa-github" aria-hidden="true"></i>
+            <span data-i18n="more.github">Zaya on GitHub</span>
           </a>
         </div>
       </div>
@@ -485,49 +499,51 @@
   <div id="docLoadingState" class="doc-loading" role="status" aria-live="polite">
     <span class="doc-loading-bar" aria-hidden="true"></span>
     <p class="doc-loading-name"><span data-pdf-info></span></p>
-    <p class="doc-loading-text">Opening document…</p>
+    <p class="doc-loading-text" data-i18n="doc.loading">Opening document…</p>
   </div>
 
   <!-- Print dialog: choose a range, then render those pages into #printSheet -->
   <div id="printDialog" class="print-overlay" hidden>
     <div class="print-panel" id="printDialogPanel" role="dialog" aria-modal="true" aria-labelledby="printDialogTitle">
       <div class="print-panel-head">
-        <h2 class="print-title" id="printDialogTitle">Print pages</h2>
-        <button id="printCloseBtn" class="print-close" type="button" title="Close" aria-label="Close">
+        <h2 class="print-title" id="printDialogTitle" data-i18n="print.title">Print pages</h2>
+        <button id="printCloseBtn" class="print-close" type="button" title="Close" aria-label="Close"
+                data-i18n-title="action.close" data-i18n-aria-label="action.close">
           <i class="fas fa-times" aria-hidden="true"></i>
         </button>
       </div>
 
       <div class="print-panel-body">
-        <div class="segmented segmented-sm" id="printRangeSwitch" role="group" aria-label="Pages to print">
+        <div class="segmented segmented-sm" id="printRangeSwitch" role="group" aria-label="Pages to print"
+             data-i18n-aria-label="print.rangeLabel">
           <button id="printRangeCurrent" type="button" class="seg-btn" data-print-range="current" aria-selected="true">
-            <span>Current page(s)</span>
+            <span data-i18n="print.rangeCurrent">Current page(s)</span>
           </button>
           <button id="printRangeAll" type="button" class="seg-btn" data-print-range="all" aria-selected="false">
-            <span>All pages</span>
+            <span data-i18n="print.rangeAll">All pages</span>
           </button>
           <button id="printRangeCustom" type="button" class="seg-btn" data-print-range="custom" aria-selected="false">
-            <span>Custom</span>
+            <span data-i18n="print.rangeCustom">Custom</span>
           </button>
         </div>
 
         <div class="print-field" id="printCustomField" hidden>
-          <label class="print-label" for="printRangeInput">Pages to print</label>
+          <label class="print-label" for="printRangeInput" data-i18n="print.rangeLabel">Pages to print</label>
           <input id="printRangeInput" class="panel-input print-input" type="text" inputmode="numeric"
                  placeholder="3-7, 10, 12-14" autocomplete="off"
                  aria-describedby="printRangeHint" aria-invalid="false">
-          <p class="print-hint" id="printRangeHint">Single pages and ranges, separated by commas.</p>
+          <p class="print-hint" id="printRangeHint" data-i18n="print.rangeHint">Single pages and ranges, separated by commas.</p>
           <p class="print-error" id="printRangeError" role="alert" hidden></p>
         </div>
 
         <p class="print-summary" id="printSummary">1 page</p>
 
         <div class="panel-row">
-          <span class="panel-row-label">Include search marks</span>
+          <span class="panel-row-label" data-i18n="print.marks">Include search marks</span>
           <label class="toggle-switch-modern">
             <input type="checkbox" id="printMarksToggle">
             <span class="slider-modern"></span>
-            <span class="sr-only">Include search marks on the printed pages</span>
+            <span class="sr-only" data-i18n="print.marksSr">Include search marks on the printed pages</span>
           </label>
         </div>
 
@@ -536,9 +552,11 @@
       </div>
 
       <div class="print-panel-foot">
-        <button id="printCancelBtn" class="ui-btn ui-btn-quiet" type="button">Cancel</button>
+        <button id="printCancelBtn" class="ui-btn ui-btn-quiet" type="button">
+          <span id="printCancelLabel" data-i18n="action.cancel">Cancel</span>
+        </button>
         <button id="printConfirmBtn" class="ui-btn ui-btn-primary" type="button">
-          <i class="fas fa-print" aria-hidden="true"></i><span id="printConfirmLabel">Print</span>
+          <i class="fas fa-print" aria-hidden="true"></i><span id="printConfirmLabel" data-i18n="print.button">Print</span>
         </button>
       </div>
     </div>
@@ -552,13 +570,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2 id="pdfQuotesModalTitle" class="modal-title">
-          <i class="fas fa-edit text-[var(--text-accent)]"></i>
-          Document notes
+          <i class="fas fa-edit text-[var(--text-accent)]" aria-hidden="true"></i>
+          <span data-i18n="notes.modalTitle">Document notes</span>
         </h2>
-        <button class="modal-close">✕</button>
+        <button class="modal-close" type="button" aria-label="Close" data-i18n-aria-label="action.close">✕</button>
       </div>
       <div class="modal-body">
-        <div id="modalQuoteList" class="modal-quote-list" data-empty="No notes saved for this document yet."></div>
+        <div id="modalQuoteList" class="modal-quote-list" data-i18n-empty="notes.modalEmpty" data-empty="No notes saved for this document yet."></div>
       </div>
     </div>
   </div>
