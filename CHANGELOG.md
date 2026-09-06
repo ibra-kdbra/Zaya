@@ -5,6 +5,17 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **The engine's contract, written down (issue #21)**: `docs/engine-api.md` specifies everything the application asks of the page-turn engine — construction and its options, teardown and resizing, navigation and the page-mode and direction rules, the pdf.js document and the mapping between PDF pages and book pages, the search hooks, the side panels and their DOM contract, the render modes and `?render=`, sound and zoom, and the ordering of the `zaya:*` events. Every member is marked as part of the contract or as internal. It is written from the outside — from what the app asks for and what it must observe in return — so a clean-room engine can be written from it without reference to the current one.
+- **Contract tests**: `tests/engine-contract.spec.mjs` exercises every kept member through `ZayaBook` on the sample, outline and Arabic fixtures: navigation and page-change events, page-mode switching and the page mapping in both modes, right-to-left reading, teardown with no stage or canvas left behind, resizing, search highlights and their repaint, both render modes including `?render=css`, and the stiff-page option. The assertions are about behaviour rather than markup, so a replacement engine runs the same file unchanged.
+
+### Changed
+- **The application talks to the engine through one facade**: `lib/js/core/book.js` publishes `window.ZayaBook`, and every feature — the control bar and its More menu, the Navigator, print, the Text pane, URL options and the loader — now goes through it instead of reaching into `window.dFlipBook`, `window.flipbookInstance`, `DFLIP.activeBook`, `book.target`, `book.contentProvider` or `book.ui`. `lib/js/core/load.js` is the only caller that opens a book. Reading direction and page mode are named (`"ltr"`/`"rtl"`, `"single"`/`"double"`) rather than numbered, and a disposed book hands its container back unmarked instead of leaving a stage-shaped element behind.
+- Page turns are reported through the `onPageChanged` construction option rather than by the engine writing to page memory and `AppState` itself.
+- `window.dFlipBook` and `window.flipbookInstance` remain as deprecated aliases for one release, so plugins written against them keep working. Nothing in `lib/` reads them.
+
 ## [6.3.0] - 2026-09-06
 
 ### Added
