@@ -54,9 +54,15 @@ gradient or `--shadow-primary` into a coloured glow is wrong.
 
 ## Where things live
 
+- `lib/css/page/shell.css` – the app shell: header, drawers, tabs, bottom bar, the More menu, the
+  notes modal and the print dialog. Linked directly from `index.html` after `style.css`, so it wins
+  by order. Its last block holds the handful of element- and id-wide rules kept from the pre-6.0
+  page sheets (`button.css`, `input-panel-buttons.css`, `layout.css`, `quotes.css`), which were
+  retired in 6.3.0.
 - `lib/css/page/chrome.css` – the fixed controls around the book (top-right cluster, version
-  label, bottom bar, side-panel skins, focus rings). Loaded last, wins by order not by `!important`.
+  label, bottom bar, side-panel skins, focus rings). The last sheet `style.css` imports.
 - `lib/css/page/custom-ui.css` – the search panel, thumbnails and outline skins.
+- `engine/engine.css` – the flipbook engine's own stylesheet, beside the engine it belongs to.
 - `vendor/css/tailwind.css` – utilities used by the markup, precompiled (`npm run build:css`).
 
 ## Navigation model by device class
@@ -138,4 +144,4 @@ with the selection.
 
 `npx impeccable detect index.html changelog.html lib/css/page lib/css/themes` runs the
 deterministic anti-pattern rules (undersized text, overused fonts, tinted glows, AI palettes).
-Expected residual findings: the purple/violet palettes inside `themes.css` are user-selectable themes and stay; the blue gradient and glow in the vendored `toastify.min.css` are overridden at runtime by `chrome.css` (the detector reads the file statically). Everything else should be zero.
+Expected residual findings: the purple/violet palettes inside `themes.css` are user-selectable themes and stay; the blue gradient and glow in the vendored `toastify.min.css` are overridden at runtime by `chrome.css` (the detector reads the file statically); and the two `clipped-overflow-container` notes for `html` and `body` are the reader filling the viewport — `overflow: hidden` there is what stops the page scrolling behind the book. That rule has not changed since 5.x; it only became visible to the detector in 6.3.0, when it moved out of an imported sheet into `shell.css`, which the page links directly. Everything else should be zero.

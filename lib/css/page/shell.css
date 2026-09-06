@@ -2096,3 +2096,99 @@ body.panel-open #flipbookContainer { pointer-events: auto; opacity: 1; }
   .print-panel-foot { flex-direction: column-reverse; }
   .print-panel-foot .ui-btn { width: 100%; }
 }
+
+/* ============================================================================
+ * Rules kept from the retired page sheets
+ *
+ * `page/button.css`, `page/input-panel-buttons.css`, `page/layout.css` and
+ * `page/quotes.css` were the last of the pre-6.0 stylesheets. Everything a
+ * later sheet already restyled was dropped; what survives is what still
+ * decides a computed value somewhere, gathered here. All of it is either
+ * element-wide or carried by an id, so it stays below the class-based rules
+ * above exactly as it did when it loaded earlier.
+ * ==========================================================================*/
+
+/* The reader fills the viewport and never scrolls: the book is the scroll. */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#flipbookContainer {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* One icon size for every button, and the icon is not the click target: the
+ * button is, so a click always reports the control rather than its glyph. */
+button i {
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* The notes modal is the exception: its rows are rebuilt from elements and
+ * their icons must stay clickable. */
+.modal-quote-actions .panel-button i,
+.modal-export-btn i,
+.panel-button.editQuoteBtn i,
+.panel-button.deleteQuoteBtn i,
+#modalExportQuotesBtn i {
+  pointer-events: auto;
+}
+
+.modal-quote-actions .panel-button,
+.modal-export-btn,
+.panel-button.editQuoteBtn,
+.panel-button.deleteQuoteBtn,
+.modal-close,
+#modalExportQuotesBtn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.modal-container .panel-button,
+.modal-content .panel-button,
+.modal-quote-item .panel-button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* The export button in the modal header is the one that needed lifting out of
+ * the rows; the rows themselves keep the stacking set for them further up. */
+#modalExportQuotesBtn {
+  position: relative !important;
+  z-index: 1000002 !important;
+}
+
+/* The default press feedback for anything a later sheet does not style. */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* The media player's close button sits over the frame. */
+#closeMediaContainer {
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+#closeMediaContainer:hover {
+  transform: scale(1.1);
+  background-color: rgba(220, 38, 38, 0.9) !important;
+}
+
+#closeMediaContainer i {
+  font-size: 0.875rem;
+}
+
+/* A note too long for its row ends in an ellipsis rather than a hard cut. */
+.quote-text {
+  text-overflow: ellipsis;
+}
