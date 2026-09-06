@@ -2,7 +2,7 @@
 
 | Component | Location | Version | License |
 | --- | --- | --- | --- |
-| DearFlip (dFlip) Lite, modularised | `lib/js/core/dflip/`, `lib/js/core/flipbook.js.bak`, `vendor/js/mockup.min.js`, `lib/css/min.css` | 1.7.3.5 | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) – personal / non-commercial use only |
+| DearFlip (dFlip) Lite, modularised | `engine/` (including `engine/engine.css`), `vendor/js/mockup.min.js` | 1.7.3.5 | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) – personal / non-commercial use only |
 | pdf.js | `vendor/js/pdf.min.js`, `pdf.worker.min.js`, `compatibility.js`, `cmaps/` | 2.3.200 (one-line patch: the regenerator-runtime `Function()` fallback was replaced with a `globalThis` assignment so it runs under a CSP without `unsafe-eval`) | Apache-2.0 |
 | three.js | `vendor/js/three.min.js` | r89-era build bundled with dFlip | MIT |
 | jQuery | `vendor/js/jquery.min.js` | 3.x | MIT |

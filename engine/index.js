@@ -133,15 +133,15 @@ DFLIP.parseBooks = function () {
         const url = import.meta.url;
         if (url) {
           const parts = url.split("/");
-          // From .../lib/js/core/dflip/index.js to the site root: drop the last 5 parts
-          window.dFlipLocation = parts.slice(0, -5).join("/") + "/";
+          // From .../engine/index.js to the site root: drop the last 2 parts
+          window.dFlipLocation = parts.slice(0, -2).join("/") + "/";
         }
       } catch (e) {
         // Fallback to scanning script tags (classic)
         $("script").each(function () {
           const src = $(this).attr("src") || "";
-          if (src.indexOf("core/dflip") > -1) {
-            window.dFlipLocation = src.split("/").slice(0, -5).join("/") + "/";
+          if (src.indexOf("engine/index.js") > -1) {
+            window.dFlipLocation = src.split("/").slice(0, -2).join("/") + "/";
             return false;
           }
         });

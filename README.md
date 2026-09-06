@@ -167,7 +167,7 @@ the control panel (Settings → Media Loop). The setting is remembered across se
 - **[PDF.js](https://mozilla.github.io/pdf.js/)** — renders PDF files in the browser.
 - **[Three.js](https://threejs.org/)** — the WebGL layer behind the page-turn animation.
 - **[DFlip](https://github.com/dearhive/dearflip-js-flipbook)** — the flipbook engine Zaya's core is
-  derived from, refactored into ES modules under `lib/js/core/dflip/`.
+  derived from, refactored into ES modules under `engine/`.
 - **[Tesseract.js](https://tesseract.projectnaptha.com/)** — on-device text recognition for scanned pages
   (`vendor/ocr/`, loaded on demand).
 

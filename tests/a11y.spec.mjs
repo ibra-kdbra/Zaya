@@ -14,7 +14,7 @@
  *                                container being a tab stop of its own.
  *   aria-allowed-attr            the engine puts `aria-*` state on a few of its own nodes whose
  *                                roles it also owns; the markup is not ours to change while
- *                                `lib/js/core/dflip/` stays a fork (see docs/THIRD_PARTY_NOTICES.md).
+ *                                `engine/` stays a fork (see docs/THIRD_PARTY_NOTICES.md).
  */
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';

@@ -7,7 +7,7 @@ import { httpsCorrection, log, nearestPowerOfTwo, getBasePage, isBookletMode, is
 import { PDFLinkService } from '../features/pdf-link-service.js';
 import { initThumbPanel, initOutlinePanel, createSearchContainer } from '../features/side-panels.js';
 import { renderPageAnnotations } from '../features/annotations.js';
-import { createSearchPanel } from '../../../features/search/search-panel.js';
+import { createSearchPanel } from '../../lib/js/features/search/search-panel.js';
 
 export class TextureLibrary {
   constructor(source, callback, options, flipbook) {
