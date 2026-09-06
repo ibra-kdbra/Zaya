@@ -1007,6 +1007,9 @@ h3 { font-size: 12px; line-height: 1.4; }
   font-weight: 600;
 }
 .segmented-sm .seg-btn { min-height: 38px; font-size: 13px; }
+/* Two settings that turn the whole document over: full 44px targets, however small the label. */
+#printRangeSwitch .seg-btn,
+#hardCoverSwitch .seg-btn { min-height: 44px; }
 
 /* ------------------------------------------------ buttons, inputs, switches */
 
@@ -1963,3 +1966,133 @@ body.panel-open #flipbookContainer { pointer-events: auto; opacity: 1; }
 /* Toasts belong to the end edge of the screen, like the rest of the interface */
 :root[dir="rtl"] .toastify.toastify-right { right: auto; left: 15px; }
 :root[dir="rtl"] .toastify.toastify-left { left: auto; right: 15px; }
+
+/* ------------------------------------------------------------- print dialog */
+
+/* The bottom bar pins itself at the maximum z-index, so the dialog sits above it. */
+.print-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.45);
+}
+.print-overlay[hidden] { display: none; }
+
+.print-panel {
+  width: 100%;
+  max-width: 440px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-primary);
+}
+
+.print-panel-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.print-title {
+  flex: 1 1 auto;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.print-close {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.print-close:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+
+.print-panel-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.print-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.print-field[hidden] { display: none; }
+.print-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.print-input {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  font-family: var(--font-mono);
+}
+.print-input[aria-invalid="true"] { border-color: var(--text-error); }
+
+.print-hint,
+.print-summary {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+.print-summary { font-family: var(--font-mono); }
+
+.print-error,
+.print-warning,
+.print-progress {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+}
+.print-error { color: var(--text-error); }
+.print-warning { color: var(--text-warning); }
+.print-progress { color: var(--text-secondary); font-family: var(--font-mono); }
+.print-error[hidden],
+.print-warning[hidden],
+.print-progress[hidden] { display: none; }
+
+.print-panel-foot {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-secondary);
+}
+.print-panel-foot .ui-btn { min-height: 44px; }
+
+@media (max-width: 480px) {
+  .print-panel-foot { flex-direction: column-reverse; }
+  .print-panel-foot .ui-btn { width: 100%; }
+}
