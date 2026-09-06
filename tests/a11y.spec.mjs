@@ -2,9 +2,9 @@
  * Accessibility sweep (issue #28).
  *
  * axe-core runs over the reader at rest and over every surface a reader actually opens — the four
- * control-panel tabs, the three Navigator tabs, the theme picker, the notes modal and the More
- * menu — in both interface languages and at both a desk width and a phone width. Anything axe
- * rates serious or critical fails the run.
+ * control-panel tabs, the four Navigator tabs, the theme picker, the notes modal, the More menu
+ * and the print dialog — in both interface languages and at both a desk width and a phone width.
+ * Anything axe rates serious or critical fails the run.
  *
  * Two rules are excluded, both for the vendored flipbook engine rather than for Zaya's own markup:
  *
@@ -95,8 +95,8 @@ for (const lang of LANGUAGES) {
       await expect(page.locator('#themeSelectorOverlay')).not.toHaveClass(/active/);
       await page.locator('#closeUnifiedPanelBtn').click();
 
-      // Every tab of the Navigator
-      for (const tab of ['thumbs', 'outline', 'search']) {
+      // Every tab of the Navigator, the Text pane among them
+      for (const tab of ['thumbs', 'outline', 'search', 'text']) {
         await page.evaluate((t) => window.ZayaNavigator.open(t, { focusSearch: false }), tab);
         await page.waitForTimeout(400);
         found.push(...await scan(page, `navigator: ${tab}`));
@@ -107,6 +107,18 @@ for (const lang of LANGUAGES) {
       await page.locator('#customMoreBtn').click();
       await expect(page.locator('#customMoreMenu')).toHaveClass(/show/);
       found.push(...await scan(page, 'more menu'));
+
+      // The print dialog, opened from that same menu
+      await page.locator('#menuPrintBtn').click();
+      await expect(page.locator('#printDialog')).toBeVisible();
+      // The custom field carries the label, the hint and the error line, so it is scanned open.
+      await page.locator('#printRangeCustom').click();
+      await expect(page.locator('#printCustomField')).toBeVisible();
+      await page.locator('#printRangeInput').fill('0-9, x');
+      await expect(page.locator('#printRangeError')).toBeVisible();
+      found.push(...await scan(page, 'print dialog'));
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#printDialog')).toBeHidden();
 
       expect(found, JSON.stringify(found, null, 2)).toEqual([]);
     });
@@ -125,6 +137,16 @@ test('the interface language can be switched from the keyboard alone', async ({ 
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.locator('#languageAr')).toBeFocused();
   await expect(page.locator('#panelTabSettings .switch-label')).toHaveText('الإعدادات');
+
+  // Both features merged in from main speak Arabic too: the More menu's Print… and the Text tab.
+  await expect(page.locator('#navTabText .switch-label')).toHaveText('النص');
+  await page.locator('#customMoreBtn').click();
+  await expect(page.locator('#customMoreMenu')).toHaveClass(/show/);
+  await expect(page.locator('#menuPrintBtn span')).toHaveText('طباعة…');
+  await page.locator('#customMoreBtn').click();
+  await expect(page.locator('#customMoreMenu')).not.toHaveClass(/show/);
+  await openPanel(page, 'Settings');
+  await page.locator('#languageAr').focus();
 
   // And back again, with no reload in between
   await page.keyboard.press('ArrowLeft');
