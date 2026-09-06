@@ -5,6 +5,8 @@
 | DearFlip (dFlip) Lite, modularised | `engine/` (including `engine/engine.css`), `vendor/js/mockup.min.js` | 1.7.3.5 | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) – personal / non-commercial use only |
 | pdf.js | `vendor/js/pdf.min.js`, `pdf.worker.min.js`, `compatibility.js`, `cmaps/` | 2.3.200 (one-line patch: the regenerator-runtime `Function()` fallback was replaced with a `globalThis` assignment so it runs under a CSP without `unsafe-eval`) | Apache-2.0 |
 | three.js | `vendor/js/three.min.js` | r89-era build bundled with dFlip | MIT |
+| pdf.js (engine-next) | `vendor/pdfjs/pdf.min.mjs`, `pdf.worker.min.mjs`, `cmaps/`, `standard_fonts/`, `vendor/pdfjs/LICENSE` | 4.10.38 (unmodified ESM build) | Apache-2.0 |
+| three.js (engine-next) | `vendor/three/three.module.min.js`, `vendor/three/LICENSE` | r169 (0.169.0, unmodified ESM build) | MIT |
 | jQuery | `vendor/js/jquery.min.js` | 3.x | MIT |
 | Themify Icons | `vendor/css/themify-icons.min.css`, `vendor/fonts/` | 1.0.1 | SIL OFL 1.1 (fonts) / MIT (CSS) |
 | Font Awesome Free | `vendor/css/fontawesome.min.css`, `vendor/fonts/webfonts/` (woff2 only) | 6.5.1 | CC BY 4.0 (icons) / SIL OFL 1.1 (fonts) / MIT (CSS) |
