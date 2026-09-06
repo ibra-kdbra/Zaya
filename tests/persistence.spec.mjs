@@ -1,12 +1,15 @@
 import { test, expect } from '@playwright/test';
 import {
   stubNetwork, collectErrors, waitForBook, openPanel, activePage, goToPage, readState, wavFixture,
-  blankPage, seedLegacyDatabases, databaseNames, SAMPLE_PDF_PATH
+  blankPage, seedLegacyDatabases, databaseNames, SAMPLE_PDF_PATH, SCANNED_PDF_PATH,
+  SAMPLE_PDF, OUTLINE_PDF, SCANNED_PDF, SAMPLE_KEY, localKey
 } from './helpers.mjs';
 
 // A same-origin PDF (served by the test web server) and a stubbed remote one.
 const LOCAL_URL_PDF = '/tests/fixtures/sample.pdf';
 const REMOTE_PDF = 'https://example.com/sample.pdf';
+const SCANNED_URL_PDF = '/tests/fixtures/sample-scanned.pdf';
+const OUTLINE_URL_PDF = '/tests/fixtures/sample-outline.pdf';
 
 const keyFor = (page, path) => page.evaluate((p) => new URL(p, location.href).href, path);
 
@@ -91,13 +94,13 @@ test.describe('Local files', () => {
     await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
     await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
     await waitForBook(page);
-    await goToPage(page, 2, 'sample.pdf');
+    await goToPage(page, 2, SAMPLE_KEY);
 
     // Stored as the filename, never as the (dead-on-reload) blob URL.
     const state = await readState(page);
     expect(state.storedPdf).toBe('sample.pdf');
     expect(state.storedType).toBe('local');
-    await expect.poll(() => page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf').then((r) => !!r)), { timeout: 10_000 }).toBe(true);
+    await expect.poll(() => page.evaluate((k) => window.ZayaLocalDocs.getFile(k).then((r) => !!r), SAMPLE_KEY), { timeout: 10_000 }).toBe(true);
 
     // After a reload the file comes back from IndexedDB, on the page where the reader left off.
     await page.reload();
@@ -108,12 +111,12 @@ test.describe('Local files', () => {
     await expect(page.locator('.app-doc-name')).toHaveText('sample.pdf');
 
     // Without the stored copy the reader is asked to pick the file again and the default opens.
-    await page.evaluate(() => window.ZayaLocalDocs.deleteFile('sample.pdf'));
+    await page.evaluate((k) => window.ZayaLocalDocs.deleteFile(k), SAMPLE_KEY);
     await page.reload();
     await waitForBook(page);
     await expect(page.locator('.toastify')).toContainText('pick it again', { timeout: 10_000 });
     expect(await page.evaluate(() => window.appState.get('currentPdfType'))).toBe('url');
-    expect(await page.evaluate(() => window.getLastPage('sample.pdf'))).toBe(2);
+    expect(await page.evaluate((k) => window.getLastPage(k), SAMPLE_KEY)).toBe(2);
 
     // Re-picking the same file restores where the reader left off.
     await openPanel(page, 'Document');
@@ -153,7 +156,7 @@ test.describe('Local files', () => {
     await expect(items).toHaveCount(1);
     await page.locator('#clearRecentBtn').click();
     await expect(page.locator('#recentDocsGroup')).toBeHidden();
-    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf'))).toBeNull();
+    expect(await page.evaluate((k) => window.ZayaLocalDocs.getFile(k), SAMPLE_KEY)).toBeNull();
   });
 
   test('switching documents disposes the book once and revokes the blob URL', async ({ page }) => {
@@ -235,7 +238,7 @@ test.describe('Quotes', () => {
         all.onsuccess = () => resolve(all.result);
       };
     }));
-    expect(stored.map((q) => q.pdfUrl)).toContain('sample.pdf');
+    expect(stored.map((q) => q.pdfUrl)).toContain(SAMPLE_KEY);
 
     await page.reload();
     await waitForBook(page);
@@ -566,7 +569,7 @@ test.describe('Storage space', () => {
     await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
     await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
     await waitForBook(page);
-    await goToPage(page, 2, 'sample.pdf');
+    await goToPage(page, 2, SAMPLE_KEY);
 
     // The entry says the file is kept, with its size, and the group carries a usage line.
     const item = page.locator('#recentDocsList .recent-item').first();
@@ -579,16 +582,16 @@ test.describe('Storage space', () => {
     await expect(page.locator('#freeUpSpaceConfirm')).toBeVisible();
     await page.locator('#freeUpSpaceCancelBtn').click();
     await expect(page.locator('#freeUpSpaceConfirm')).toBeHidden();
-    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf').then((r) => !!r))).toBe(true);
+    expect(await page.evaluate((k) => window.ZayaLocalDocs.getFile(k).then((r) => !!r), SAMPLE_KEY)).toBe(true);
 
     await page.locator('#freeUpSpaceBtn').click();
     await page.locator('#freeUpSpaceConfirmBtn').click();
 
     // The stored copy goes; the entry and the page it remembers stay.
     await expect(item.locator('.recent-state')).toHaveText('Not kept', { timeout: 10_000 });
-    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf'))).toBeNull();
-    expect(await page.evaluate(() => window.ZayaLocalDocs.recent().map((r) => r.key))).toContain('sample.pdf');
-    expect(await page.evaluate(() => window.getLastPage('sample.pdf'))).toBe(2);
+    expect(await page.evaluate((k) => window.ZayaLocalDocs.getFile(k), SAMPLE_KEY)).toBeNull();
+    expect(await page.evaluate(() => window.ZayaLocalDocs.recent().map((r) => r.key))).toContain(SAMPLE_KEY);
+    expect(await page.evaluate((k) => window.getLastPage(k), SAMPLE_KEY)).toBe(2);
   });
 
   test('a file that would not fit is not kept, and the reader is told', async ({ page }) => {
@@ -607,7 +610,7 @@ test.describe('Storage space', () => {
 
     // The document still opens; it is simply not kept for next time.
     expect(await page.evaluate(() => window.appState.get('currentPdfType'))).toBe('local');
-    expect(await page.evaluate(() => window.ZayaLocalDocs.getFile('sample.pdf'))).toBeNull();
+    expect(await page.evaluate((k) => window.ZayaLocalDocs.getFile(k), SAMPLE_KEY)).toBeNull();
     await expect(page.locator('#recentDocsList .recent-state').first()).toHaveText('Not kept');
   });
 
@@ -761,5 +764,288 @@ test.describe('Deploy guard', () => {
     const cacheNames = await page.evaluate(async () => ('caches' in window) ? (await caches.keys()).filter((k) => k.startsWith('zaya-')) : []);
     // Only the freshly (re)installed worker's cache may exist; nothing from before the reload.
     expect(cacheNames.length).toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe('Every feature follows the open document', () => {
+  /** Pick a file from disk under a name of the test's choosing. */
+  const pick = (page, name, buffer) =>
+    page.setInputFiles('#pdfFile', { name, mimeType: 'application/pdf', buffer });
+
+  const noteTexts = (page) => page.locator('#quoteList .quote-text').allTextContents();
+
+  test('two files of the same name keep their own notes, pages and stored copy', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    const smallKey = localKey('twin.pdf', SAMPLE_PDF.length);
+    const largeKey = localKey('twin.pdf', OUTLINE_PDF.length);
+    expect(smallKey).not.toBe(largeKey);
+
+    // The first twin: a note on its second page.
+    await openPanel(page, 'Document');
+    await pick(page, 'twin.pdf', SAMPLE_PDF);
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
+    await waitForBook(page);
+    await goToPage(page, 2, smallKey);
+    await openPanel(page, 'Notes');
+    await page.locator('#quoteInput').fill('A note in the first twin');
+    await page.locator('#addQuoteBtn').click();
+    await expect(page.locator('#quoteList .quote-text').first()).toContainText('A note in the first twin', { timeout: 10_000 });
+
+    // The second twin, same name and a different size: its own document, so its own empty list.
+    await openPanel(page, 'Document');
+    await pick(page, 'twin.pdf', OUTLINE_PDF);
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfSize')), { timeout: 20_000 })
+      .toBe(OUTLINE_PDF.length);
+    await waitForBook(page);
+    await openPanel(page, 'Notes');
+    await expect(page.locator('#quoteList .no-quotes')).toBeVisible({ timeout: 10_000 });
+    expect(await activePage(page)).toBe(1);
+    await page.locator('#quoteInput').fill('A note in the second twin');
+    await page.locator('#addQuoteBtn').click();
+    await expect(page.locator('#quoteList .quote-text').first()).toContainText('A note in the second twin', { timeout: 10_000 });
+
+    // Both are kept, under keys of their own, and both are in Recent.
+    expect(await page.evaluate((k) => window.ZayaLocalDocs.getFile(k).then((r) => !!r), smallKey)).toBe(true);
+    expect(await page.evaluate((k) => window.ZayaLocalDocs.getFile(k).then((r) => !!r), largeKey)).toBe(true);
+    expect(await page.evaluate(() => window.ZayaLocalDocs.recent().map((r) => r.key)))
+      .toEqual(expect.arrayContaining([smallKey, largeKey]));
+
+    // Reopening the first twin from Recent brings back its own page and its own note.
+    await openPanel(page, 'Document');
+    await page.locator('#recentDocsList .recent-item .recent-open').nth(1).click();
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfSize')), { timeout: 20_000 })
+      .toBe(SAMPLE_PDF.length);
+    await waitForBook(page);
+    await expect.poll(() => activePage(page), { timeout: 20_000 }).toBe(2);
+    await openPanel(page, 'Notes');
+    await expect.poll(() => noteTexts(page), { timeout: 10_000 }).toEqual(['A note in the first twin']);
+  });
+
+  test('records kept under the bare filename move to the new key when the file is opened', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    // A profile from before the key carried the size: everything is filed under "sample.pdf".
+    await page.evaluate(() => Promise.all([
+      window.ZayaDB.put('pages', 3, 'sample.pdf'),
+      window.ZayaDB.add('quotes', { quote: 'An older note', pdfUrl: 'sample.pdf', pdfName: 'sample.pdf', pageNumber: 3, timestamp: new Date().toISOString() }),
+      window.ZayaDB.put('ocr', { id: 'sample.pdf 1', doc: 'sample.pdf', page: 1, lang: 'eng', lines: [{ words: [{ s: 'older', x: 1, y: 1, w: 8, h: 4 }] }], at: Date.now() })
+    ]).then(() => window.ZayaLocalDocs.touch({ key: 'sample.pdf', type: 'local', name: 'sample.pdf', size: 0 })));
+
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', SAMPLE_PDF_PATH);
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
+    await waitForBook(page);
+
+    // The remembered page, the note and the recognised text all follow the file to its new key.
+    await expect.poll(() => page.evaluate((k) => window.getLastPage(k), SAMPLE_KEY), { timeout: 15_000 }).toBe(3);
+    await expect.poll(() => page.evaluate((k) => window.ZayaDB.byIndex('quotes', 'pdfUrl', k).then((r) => r.map((q) => q.quote)), SAMPLE_KEY), { timeout: 15_000 })
+      .toEqual(['An older note']);
+    await expect.poll(() => page.evaluate((k) => window.ZayaDB.byIndex('ocr', 'doc', k).then((r) => r.length), SAMPLE_KEY), { timeout: 15_000 }).toBe(1);
+    expect(await page.evaluate(() => window.getLastPage('sample.pdf'))).toBeNull();
+    expect(await page.evaluate(() => window.ZayaDB.byIndex('ocr', 'doc', 'sample.pdf').then((r) => r.length))).toBe(0);
+    // The recent entry moved with it rather than being duplicated.
+    expect(await page.evaluate(() => window.ZayaLocalDocs.recent().map((r) => r.key))).toEqual([SAMPLE_KEY]);
+    await expect.poll(() => activePage(page), { timeout: 20_000 }).toBe(3);
+  });
+
+  test('the notes of the open document are grouped by page, and a note leads back to its page', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+    const key = await keyFor(page, LOCAL_URL_PDF);
+
+    await goToPage(page, 2, key);
+    await openPanel(page, 'Notes');
+    await page.locator('#quoteInput').fill('Taken on the second page');
+    await page.locator('#addQuoteBtn').click();
+    await expect(page.locator('#quoteList .quote-text').first()).toContainText('Taken on the second page', { timeout: 10_000 });
+
+    await goToPage(page, 1, key);
+    await page.locator('#quoteInput').fill('Taken on the first page');
+    await page.locator('#addQuoteBtn').click();
+
+    // One group per page, the page on screen first and marked, with its heading and count.
+    const groups = page.locator('#quoteList .quote-group');
+    await expect(groups).toHaveCount(2, { timeout: 10_000 });
+    await expect(groups.nth(0)).toHaveAttribute('data-page', '1');
+    await expect(groups.nth(0)).toHaveClass(/is-current/);
+    await expect(groups.nth(0).locator('.quote-group-title')).toHaveText('Page 1');
+    await expect(groups.nth(0).locator('.quote-group-count')).toHaveText('1 note');
+    await expect(groups.nth(1)).toHaveAttribute('data-page', '2');
+    await expect(groups.nth(1)).not.toHaveClass(/is-current/);
+
+    // The line above the list counts the notes on this page.
+    await expect(page.locator('#notesPageCount')).toHaveText(/1 note on this page\./);
+
+    // "Go to page" turns the book to the page the note was taken on.
+    await groups.nth(1).locator('.goToPageBtn').first().click();
+    await expect.poll(() => activePage(page), { timeout: 15_000 }).toBe(2);
+    // ...and the marked group follows the reader.
+    await expect(page.locator('#quoteList .quote-group').first()).toHaveAttribute('data-page', '2', { timeout: 10_000 });
+
+    // A note taken from the Text pane's selection lands in the same list, on the same page.
+    await page.evaluate(() => new Promise((resolve) => window.ZayaQuotes.add('Filed from the text pane', 2, resolve)));
+    await expect.poll(() => page.locator('#quoteList .quote-group[data-page="2"] .quote-item').count(), { timeout: 10_000 }).toBe(2);
+  });
+
+  test('opening another document replaces its notes, its counts and its page range', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    await openPanel(page, 'Notes');
+    await page.locator('#quoteInput').fill('A note in the first document');
+    await page.locator('#addQuoteBtn').click();
+    await expect(page.locator('#quoteList .quote-text').first()).toContainText('A note in the first document', { timeout: 10_000 });
+    await expect(page.locator('#panelPageCount')).toHaveText('3', { timeout: 10_000 });
+
+    // The scanned fixture has two pages where the first has three.
+    await openPanel(page, 'Document');
+    await page.locator('#pdfUrl').fill(await keyFor(page, SCANNED_URL_PDF));
+    await page.locator('#loadPdfUrlBtn').click();
+    await waitForBook(page);
+    await expect.poll(() => page.evaluate(() => window.ZayaBook.current.pageCount), { timeout: 20_000 }).toBe(2);
+
+    // The bar, the Navigator and the Notes tab all speak for the new document.
+    await expect(page.locator('#panelPageCount')).toHaveText('2', { timeout: 10_000 });
+    await expect(page.locator('#navPageCount')).toHaveText('2', { timeout: 10_000 });
+    await openPanel(page, 'Notes');
+    await expect(page.locator('#quoteList .no-quotes')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#notesPageCount')).toHaveText('');
+
+    // Print counts the new document's pages, not the last one's.
+    await page.locator('#customMoreBtn').click();
+    await page.locator('#menuPrintBtn').click();
+    await expect(page.locator('#printDialog')).toBeVisible();
+    await page.locator('#printRangeCustom').click();
+    await page.locator('#printRangeInput').fill('3');
+    await expect(page.locator('#printRangeError')).toContainText('1 to 2', { timeout: 10_000 });
+    await page.locator('#printCloseBtn').click();
+
+    // ...and the first document's notes are still its own.
+    await openPanel(page, 'Document');
+    await page.locator('#pdfUrl').fill(await keyFor(page, LOCAL_URL_PDF));
+    await page.locator('#loadPdfUrlBtn').click();
+    await waitForBook(page);
+    await openPanel(page, 'Notes');
+    await expect(page.locator('#quoteList .quote-text').first()).toContainText('A note in the first document', { timeout: 15_000 });
+  });
+
+  test('the Text pane heads its sections with the open document’s page numbers', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}&mode=single`);
+    await waitForBook(page);
+    await goToPage(page, 3);
+    await page.evaluate(() => window.ZayaNavigator.open('text'));
+    await expect(page.locator('#navPaneText .text-page-title').first()).toHaveText('Page 3', { timeout: 20_000 });
+
+    await openPanel(page, 'Document');
+    await page.locator('#pdfUrl').fill(await keyFor(page, OUTLINE_URL_PDF));
+    await page.locator('#loadPdfUrlBtn').click();
+    await waitForBook(page);
+    await page.evaluate(() => window.ZayaNavigator.open('text'));
+    // The new document opens at its own first page, and the pane says so.
+    await expect(page.locator('#navPaneText .text-page-title').first()).toHaveText('Page 1', { timeout: 20_000 });
+  });
+
+  test('each document reopens with the soundtrack it was last read with', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    await openPanel(page, 'Media');
+    await page.locator('#youtubeUrl').fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    await page.locator('#loadYoutubeBtn').click();
+    await expect(page.locator('#youtubePlayer')).toHaveAttribute('src', /dQw4w9WgXcQ/, { timeout: 10_000 });
+
+    await openPanel(page, 'Document');
+    await page.locator('#pdfUrl').fill(await keyFor(page, SCANNED_URL_PDF));
+    await page.locator('#loadPdfUrlBtn').click();
+    await waitForBook(page);
+    await openPanel(page, 'Media');
+    // A document with no soundtrack of its own keeps the last one as its default...
+    await expect(page.locator('#youtubeUrl')).toHaveValue('https://www.youtube.com/watch?v=dQw4w9WgXcQ', { timeout: 10_000 });
+    await page.locator('#youtubeUrl').fill('https://www.youtube.com/watch?v=9bZkp7q19f0');
+    await page.locator('#loadYoutubeBtn').click();
+    await expect(page.locator('#youtubePlayer')).toHaveAttribute('src', /9bZkp7q19f0/, { timeout: 10_000 });
+
+    // ...and the first document comes back with its own.
+    await openPanel(page, 'Document');
+    await page.locator('#pdfUrl').fill(await keyFor(page, LOCAL_URL_PDF));
+    await page.locator('#loadPdfUrlBtn').click();
+    await waitForBook(page);
+    await openPanel(page, 'Media');
+    await expect(page.locator('#youtubeUrl')).toHaveValue('https://www.youtube.com/watch?v=dQw4w9WgXcQ', { timeout: 15_000 });
+
+    // The choice survives a reload, and it is kept with the document rather than with the browser.
+    await page.reload();
+    await waitForBook(page);
+    await openPanel(page, 'Media');
+    await expect(page.locator('#youtubeUrl')).toHaveValue('https://www.youtube.com/watch?v=dQw4w9WgXcQ', { timeout: 15_000 });
+  });
+
+  test('a recognised file reopened from Recent keeps its text and is not offered for recognition', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html');
+    await waitForBook(page);
+
+    // Open the scanned file once, then put recognised text for it in place, as OCR would have.
+    await openPanel(page, 'Document');
+    await page.setInputFiles('#pdfFile', SCANNED_PDF_PATH);
+    await expect.poll(() => page.evaluate(() => window.appState.get('currentPdfType')), { timeout: 20_000 }).toBe('local');
+    await waitForBook(page);
+    const scannedKey = localKey('sample-scanned.pdf', SCANNED_PDF.length);
+    expect(await page.evaluate(() => window.ZayaCurrentDocKey())).toBe(scannedKey);
+    await page.evaluate((k) => Promise.all([1, 2].map((p) => window.ZayaDB.put('ocr', {
+      id: `${k} ${p}`, doc: k, page: p, lang: 'eng',
+      lines: [{ words: [{ s: 'kalimah', x: 50, y: 700, w: 60, h: 12 }] }], at: Date.now()
+    }))), scannedKey);
+
+    // Open something else, then come back to the file from Recent.
+    await page.locator('#pdfUrl').fill(REMOTE_PDF);
+    await page.locator('#loadPdfUrlBtn').click();
+    await waitForBook(page);
+    await openPanel(page, 'Document');
+    // The first entry is the document that is open; the file is the one under it.
+    await page.locator('#recentDocsList .recent-item .recent-open').nth(1).click();
+    await expect.poll(() => page.evaluate(() => window.ZayaCurrentDocKey()), { timeout: 20_000 }).toBe(scannedKey);
+    await waitForBook(page);
+
+    // The recognised text is there without recognising anything again.
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    const input = page.locator('.df-search-input');
+    await expect(input).toBeVisible({ timeout: 15_000 });
+    await input.fill('kalimah');
+    await expect(page.locator('.df-search-result')).toHaveCount(2, { timeout: 20_000 });
+    await expect(page.locator('.df-ocr-text')).toContainText('recognised on this device', { timeout: 10_000 });
+    await expect(page.locator('.df-ocr-progress')).toHaveText('');
+  });
+
+  test('switching documents empties the search box, its results and its highlight', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
+    await waitForBook(page);
+
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    const input = page.locator('.df-search-input');
+    await expect(input).toBeVisible({ timeout: 15_000 });
+    await input.fill('flipbooks');
+    await expect(page.locator('.df-search-result').first()).toBeVisible({ timeout: 20_000 });
+
+    await openPanel(page, 'Document');
+    await page.locator('#pdfUrl').fill(await keyFor(page, SCANNED_URL_PDF));
+    await page.locator('#loadPdfUrlBtn').click();
+    await waitForBook(page);
+
+    await expect.poll(() => page.evaluate(() => window.ZayaBook.current.pageCount), { timeout: 20_000 }).toBe(2);
+
+    await page.evaluate(() => window.ZayaNavigator.open('search'));
+    await expect(page.locator('#navPaneSearch .df-search-input')).toHaveValue('', { timeout: 15_000 });
+    expect(await page.locator('#navPaneSearch .df-search-result').count()).toBe(0);
   });
 });

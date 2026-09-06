@@ -80,6 +80,27 @@ as ESM. And the engine resolves its own asset locations at load time from `impor
 libraries, worker and CMaps, and at `lib/images` and `lib/sound` for its images and page-turn
 sound. Moving `engine/index.js` means fixing that walk.
 
+## The document key
+
+Everything Zaya keeps is filed against one identity, computed in `lib/js/utils/pageMemory.js`
+(`window.ZayaDocKey`, and `window.ZayaCurrentDocKey` for whatever is open):
+
+| The document | Its key |
+| --- | --- |
+| a link | the URL with its `#fragment` and its tracking parameters (`utm_*`, `gclid`, `fbclid`, `igshid`, `si` and their kind) removed. Everything else — path, port, remaining query — is part of the identity, because a query string often is what selects the file. |
+| a file from disk | `"<filename>::<size in bytes>"`. Its `blob:` URL dies with the page, and a name alone is not an identity: two different files called `notes.pdf` used to share one remembered page, one note list and one recognised text. |
+
+That one key is the key of the `pages` record, the `pdfUrl` of every note, the `doc` of every
+recognised page, the `name` of the stored copy of a file (which also carries its `label`, the name
+the reader sees), the `key` of the recent entry, and the id — prefixed `doc ` — of the `settings`
+record where a document remembers its page mode and the soundtrack it was last read with.
+
+A file whose size is not known keeps the bare filename: a profile written before this release, or
+one restored from an older backup. Those records are not lost and they are not migrated in bulk
+either — the first time that file is opened from disk again, `ZayaLocalDocs.adopt()` moves the
+remembered page, the notes, the recognised text, the stored copy, the recent entry and the
+per-document record across to the new key, and only then does the document open.
+
 ## Versioning
 
 One rule: **any change to a served path or asset bumps the version.** Asset URLs carry `?v=<version>`
