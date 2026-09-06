@@ -30,8 +30,11 @@ and it works offline as a PWA.
 - Stiff pages: soft, hard cover, or every page as a board (Settings → Pages)
 - Thumbnails and outline/bookmark side panels that overlay the book on narrow screens
 - 50+ colour themes built on one set of design tokens (see `docs/DESIGN.md`)
-- Quotes notebook stored locally in IndexedDB, and the last page remembered per document
-- Built-in media player: YouTube videos and playlists or local audio, with loop
+- Notes kept with the document and grouped by the page they were taken on, stored locally in
+  IndexedDB, with the last page remembered per document — a file from disk by its name and size, so
+  two books of the same name stay apart
+- Built-in media player: YouTube videos and playlists or local audio, with loop, remembered per
+  document
 - Backup and restore: export every quote and preference to JSON and import it on another device
   (Settings → Backup)
 - **English and Arabic interface**: every label, message and tooltip is translated, and Arabic
