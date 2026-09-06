@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The deployment's policy, so the demo proves the engine runs under it. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' blob:; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
+<title>engine-next demo</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="engine.css">
+<style>
+  :root { color-scheme: dark; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column;
+    background: #15171c; color: #e8eaed;
+    font: 14px/1.5 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 10px 14px; border-bottom: 1px solid #2c313a; background: #1b1e24;
+  }
+  button, select {
+    font: inherit; color: inherit; background: #262b33;
+    border: 1px solid #3a414c; border-radius: 6px; padding: 6px 12px; cursor: pointer;
+  }
+  button:hover, select:hover { background: #303743; }
+  label { display: inline-flex; align-items: center; gap: 6px; color: #aab2c0; }
+  #status { margin-left: auto; font-variant-numeric: tabular-nums; color: #aab2c0; }
+  #book { flex: 1 1 auto; min-height: 0; }
+  #error { padding: 12px 14px; color: #ff9a9a; }
+</style>
+</head>
+<body>
+<header>
+  <button id="prev" type="button">Previous</button>
+  <button id="next" type="button">Next</button>
+  <label>Pages
+    <select id="mode">
+      <option value="double">Double</option>
+      <option value="single">Single</option>
+    </select>
+  </label>
+  <label>Direction
+    <select id="dir">
+      <option value="ltr">Left to right</option>
+      <option value="rtl">Right to left</option>
+    </select>
+  </label>
+  <label>Covers
+    <select id="hard">
+      <option value="none">Soft</option>
+      <option value="cover">Hard covers</option>
+      <option value="all">All hard</option>
+    </select>
+  </label>
+  <button id="dispose" type="button">Dispose</button>
+  <span id="status">loading…</span>
+</header>
+<div id="book"></div>
+<p id="error" hidden></p>
+
+<script type="module" src="demo.js"></script>
+
+</body>
+</html>
