@@ -10,7 +10,7 @@ everything below.
 | --- | --- | --- |
 | the top level | The served entry points and nothing else: `index.html`, `changelog.html`, `sw.js` (a service worker only controls pages at or below its own path, so it has to live here), `config.js` for per-deployment settings, plus the repository's own metadata. | MIT |
 | `lib/` | The first-party application: `lib/js/app.js` (the loader), `lib/js/core/load.js`, `lib/js/ui/`, `lib/js/features/`, `lib/js/utils/`, `lib/js/i18n/`, the stylesheets under `lib/css/`, and the images and sounds the app itself ships. | MIT |
-| `engine/` | The page-turn engine: a fork of DearFlip Lite, modularised into ES modules, with its own stylesheet as `engine/engine.css`. It is neither ours nor a library we merely use, which is why it has a root of its own — it is the one part of the tree we intend to delete. | CC BY-NC-ND 4.0, non-commercial only |
+| `engine/` | The page-turn engine: a fork of DearFlip Lite, modularised into ES modules, with its own stylesheet as `engine/engine.css`. It is neither ours nor a library we merely use, which is why it has a root of its own — it is the one part of the tree we intend to delete. Reached only through the facade below. | CC BY-NC-ND 4.0, non-commercial only |
 | `vendor/` | Third-party runtime code, unmodified but for the patches recorded in `THIRD_PARTY_NOTICES.md`: `vendor/js` (jQuery, three.js, pdf.js and its worker and CMaps, marked, Toastify, the engine's mockup build), `vendor/css`, `vendor/fonts` and `vendor/ocr` (Tesseract and its language packs). Each licence sits beside the files it covers. | various, all noted |
 
 Three roots are not served at all: `docs/` (these notes, contributing, security, design and the
@@ -26,10 +26,34 @@ Ask one question at a time, in this order:
    Content-Security-Policy.
 2. **Is it part of the page-turn engine?** Then `engine/`, and only if there is no way to do it
    from the outside. The engine is on its way out; every line added to it is a line to port later.
+   Whatever the answer, the new file does not talk to it directly — see the facade rule below.
 3. **Does the browser fetch it?** Then somewhere under `lib/` — `lib/js/features/<feature>/` for a
    feature, `lib/js/utils/` for something several features share, `lib/js/ui/` for the chrome,
    `lib/css/page/` for a stylesheet, and register it in the loader (below).
 4. **Otherwise** it is `docs/`, `tools/` or `tests/`, and it must not be reachable over HTTP.
+
+## The engine facade
+
+**Only `lib/js/core/book.js` may import, reference or otherwise know about `engine/`.** It
+publishes `window.ZayaBook`; everything else in `lib/` works through that and through nothing
+else. No other file may read `window.dFlipBook`, `window.flipbookInstance`, `DFLIP.activeBook`,
+or reach into a book's `target`, `contentProvider`, `ui`, `stage` or `options`.
+
+`docs/engine-api.md`, beside this file, is the contract `ZayaBook` publishes: it is written from
+the application's usage and the engine's observable behaviour rather than from the fork's
+internals, precisely so that a clean-room replacement can be written from it. Each member is
+marked as part of the contract or as internal. `tests/engine-contract.spec.mjs` exercises every
+kept member through `ZayaBook` alone and asserts behaviour rather than markup, so the same file
+runs against the replacement.
+
+Two consequences. Replacing the engine is a rewrite of one file under `lib/` plus whatever
+replaces `engine/` — not a pass over every feature. And a feature that finds itself wanting
+something the contract does not offer adds it to `ZayaBook` and to `engine-api.md`, rather than
+reaching past them; that addition is then a requirement on the replacement, so it is worth being
+sure it is needed.
+
+`window.dFlipBook` and `window.flipbookInstance` survive as deprecated aliases for one release,
+for plugins written before the facade existed. They are not for `lib/`.
 
 ## The ordered loader
 
@@ -41,8 +65,10 @@ fetches them in parallel and runs them in the order they were appended, in three
    `pdf.worker.min.js` is deliberately absent: pdf.js spawns it as a Web Worker itself, from the
    path the engine hands it.
 2. **Utilities, state, i18n and the engine** — `lib/js/utils/*`, the dictionaries, then
-   `engine/index.js`. Entries listed in the `MODULES` set are loaded as `type="module"`, which the
-   browser defers, so they run after the classic scripts of the same batch.
+   `engine/index.js` and `lib/js/core/book.js`. Entries listed in the `MODULES` set are loaded as
+   `type="module"`, which the browser defers, so they run after the classic scripts of the same
+   batch — which is why the facade, a classic script, may be listed after the engine and still run
+   before it: it only publishes `ZayaBook`, and looks the engine up when a book is opened.
 3. **The application** — `core/load.js`, the UI and every feature.
 
 Two consequences worth knowing. Everything is a global on `window` unless it is in `MODULES`;
