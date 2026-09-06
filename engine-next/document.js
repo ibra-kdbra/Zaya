@@ -113,6 +113,8 @@ export class PageCache {
     /** @type {Map<string, HTMLCanvasElement>} insertion order is the LRU order */
     this.entries = new Map();
     this.generation = 0;
+    /** Keys that may not be evicted: whatever is on screen this moment. */
+    this.pinned = new Set();
   }
 
   static key(pdfPageNumber, scale, half, generation) {
@@ -122,7 +124,17 @@ export class PageCache {
   /** Everything rendered so far is stale (the painted search query changed). */
   invalidate() {
     this.generation++;
+    this.pinned.clear();
     this.clear();
+  }
+
+  /**
+   * Pin exactly these keys. A pinned canvas is never evicted, so the pages the reader is
+   * looking at cannot be thrown away by a pre-render running behind them.
+   * @param {string[]} keys
+   */
+  pin(keys) {
+    this.pinned = new Set(keys || []);
   }
 
   get(key) {
@@ -139,13 +151,22 @@ export class PageCache {
     this.entries.set(key, canvas);
     this.pixels += cost;
     while (this.pixels > this.budget && this.entries.size > 1) {
-      const oldest = this.entries.keys().next().value;
+      const oldest = this.evictable();
+      if (!oldest) break;                    // everything left is on screen: keep it and stop
       const victim = this.entries.get(oldest);
       this.entries.delete(oldest);
       this.pixels -= victim.width * victim.height;
       victim.width = victim.height = 0;
     }
     return canvas;
+  }
+
+  /** The least recently used key that is not pinned, or null when every one of them is. */
+  evictable() {
+    for (const key of this.entries.keys()) {
+      if (!this.pinned.has(key)) return key;
+    }
+    return null;
   }
 
   clear() {

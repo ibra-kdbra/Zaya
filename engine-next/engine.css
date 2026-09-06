@@ -25,6 +25,8 @@
   inset: 0;
   overflow: hidden;
   cursor: pointer;
+  /* Two fingers on the stage mean a pinch zoom, so the browser must not take them first. */
+  touch-action: none;
   perspective: 2400px;
   perspective-origin: 50% 50%;
 }
@@ -96,4 +98,67 @@
   .zn-sheet {
     will-change: auto;
   }
+}
+
+/*
+ * The selectable text layer. It sits over the pages, invisible: only the browser's own
+ * selection highlight shows where it is. Nothing but a run of text takes pointer input, so a
+ * click that lands between two lines still reaches the stage and turns the page.
+ */
+
+.zn-textlayers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.zn-textlayers[hidden] {
+  display: none;
+}
+
+.zn-textlayer {
+  position: absolute;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.zn-textlayer-inner {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+}
+
+.zn-textlayer span {
+  position: absolute;
+  white-space: pre;
+  margin: 0;
+  padding: 0;
+  color: transparent;
+  transform-origin: 0 0;
+  cursor: text;
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.zn-textlayer span::selection {
+  background: rgb(64 138 255 / 35%);
+  color: transparent;
+}
+
+/* The pointer belongs to the application's own chrome for the moment. */
+.zn-stage.zn-inert {
+  cursor: default;
+}
+
+.zn-stage.zn-inert .zn-textlayers {
+  visibility: hidden;
+}
+
+/* Fullscreen paints its own backdrop; the container must fill it. */
+.zn-book:fullscreen,
+.zn-book.zn-fullscreen {
+  width: 100%;
+  height: 100%;
 }
