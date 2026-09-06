@@ -140,7 +140,7 @@ Rules that keep it safe:
 
 ### v5.6 — polish
 - Keyboard-accessible everything: focus trap in modals, ARIA on side panels, skip links
-- Page-turn sound/animation refinements; hardcover option
+- Page-turn sound/animation refinements; ~~hardcover option~~ (done: Settings → Pages)
 - Settings export/import (quotes + preferences as JSON)
 - `?theme=` and `?mode=single|double` URL parameters for embedding
 - Replace remaining jQuery in `controls.js` / `custom-controls.js` with vanilla DOM
@@ -148,7 +148,7 @@ Rules that keep it safe:
 ### v6.0 — new engine
 - MIT engine per section 3; pdf.js 4.x (fixes the 2019 pdf.js build we ship today)
 - Text selection & copy on pages; search highlights on the page itself
-- Print / download of page ranges
+- ~~Print / download of page ranges~~ (print done: More menu → Print…, `Ctrl/Cmd+P`)
 - i18n of the UI strings
 
 ### Later
