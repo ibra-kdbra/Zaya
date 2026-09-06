@@ -1,8 +1,8 @@
-@import url('vendor/fonts.css');
+@import url('../../vendor/css/fonts.css');
 
 /* Core Library & Icons */
 @import url('min.css');
-@import url('themify-icons.min.css');
+@import url('../../vendor/css/themify-icons.min.css');
 
 /* Modular Styles */
 @import url('themes/themes.css');

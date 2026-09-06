@@ -35,7 +35,7 @@ const rules = {
 
 export default [
   {
-    ignores: ['lib/js/libs/**', '**/*.min.js', '**/*.bak', 'lib/js/features/changelog/changelog.bundle.js', 'node_modules/**', 'playwright-report/**', 'test-results/**']
+    ignores: ['vendor/**', '**/*.min.js', '**/*.bak', 'lib/js/features/changelog/changelog.bundle.js', 'node_modules/**', 'playwright-report/**', 'test-results/**']
   },
   {
     files: ['lib/js/**/*.js', 'sw.js'],

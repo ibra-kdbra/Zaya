@@ -20,7 +20,7 @@ const PRECACHE = [
   './lib/css/style.css',
   './lib/js/app.js',
   './assets/zaya.svg',
-  './lib/fonts/themify.woff'
+  './vendor/fonts/themify.woff'
 ];
 
 const STATIC_DESTINATIONS = new Set(['script', 'style', 'font', 'image', 'worker']);
@@ -54,12 +54,12 @@ function isStaticAsset(request, url) {
   return STATIC_DESTINATIONS.has(request.destination) || /\.(js|mjs|css|woff2?|ttf|eot|svg|png|jpe?g|gif|json|mp3)$/i.test(url.pathname);
 }
 
-// Only binary assets that never change between commits (fonts, images, sounds, CMaps) are served from
+// Only binary assets that never change between commits (everything vendored, images, sounds) are served from
 // cache first. Scripts and stylesheets always come from the network while online, even when they carry
 // the release version, so a deploy within the same version never runs on top of stale code; the cache
 // is their offline fallback only.
 function isImmutable(url) {
-  return /\/(fonts|images|sound|cmaps|ocr)\//.test(url.pathname);
+  return /\/(vendor|images|sound)\//.test(url.pathname);
 }
 
 async function trimCache(cache) {

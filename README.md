@@ -169,7 +169,7 @@ the control panel (Settings → Media Loop). The setting is remembered across se
 - **[DFlip](https://github.com/dearhive/dearflip-js-flipbook)** — the flipbook engine Zaya's core is
   derived from, refactored into ES modules under `lib/js/core/dflip/`.
 - **[Tesseract.js](https://tesseract.projectnaptha.com/)** — on-device text recognition for scanned pages
-  (`lib/ocr/`, loaded on demand).
+  (`vendor/ocr/`, loaded on demand).
 
 Full attribution and licences are in `docs/THIRD_PARTY_NOTICES.md`.
 

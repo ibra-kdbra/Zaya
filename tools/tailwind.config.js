@@ -3,7 +3,7 @@ const { join } = require('node:path');
 const ROOT = join(__dirname, '..');
 
 module.exports = {
-  content: [join(ROOT, 'index.html'), join(ROOT, 'changelog.html'), join(ROOT, 'lib/js/**/*.js'), '!' + join(ROOT, 'lib/js/libs/**')],
+  content: [join(ROOT, 'index.html'), join(ROOT, 'changelog.html'), join(ROOT, 'lib/js/**/*.js')],
   theme: { extend: {} },
   corePlugins: { preflight: true },
   plugins: []

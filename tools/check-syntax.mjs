@@ -5,7 +5,7 @@ import { join, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const ROOT = new URL('..', import.meta.url).pathname;
-const SKIP = [/\/libs\//, /\/lib\/ocr\//, /\.min\.js$/, /\.bak$/, /node_modules/, /changelog\.bundle\.js$/, /\/cmaps\//];
+const SKIP = [/\/vendor\//, /\.min\.js$/, /\.bak$/, /node_modules/, /changelog\.bundle\.js$/, /\/cmaps\//];
 const MODULE_DIRS = [/lib\/js\/core\/dflip\//, /lib\/js\/features\/themes\//, /lib\/js\/features\/quotes\//,
   /lib\/js\/features\/changelog\//, /lib\/js\/features\/search\//, /lib\/js\/features\/settings\//, /lib\/js\/pro-features\//, /tools\//, /tests\//];
 

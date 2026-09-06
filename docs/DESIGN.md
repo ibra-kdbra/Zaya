@@ -23,7 +23,7 @@ and the CSS under `lib/css/`, and they are the checklist for any UI change.
 3. **Neutral elevation.** Shadows are black at low opacity, offset downward. No tinted glows, no
    hairline border paired with a wide blur.
 4. **Type with a voice.** `IBM Plex Sans` for interface text, `IBM Plex Mono` for numbers, page
-   counters and the version label. Self hosted (`lib/css/vendor/fonts.css`). Interface text is
+   counters and the version label. Self hosted (`vendor/css/fonts.css`). Interface text is
    never below 12px; controls are 13–14px; section labels are 12px uppercase with 0.08em tracking.
 5. **Touch first.** Every control is at least 44×44px. Hover is a hint, not a requirement: on touch
    devices the bottom bar is pinned and side panels close on an outside tap.
@@ -57,7 +57,7 @@ gradient or `--shadow-primary` into a coloured glow is wrong.
 - `lib/css/page/chrome.css` – the fixed controls around the book (top-right cluster, version
   label, bottom bar, side-panel skins, focus rings). Loaded last, wins by order not by `!important`.
 - `lib/css/page/custom-ui.css` – the search panel, thumbnails and outline skins.
-- `lib/css/vendor/tailwind.css` – utilities used by the markup, precompiled (`npm run build:css`).
+- `vendor/css/tailwind.css` – utilities used by the markup, precompiled (`npm run build:css`).
 
 ## Navigation model by device class
 

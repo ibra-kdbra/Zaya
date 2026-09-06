@@ -34,6 +34,7 @@ Please keep pull requests focused. One fix or feature per PR makes review and ch
 | `lib/js/ui/`, `lib/js/features/` | Control panel, bottom bar, media, quotes, themes, changelog, search |
 | `lib/js/utils/` | State store, plugin registry, validation, service-worker manager |
 | `lib/css/` | Styles; theme tokens are CSS custom properties in `lib/css/themes/themes.css` |
+| `vendor/` | Third-party runtime code, with its licences beside it |
 | `sw.js` | Service worker (must stay at the site root) |
 | `tests/` | Playwright smoke tests |
 | `tools/` | Dev configuration and checks (eslint, playwright, tailwind, `check-syntax.mjs`, `check-version.mjs`) |
@@ -73,4 +74,4 @@ should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`,
 
 ## Licensing note
 
-Zaya's own code is MIT. The flipbook engine under `lib/js/core/dflip/` and `lib/js/libs/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`, beside this file. Contributions that replace those components with permissively-licensed code are very welcome.
+Zaya's own code is MIT. The flipbook engine under `lib/js/core/dflip/` and `vendor/js/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`, beside this file. Contributions that replace those components with permissively-licensed code are very welcome.
