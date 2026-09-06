@@ -1319,6 +1319,34 @@ h3 { font-size: 12px; line-height: 1.4; }
 
 .quotes-list { margin-top: 6px; display: flex; flex-direction: column; }
 
+/* Notes are grouped by the page they were taken on; the pages on screen lead the list. */
+#quoteList .quote-group { display: flex; flex-direction: column; }
+#quoteList .quote-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 0 4px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+#quoteList .quote-group-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+#quoteList .quote-group-count,
+#quoteList .quote-group-here {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+#quoteList .quote-group.is-current .quote-group-title,
+#quoteList .quote-group-here { color: var(--text-accent); }
+#quoteList .quote-group.is-current .quote-group-head { border-bottom-color: var(--text-accent); }
+
+.panel-note-count { color: var(--text-accent); }
+
 #quoteList .quote-item {
   display: flex;
   align-items: flex-start;
