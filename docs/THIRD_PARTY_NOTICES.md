@@ -18,4 +18,4 @@
 
 Everything else in this repository is © ibra-kdbra and released under the MIT License (see `LICENSE`).
 
-> **Important:** the DearFlip-derived files are *not* covered by the MIT license and may not be used commercially without a license from DearHive. See `ROADMAP.md` for the plan to replace them.
+> **Important:** the DearFlip-derived files are *not* covered by the MIT license and may not be used commercially without a license from DearHive. See the roadmap in `README.md` for the plan to replace them.

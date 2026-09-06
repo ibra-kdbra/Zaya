@@ -36,6 +36,8 @@ Please keep pull requests focused. One fix or feature per PR makes review and ch
 | `lib/css/` | Styles; theme tokens are CSS custom properties in `lib/css/themes/themes.css` |
 | `sw.js` | Service worker (must stay at the site root) |
 | `tests/` | Playwright smoke tests |
+| `tools/` | Dev configuration and checks (eslint, playwright, tailwind, `check-syntax.mjs`, `check-version.mjs`) |
+| `docs/` | Contributing, security, design and third-party notes |
 
 ## Plugin / extension API
 
@@ -61,7 +63,7 @@ Every word a reader sees is translated. To add one:
 
 British English for the English strings; natural Modern Standard Arabic, short labels rather than
 literal translations, for the Arabic ones. Anything positional in the CSS that goes with the string
-should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`).
+should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`, beside this file).
 
 ## Coding conventions
 
@@ -71,4 +73,4 @@ should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`)
 
 ## Licensing note
 
-Zaya's own code is MIT. The flipbook engine under `lib/js/core/dflip/` and `lib/js/libs/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`. Contributions that replace those components with permissively-licensed code are very welcome.
+Zaya's own code is MIT. The flipbook engine under `lib/js/core/dflip/` and `lib/js/libs/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`, beside this file. Contributions that replace those components with permissively-licensed code are very welcome.

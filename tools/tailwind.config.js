@@ -1,6 +1,9 @@
 /** Tailwind is precompiled into lib/css/vendor/tailwind.css (npm run build:css); the play CDN is no longer used. */
+const { join } = require('node:path');
+const ROOT = join(__dirname, '..');
+
 module.exports = {
-  content: ['./index.html', './changelog.html', './lib/js/**/*.js', '!./lib/js/libs/**'],
+  content: [join(ROOT, 'index.html'), join(ROOT, 'changelog.html'), join(ROOT, 'lib/js/**/*.js'), '!' + join(ROOT, 'lib/js/libs/**')],
   theme: { extend: {} },
   corePlugins: { preflight: true },
   plugins: []

@@ -1,6 +1,7 @@
 node_modules
 tests
-scripts
+tools
+docs
 test-results
 playwright-report
 .github
@@ -8,6 +9,4 @@ playwright-report
 !README.md
 !CHANGELOG.md
 eslint.config.mjs
-playwright.config.mjs
-tailwind.config.js
 package-lock.json

@@ -29,7 +29,7 @@ and it works offline as a PWA.
   current search marks painted on them
 - Stiff pages: soft, hard cover, or every page as a board (Settings → Pages)
 - Thumbnails and outline/bookmark side panels that overlay the book on narrow screens
-- 50+ colour themes built on one set of design tokens (see `DESIGN.md`)
+- 50+ colour themes built on one set of design tokens (see `docs/DESIGN.md`)
 - Quotes notebook stored locally in IndexedDB, and the last page remembered per document
 - Built-in media player: YouTube videos and playlists or local audio, with loop
 - Backup and restore: export every quote and preference to JSON and import it on another device
@@ -69,7 +69,7 @@ npm run build:assets   # recompile Tailwind CSS and the changelog bundle (output
 ```
 
 Scripts are loaded and ordered by `lib/js/app.js` — there is nothing to include by hand in the HTML.
-See `CONTRIBUTING.md`, `SECURITY.md`, `ROADMAP.md` and `DESIGN.md`.
+See `docs/CONTRIBUTING.md`, `docs/SECURITY.md`, `docs/ARCHITECTURE.md` and `docs/DESIGN.md`.
 
 ## Tech Stack
 
@@ -171,7 +171,7 @@ the control panel (Settings → Media Loop). The setting is remembered across se
 - **[Tesseract.js](https://tesseract.projectnaptha.com/)** — on-device text recognition for scanned pages
   (`lib/ocr/`, loaded on demand).
 
-Full attribution and licences are in `THIRD_PARTY_NOTICES.md`.
+Full attribution and licences are in `docs/THIRD_PARTY_NOTICES.md`.
 
 ## Licence
 

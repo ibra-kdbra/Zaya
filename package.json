@@ -9,10 +9,10 @@
   },
   "scripts": {
     "start": "http-server -p 8080 -c-1 .",
-    "check": "node scripts/check-syntax.mjs && node scripts/check-version.mjs",
-    "lint": "eslint .",
-    "test": "playwright test",
-    "build:css": "tailwindcss -c tailwind.config.js -i lib/css/tailwind.src.css -o lib/css/vendor/tailwind.css --minify",
+    "check": "node tools/check-syntax.mjs && node tools/check-version.mjs",
+    "lint": "eslint -c tools/eslint.config.mjs .",
+    "test": "playwright test -c tools/playwright.config.mjs",
+    "build:css": "tailwindcss -c tools/tailwind.config.js -i lib/css/tailwind.src.css -o lib/css/vendor/tailwind.css --minify",
     "build:changelog": "esbuild lib/js/features/changelog/changelog.js --bundle --format=iife --outfile=lib/js/features/changelog/changelog.bundle.js",
     "build:assets": "npm run build:css && npm run build:changelog"
   },

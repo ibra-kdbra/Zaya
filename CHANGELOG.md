@@ -79,14 +79,14 @@ navigation model all changed.
   and sharing. Values are allow-listed.
 - **Project tooling**: `npm run check` (syntax), `npm run lint` (ESLint), `npm test` (Playwright
   smoke tests including a mobile emulation), GitHub Actions CI, issue and pull-request templates,
-  `SECURITY.md`, `CONTRIBUTING.md`, `THIRD_PARTY_NOTICES.md` and `ROADMAP.md`.
+  `docs/SECURITY.md`, `docs/CONTRIBUTING.md`, `docs/THIRD_PARTY_NOTICES.md` and `ROADMAP.md`.
 
 ### Changed
 
 - **Visual refresh**: a quieter, warmer default theme — ink-dark tinted neutrals, one brass accent,
   neutral shadows. Self-hosted IBM Plex Sans and Mono replace Inter, controls are flat and 44px,
   nothing lifts or glows on hover, no interface text sits below 12px, keyboard focus is visible and
-  reduced-motion preferences are respected. The rationale and the tokens live in `DESIGN.md`; the
+  reduced-motion preferences are respected. The rationale and the tokens live in `docs/DESIGN.md`; the
   other 53 themes keep their palettes with neutralised shadows.
 - **Mobile layout (#11, #8)**: page mode follows the viewport rather than the user-agent string.
   Portrait phones get a single page filling the width; landscape tablets and desktops get the
