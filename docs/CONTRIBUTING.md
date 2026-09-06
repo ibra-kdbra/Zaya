@@ -33,7 +33,8 @@ file belongs. In short:
 | `index.html`, `changelog.html` | The two pages of the site |
 | `lib/js/app.js` | Ordered script loader (the only place load order is defined) |
 | `engine/` | The flipbook engine (modularised DearFlip 1.7.x fork, see licensing note below) |
-| `lib/js/core/load.js` | Glue between the UI, `AppState` and the flipbook |
+| `lib/js/core/book.js` | `window.ZayaBook`, the one facade over the engine — the only file in `lib/` allowed to touch it |
+| `lib/js/core/load.js` | Glue between the UI, `AppState` and the flipbook; the only caller of `ZayaBook.create` |
 | `lib/js/ui/`, `lib/js/features/` | Control panel, bottom bar, media, quotes, themes, changelog, search |
 | `lib/js/utils/` | State store, plugin registry, validation, service-worker manager |
 | `lib/css/` | Styles; theme tokens are CSS custom properties in `lib/css/themes/themes.css` |
@@ -41,7 +42,17 @@ file belongs. In short:
 | `sw.js` | Service worker (must stay at the site root) |
 | `tests/` | Playwright smoke tests |
 | `tools/` | Dev configuration and checks (eslint, playwright, tailwind, `check-syntax.mjs`, `check-version.mjs`) |
-| `docs/` | Architecture, contributing, security, design and third-party notes |
+| `docs/` | Architecture, contributing, security, design, the engine contract and third-party notes |
+
+## Talking to the flipbook
+
+Everything the app asks of the page-turn engine goes through `window.ZayaBook`, and
+`docs/engine-api.md` is the contract it publishes. Never read `window.dFlipBook`,
+`window.flipbookInstance` or `DFLIP.activeBook`, and never reach into a book's `target`,
+`contentProvider`, `ui` or `options`: those are the engine's insides, and the engine is being
+replaced. If the contract is missing something your feature needs, add it to
+`lib/js/core/book.js` and to `docs/engine-api.md` in the same change, and cover it in
+`tests/engine-contract.spec.mjs`.
 
 ## Plugin / extension API
 
