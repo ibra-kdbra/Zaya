@@ -1,14 +1,10 @@
-@import url('vendor/fonts.css');
+@import url('../../vendor/css/fonts.css');
 
 /* Core Library & Icons */
-@import url('min.css');
-@import url('themify-icons.min.css');
+@import url('../../engine/engine.css');
+@import url('../../vendor/css/themify-icons.min.css');
 
 /* Modular Styles */
 @import url('themes/themes.css');
-@import url('page/button.css');
-@import url('page/input-panel-buttons.css');
-@import url('page/layout.css');
-@import url('page/quotes.css');
 @import url('page/custom-ui.css');
 @import url('page/chrome.css');

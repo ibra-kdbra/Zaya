@@ -1,6 +1,5 @@
 # code editor
 .vscode
-docs
 /design_prototypes
 node_modules
 
@@ -8,5 +7,5 @@ node_modules
 test-results
 playwright-report
 .playwright
-scripts/_tmp_*
-scripts/_*.mjs
+tools/_tmp_*
+tools/_*.mjs

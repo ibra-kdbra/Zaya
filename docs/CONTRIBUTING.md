@@ -25,17 +25,23 @@ Please keep pull requests focused. One fix or feature per PR makes review and ch
 
 ## Project layout
 
+`ARCHITECTURE.md`, beside this file, explains why the tree is shaped this way and where a new
+file belongs. In short:
+
 | Path | What lives there |
 | --- | --- |
 | `index.html`, `changelog.html` | The two pages of the site |
 | `lib/js/app.js` | Ordered script loader (the only place load order is defined) |
-| `lib/js/core/dflip/` | The flipbook engine (modularised DearFlip 1.7.x fork, see licensing note below) |
+| `engine/` | The flipbook engine (modularised DearFlip 1.7.x fork, see licensing note below) |
 | `lib/js/core/load.js` | Glue between the UI, `AppState` and the flipbook |
 | `lib/js/ui/`, `lib/js/features/` | Control panel, bottom bar, media, quotes, themes, changelog, search |
 | `lib/js/utils/` | State store, plugin registry, validation, service-worker manager |
 | `lib/css/` | Styles; theme tokens are CSS custom properties in `lib/css/themes/themes.css` |
+| `vendor/` | Third-party runtime code, with its licences beside it |
 | `sw.js` | Service worker (must stay at the site root) |
 | `tests/` | Playwright smoke tests |
+| `tools/` | Dev configuration and checks (eslint, playwright, tailwind, `check-syntax.mjs`, `check-version.mjs`) |
+| `docs/` | Architecture, contributing, security, design and third-party notes |
 
 ## Plugin / extension API
 
@@ -61,7 +67,7 @@ Every word a reader sees is translated. To add one:
 
 British English for the English strings; natural Modern Standard Arabic, short labels rather than
 literal translations, for the Arabic ones. Anything positional in the CSS that goes with the string
-should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`).
+should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`, beside this file).
 
 ## Coding conventions
 
@@ -71,4 +77,4 @@ should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`)
 
 ## Licensing note
 
-Zaya's own code is MIT. The flipbook engine under `lib/js/core/dflip/` and `lib/js/libs/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`. Contributions that replace those components with permissively-licensed code are very welcome.
+Zaya's own code is MIT. The flipbook engine under `engine/` and `vendor/js/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`, beside this file, and the Roadmap section of `README.md`. Contributions that replace those components with permissively-licensed code are very welcome.

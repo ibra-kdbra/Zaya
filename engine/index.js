@@ -125,30 +125,23 @@ DFLIP.parseBooks = function () {
 // Global Setup on evaluation
 (function ($) {
   $(document).ready(function () {
-    // Auto-detect dFlipLocation if not defined
+    // Auto-detect dFlipLocation if not defined. It is the site root: the engine's own assets are
+    // vendored under vendor/, its sounds and images are first-party under lib/.
     if (typeof window.dFlipLocation === "undefined") {
       // Try to use import.meta.url (modern modules)
       try {
         const url = import.meta.url;
         if (url) {
           const parts = url.split("/");
-          // From .../lib/js/core/dflip/index.js to .../lib/
-          // We remove the last 4 parts
-          window.dFlipLocation = parts.slice(0, -4).join("/") + "/";
+          // From .../engine/index.js to the site root: drop the last 2 parts
+          window.dFlipLocation = parts.slice(0, -2).join("/") + "/";
         }
       } catch (e) {
         // Fallback to scanning script tags (classic)
         $("script").each(function () {
           const src = $(this).attr("src") || "";
-          if (src.indexOf("dflip") > -1 && src.indexOf("js/") > -1) {
-            const parts = src.split("/");
-            // Assuming dflip.js bundle is at lib/js/dflip.js
-            // Or modules are at lib/js/core/dflip/index.js
-            if (src.indexOf("core/dflip") > -1) {
-              window.dFlipLocation = parts.slice(0, -4).join("/") + "/";
-            } else {
-              window.dFlipLocation = parts.slice(0, -2).join("/") + "/";
-            }
+          if (src.indexOf("engine/index.js") > -1) {
+            window.dFlipLocation = src.split("/").slice(0, -2).join("/") + "/";
             return false;
           }
         });
@@ -161,15 +154,15 @@ DFLIP.parseBooks = function () {
         loc += "/";
         window.dFlipLocation = loc;
       }
-      DFLIP.defaults.mockupjsSrc = loc + "js/libs/mockup.min.js";
-      DFLIP.defaults.pdfjsSrc = loc + "js/libs/pdf.min.js";
-      DFLIP.defaults.pdfjsCompatibilitySrc = loc + "js/libs/compatibility.js";
-      DFLIP.defaults.threejsSrc = loc + "js/libs/three.min.js";
-      DFLIP.defaults.pdfjsWorkerSrc = loc + "js/libs/pdf.worker.min.js";
-      DFLIP.defaults.soundFile = loc + "sound/turn2.mp3";
-      DFLIP.defaults.imagesLocation = loc + "images";
-      DFLIP.defaults.imageResourcesPath = loc + "images/pdfjs/";
-      DFLIP.defaults.cMapUrl = loc + "js/libs/cmaps/";
+      DFLIP.defaults.mockupjsSrc = loc + "vendor/js/mockup.min.js";
+      DFLIP.defaults.pdfjsSrc = loc + "vendor/js/pdf.min.js";
+      DFLIP.defaults.pdfjsCompatibilitySrc = loc + "vendor/js/compatibility.js";
+      DFLIP.defaults.threejsSrc = loc + "vendor/js/three.min.js";
+      DFLIP.defaults.pdfjsWorkerSrc = loc + "vendor/js/pdf.worker.min.js";
+      DFLIP.defaults.soundFile = loc + "lib/sound/turn2.mp3";
+      DFLIP.defaults.imagesLocation = loc + "lib/images";
+      DFLIP.defaults.imageResourcesPath = loc + "lib/images/pdfjs/";
+      DFLIP.defaults.cMapUrl = loc + "vendor/js/cmaps/";
     }
 
     $("body").on("click", "._df_button, ._df_thumb, ._df_custom", function (e) {

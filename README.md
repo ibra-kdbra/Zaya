@@ -29,7 +29,7 @@ and it works offline as a PWA.
   current search marks painted on them
 - Stiff pages: soft, hard cover, or every page as a board (Settings → Pages)
 - Thumbnails and outline/bookmark side panels that overlay the book on narrow screens
-- 50+ colour themes built on one set of design tokens (see `DESIGN.md`)
+- 50+ colour themes built on one set of design tokens (see `docs/DESIGN.md`)
 - Quotes notebook stored locally in IndexedDB, and the last page remembered per document
 - Built-in media player: YouTube videos and playlists or local audio, with loop
 - Backup and restore: export every quote and preference to JSON and import it on another device
@@ -69,7 +69,23 @@ npm run build:assets   # recompile Tailwind CSS and the changelog bundle (output
 ```
 
 Scripts are loaded and ordered by `lib/js/app.js` — there is nothing to include by hand in the HTML.
-See `CONTRIBUTING.md`, `SECURITY.md`, `ROADMAP.md` and `DESIGN.md`.
+See `docs/CONTRIBUTING.md`, `docs/SECURITY.md`, `docs/ARCHITECTURE.md` and `docs/DESIGN.md`.
+
+## Roadmap
+
+Open milestones, in the order they matter:
+
+- **Replace the flipbook engine** ([issue #21](https://github.com/ibra-kdbra/Zaya/issues/21)). The
+  page-turn engine under `engine/` is a fork of DearFlip Lite and carries a non-commercial licence
+  (see `docs/THIRD_PARTY_NOTICES.md`). A permissively-licensed replacement is the one change the
+  rest of the project waits on.
+- **Slice the app into `src/features`.** The first-party code under `lib/js` still follows the
+  served layout rather than the shape of the features. Reorganising it is deferred until the engine
+  is replaced, so that both moves land as one change of URL.
+- **More recognition languages.** Only Arabic and English packs are vendored today; the language
+  packs and the picker are ready for more.
+- **Selection on the page itself.** Text can be selected in the Navigator's Text tab; selecting it
+  on the rendered page, where the reader is looking, is still to come.
 
 ## Tech Stack
 
@@ -129,18 +145,22 @@ the control panel (Settings → Media Loop). The setting is remembered across se
     ├── changelog.html        release notes, rendered from CHANGELOG.md
     ├── config.js             per-deployment settings
     ├── sw.js                 service worker
-    └── 📁assets
-    └── 📁lib
+    └── 📁assets              favicons and the screenshot used above
+    └── 📁engine              the flipbook engine (DearFlip fork, non-commercial licence)
+        └── 📁core            book, pages, textures, the preview stage
+        └── 📁features        thumbnails, outline, find, annotations, links
+        └── 📁ui              toolbar, lightbox, popup, share
+        ├── index.js  factory.js  constants.js  utils.js  tween.js
+        ├── engine.css        the engine's own stylesheet
+    └── 📁lib                 first-party application code
         └── 📁css
-            └── 📁page        chrome.css, shell.css, custom-ui.css, storage.css, changelog.css
+            └── 📁page        shell.css, chrome.css, custom-ui.css, storage.css, text-pane.css,
+            │                 print.css, changelog.css
             └── 📁themes      themes.css (all colour themes and design tokens)
-            └── 📁vendor      fonts.css, tailwind.css, fontawesome, toastify (compiled/vendored)
-        └── 📁fonts           self-hosted IBM Plex Sans/Mono
+            ├── style.css     the sheet that pulls the others together
         └── 📁images
         └── 📁js
-            └── 📁core
-                └── 📁dflip   modular flipbook engine
-                ├── load.js
+            └── 📁core        load.js — glue between the UI, AppState and the engine
             └── 📁features
                 └── 📁changelog
                     └── 📁services  ChangelogApiService.js, ChangelogParserService.js
@@ -148,16 +168,21 @@ the control panel (Settings → Media Loop). The setting is remembered across se
                     └── 📁utils     ChangelogConfig.js, ChangelogUtils.js
                     ├── changelog.js
                     ├── changelog.bundle.js  (built by `npm run build:changelog`)
-                └── 📁media
-                └── 📁quotes
-                └── 📁search
-                └── 📁settings
-                └── 📁themes
-            └── 📁libs        jquery, three, pdf.js, marked, toastify (vendored)
+                └── 📁controls  📁documents  📁media  📁print  📁quotes
+                └── 📁search    📁settings    📁text    📁themes
+            └── 📁i18n        en.js, ar.js, i18n.js
             └── 📁ui          controls.js
             └── 📁utils       app-state.js, validation.js, mobile-support.js, …
             ├── app.js        the only script the pages include; loads everything else in order
         └── 📁sound
+    └── 📁vendor              third-party runtime code, licences beside it
+        └── 📁css             tailwind.css, fontawesome, toastify, themify, fonts.css
+        └── 📁fonts           IBM Plex, Font Awesome and Themify faces
+        └── 📁js              jquery, three, pdf.js (+ worker, cmaps), marked, toastify, mockup
+        └── 📁ocr             Tesseract in WebAssembly and its Arabic/English packs
+    └── 📁docs                ARCHITECTURE, CONTRIBUTING, SECURITY, DESIGN, THIRD_PARTY_NOTICES
+    └── 📁tools               eslint, playwright and tailwind config; the check scripts
+    └── 📁tests               Playwright suites
 ```
 
 </details>
@@ -167,11 +192,11 @@ the control panel (Settings → Media Loop). The setting is remembered across se
 - **[PDF.js](https://mozilla.github.io/pdf.js/)** — renders PDF files in the browser.
 - **[Three.js](https://threejs.org/)** — the WebGL layer behind the page-turn animation.
 - **[DFlip](https://github.com/dearhive/dearflip-js-flipbook)** — the flipbook engine Zaya's core is
-  derived from, refactored into ES modules under `lib/js/core/dflip/`.
+  derived from, refactored into ES modules under `engine/`.
 - **[Tesseract.js](https://tesseract.projectnaptha.com/)** — on-device text recognition for scanned pages
-  (`lib/ocr/`, loaded on demand).
+  (`vendor/ocr/`, loaded on demand).
 
-Full attribution and licences are in `THIRD_PARTY_NOTICES.md`.
+Full attribution and licences are in `docs/THIRD_PARTY_NOTICES.md`.
 
 ## Licence
 

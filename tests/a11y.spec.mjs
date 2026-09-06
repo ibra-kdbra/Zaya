@@ -14,7 +14,7 @@
  *                                container being a tab stop of its own.
  *   aria-allowed-attr            the engine puts `aria-*` state on a few of its own nodes whose
  *                                roles it also owns; the markup is not ours to change while
- *                                `lib/js/core/dflip/` stays a fork (see THIRD_PARTY_NOTICES.md).
+ *                                `engine/` stays a fork (see docs/THIRD_PARTY_NOTICES.md).
  */
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -106,6 +106,7 @@ for (const lang of LANGUAGES) {
       // The More menu on the bottom bar
       await page.locator('#customMoreBtn').click();
       await expect(page.locator('#customMoreMenu')).toHaveClass(/show/);
+      await settled(page, '#customMoreMenu');
       found.push(...await scan(page, 'more menu'));
 
       // The print dialog, opened from that same menu

@@ -5,7 +5,7 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [6.3.0] - 2026-09-06
 
 ### Added
 - **The interface speaks Arabic (issue #27)**: every label, tooltip, message, empty state and toast the reader sees is translated, including the flipbook engine's own tooltips and the text-recognition pane. A **Language** control in Settings switches between English and العربية live — nothing reloads, and the choice is remembered. A first visit picks Arabic when the browser asks for it first, and `?lang=ar` (or `?lang=en`) presets it from a link. Counted lines use real plural forms, so Arabic gets its six grammatical categories rather than an English "s"; numbers stay in Western digits. The strings live in `lib/js/i18n/en.js` and `ar.js` under stable dotted keys, and the markup names its key in `data-i18n`.
@@ -19,12 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **More-menu choices are remembered**: the page-mode override (single or double) and the page-turn sound survive a reload and a change of document, alongside the bottom-bar mode that was already kept. An explicit `?mode=` still wins over the remembered choice.
 
 ### Changed
+- **The repository has four roots instead of one**: `index.html`, `changelog.html`, `sw.js` and `config.js` are all that is left at the top level. First-party application code stays under `lib/`; the DearFlip-derived page-turn engine moved to `engine/` (with its stylesheet as `engine/engine.css`) because it is a fork to be replaced rather than a library; every third-party runtime file moved to `vendor/` (`vendor/js`, `vendor/css`, `vendor/fonts`, `vendor/ocr`) with its licence beside it; the contributor documents moved to `docs/`, which now also holds `docs/ARCHITECTURE.md`; and the dev configuration and checks moved to `tools/`. Served paths changed, which is why this is a release of its own. The four remaining pre-6.0 page stylesheets (`button.css`, `input-panel-buttons.css`, `layout.css`, `quotes.css`) were retired, with the handful of rules still deciding a value gathered at the bottom of `page/shell.css`. The roadmap and the notes on the private build are no longer in this repository; `README.md` carries a short list of the open milestones instead.
 - **The whole layout mirrors in Arabic (issue #27)**: with a right-to-left interface the brand moves to the right and the header actions to the left, the Navigator opens from the right and the control panel from the left (docked margins swapped with them), the icon rail stays on the drawer's outer edge, the bottom bar and the notes, Recent and search lists read from the right, and chevrons and page arrows turn over while a cog or a quote mark does not — a button on the left still goes left. This is done with CSS logical properties rather than a second, mirrored stylesheet, so there is only one set of rules to keep in step. Arabic text falls back to a system Arabic face with more leading, since IBM Plex Sans carries no Arabic. The document's own reading direction stays a separate setting from the interface's.
 - **The app layer no longer uses jQuery**: `ui/controls.js`, `features/controls/custom-controls.js` and the DOM work in `core/load.js` are plain DOM — the same ids, `zaya:*` events, `ZayaPanel` / `ZayaNavigator` / `ZayaDrawers` / `ZayaDocuments` APIs, keyboard shortcuts and drawer model, with the engine's jQuery objects unwrapped only where the flipbook itself hands them over. jQuery remains a dependency of the vendored engine.
 - **No user text is ever built into markup**: the notes list and its modal, the delete confirmation, the theme picker, the mobile hints and the "re-select the file" toast are all built from elements, so a quote, a filename or a document name reaches the page as text and never through `innerHTML`. A plugin's `ZayaUI.registerPanelTab({ content })` now takes a node or plain text; markup goes through `renderContent`.
 - **Drawer state reads and writes AppState**: the Navigator and the control panel take their open state and selected tab from `navigatorOpen` / `navigatorTab` / `panelOpen` / `panelTab`, so link presets and a restored backup drive them. Drawers that were left open are only reopened where they are layout rather than an overlay (1200px and wider); on smaller screens the tab is remembered but the drawer starts closed.
 - **The legacy panel stylesheet is retired**: `lib/css/page/panel.css` is gone. What was still in use — the bottom bar, the More menu, the notes modal, the toggle switch and the volume slider — moved to the top of `page/shell.css`, and everything a later sheet already restyled was dropped.
-- **The flipbook engine is split by responsibility**: the search pane (query, results, and the offer to recognise scanned pages) is now `lib/js/features/search/search-panel.js`, the thumbnail and outline drawers are `lib/js/core/dflip/features/side-panels.js`, and `texture-library.js` is left with textures and page rendering — half its previous size, with no change to what the panels do.
+- **The flipbook engine is split by responsibility**: the search pane (query, results, and the offer to recognise scanned pages) is now `lib/js/features/search/search-panel.js`, the thumbnail and outline drawers are `engine/features/side-panels.js`, and `texture-library.js` is left with textures and page rendering — half its previous size, with no change to what the panels do.
 
 ### Fixed
 - **Accessibility pass (issue #28)**: the More menu is a real menu (`role=menuitem` on its entries, `aria-haspopup` and `aria-expanded` on its button), the theme picker is labelled by its own heading instead of a duplicate label, the notes modal's close button has an accessible name, decorative icons inside labelled buttons are hidden from assistive technology, and every bottom-bar button is an explicit `type=button`. `<html>` carries the interface language and direction, so a screen reader announces Arabic as Arabic. A new `tests/a11y.spec.mjs` runs axe-core over the reader at rest, all four panel tabs, all three Navigator tabs, the theme picker, the notes modal and the More menu, in both languages and at 1440px and 412px, and fails on anything rated serious or critical; a keyboard-only walk of opening a document, searching, taking a note, changing theme and changing language is covered alongside it.
@@ -79,14 +80,14 @@ navigation model all changed.
   and sharing. Values are allow-listed.
 - **Project tooling**: `npm run check` (syntax), `npm run lint` (ESLint), `npm test` (Playwright
   smoke tests including a mobile emulation), GitHub Actions CI, issue and pull-request templates,
-  `SECURITY.md`, `CONTRIBUTING.md`, `THIRD_PARTY_NOTICES.md` and `ROADMAP.md`.
+  `docs/SECURITY.md`, `docs/CONTRIBUTING.md`, `docs/THIRD_PARTY_NOTICES.md` and a roadmap.
 
 ### Changed
 
 - **Visual refresh**: a quieter, warmer default theme — ink-dark tinted neutrals, one brass accent,
   neutral shadows. Self-hosted IBM Plex Sans and Mono replace Inter, controls are flat and 44px,
   nothing lifts or glows on hover, no interface text sits below 12px, keyboard focus is visible and
-  reduced-motion preferences are respected. The rationale and the tokens live in `DESIGN.md`; the
+  reduced-motion preferences are respected. The rationale and the tokens live in `docs/DESIGN.md`; the
   other 53 themes keep their palettes with neutralised shadows.
 - **Mobile layout (#11, #8)**: page mode follows the viewport rather than the user-agent string.
   Portrait phones get a single page filling the width; landscape tablets and desktops get the

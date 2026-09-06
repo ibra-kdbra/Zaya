@@ -1,0 +1,21 @@
+# Third-party notices
+
+| Component | Location | Version | License |
+| --- | --- | --- | --- |
+| DearFlip (dFlip) Lite, modularised | `engine/` (including `engine/engine.css`), `vendor/js/mockup.min.js` | 1.7.3.5 | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) – personal / non-commercial use only |
+| pdf.js | `vendor/js/pdf.min.js`, `pdf.worker.min.js`, `compatibility.js`, `cmaps/` | 2.3.200 (one-line patch: the regenerator-runtime `Function()` fallback was replaced with a `globalThis` assignment so it runs under a CSP without `unsafe-eval`) | Apache-2.0 |
+| three.js | `vendor/js/three.min.js` | r89-era build bundled with dFlip | MIT |
+| jQuery | `vendor/js/jquery.min.js` | 3.x | MIT |
+| Themify Icons | `vendor/css/themify-icons.min.css`, `vendor/fonts/` | 1.0.1 | SIL OFL 1.1 (fonts) / MIT (CSS) |
+| Font Awesome Free | `vendor/css/fontawesome.min.css`, `vendor/fonts/webfonts/` (woff2 only) | 6.5.1 | CC BY 4.0 (icons) / SIL OFL 1.1 (fonts) / MIT (CSS) |
+| Toastify JS | `vendor/js/toastify.min.js`, `vendor/css/toastify.min.css` | 1.12.0 | MIT |
+| marked | `vendor/js/marked.min.js` (changelog page only) | 12.0.2 | MIT |
+| Tailwind CSS | precompiled to `vendor/css/tailwind.css` from `lib/css/tailwind.src.css` (`npm run build:css`) | 3.4 | MIT |
+| Tesseract.js | `vendor/ocr/tesseract.min.js`, `vendor/ocr/worker.min.js` (loaded only when the reader asks to recognise scanned pages) | 6.0.1 | Apache-2.0 |
+| Tesseract.js-core (Tesseract OCR compiled to WebAssembly) | `vendor/ocr/core/tesseract-core-simd-lstm.wasm.js`, `tesseract-core-lstm.wasm.js` | 6.1.2 (Tesseract 5) | Apache-2.0 |
+| tessdata_fast language packs | `vendor/ocr/lang/ara.traineddata.gz`, `eng.traineddata.gz` | tessdata_fast (Tesseract 4/5 LSTM) | Apache-2.0 |
+| IBM Plex Sans / Mono | `vendor/fonts/plex/` (latin subset, self-hosted via `vendor/css/fonts.css`) | 5.x (fontsource) | SIL OFL 1.1 |
+
+Everything else in this repository is © ibra-kdbra and released under the MIT License (see `LICENSE`).
+
+> **Important:** the DearFlip-derived files are *not* covered by the MIT license and may not be used commercially without a license from DearHive. See the roadmap in `README.md` for the plan to replace them.

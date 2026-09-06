@@ -3,7 +3,7 @@
  *
  * The 2D renderer, used when WebGL is unavailable or when the CSS mode is forced
  * (`?render=css`, or `window.ZAYA_RENDER_MODE = "css"`). It builds the same DOM the
- * stylesheet in `lib/css/min.css` already describes -- a `.df-book-stage` holding a
+ * stylesheet in `engine/engine.css` already describes -- a `.df-book-stage` holding a
  * `.df-book-wrapper` with `.df-book-page` leaves, each carrying a `.df-page-front` and a
  * `.df-page-back` -- and offers the texture library exactly the interface the WebGL `Book`
  * offers, so `TextureLibrary.setPage()` paints both renderers through the same code path.
