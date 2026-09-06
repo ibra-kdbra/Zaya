@@ -79,7 +79,7 @@ navigation model all changed.
   and sharing. Values are allow-listed.
 - **Project tooling**: `npm run check` (syntax), `npm run lint` (ESLint), `npm test` (Playwright
   smoke tests including a mobile emulation), GitHub Actions CI, issue and pull-request templates,
-  `docs/SECURITY.md`, `docs/CONTRIBUTING.md`, `docs/THIRD_PARTY_NOTICES.md` and `ROADMAP.md`.
+  `docs/SECURITY.md`, `docs/CONTRIBUTING.md`, `docs/THIRD_PARTY_NOTICES.md` and a roadmap.
 
 ### Changed
 

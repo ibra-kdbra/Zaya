@@ -74,4 +74,4 @@ should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`,
 
 ## Licensing note
 
-Zaya's own code is MIT. The flipbook engine under `engine/` and `vendor/js/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`, beside this file. Contributions that replace those components with permissively-licensed code are very welcome.
+Zaya's own code is MIT. The flipbook engine under `engine/` and `vendor/js/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`, beside this file, and the Roadmap section of `README.md`. Contributions that replace those components with permissively-licensed code are very welcome.

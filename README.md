@@ -71,6 +71,22 @@ npm run build:assets   # recompile Tailwind CSS and the changelog bundle (output
 Scripts are loaded and ordered by `lib/js/app.js` — there is nothing to include by hand in the HTML.
 See `docs/CONTRIBUTING.md`, `docs/SECURITY.md`, `docs/ARCHITECTURE.md` and `docs/DESIGN.md`.
 
+## Roadmap
+
+Open milestones, in the order they matter:
+
+- **Replace the flipbook engine** ([issue #21](https://github.com/ibra-kdbra/Zaya/issues/21)). The
+  page-turn engine under `engine/` is a fork of DearFlip Lite and carries a non-commercial licence
+  (see `docs/THIRD_PARTY_NOTICES.md`). A permissively-licensed replacement is the one change the
+  rest of the project waits on.
+- **Slice the app into `src/features`.** The first-party code under `lib/js` still follows the
+  served layout rather than the shape of the features. Reorganising it is deferred until the engine
+  is replaced, so that both moves land as one change of URL.
+- **More recognition languages.** Only Arabic and English packs are vendored today; the language
+  packs and the picker are ready for more.
+- **Selection on the page itself.** Text can be selected in the Navigator's Text tab; selecting it
+  on the rendered page, where the reader is looking, is still to come.
+
 ## Tech Stack
 
 [![Tech Stack](https://skillicons.dev/icons?i=threejs,js,jquery,css,html,tailwindcss,svg)](https://skillicons.dev)
