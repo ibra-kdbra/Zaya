@@ -69,7 +69,8 @@ npm run build:assets   # recompile Tailwind CSS and the changelog bundle (output
 ```
 
 Scripts are loaded and ordered by `lib/js/app.js` — there is nothing to include by hand in the HTML.
-See `docs/CONTRIBUTING.md`, `docs/SECURITY.md`, `docs/ARCHITECTURE.md` and `docs/DESIGN.md`.
+See `docs/CONTRIBUTING.md`, `docs/SECURITY.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN.md` and
+`docs/engine-api.md` (the contract between the app and the page-turn engine).
 
 ## Roadmap
 
@@ -78,7 +79,10 @@ Open milestones, in the order they matter:
 - **Replace the flipbook engine** ([issue #21](https://github.com/ibra-kdbra/Zaya/issues/21)). The
   page-turn engine under `engine/` is a fork of DearFlip Lite and carries a non-commercial licence
   (see `docs/THIRD_PARTY_NOTICES.md`). A permissively-licensed replacement is the one change the
-  rest of the project waits on.
+  rest of the project waits on. The contract that replacement is to be written from is frozen in
+  `docs/engine-api.md`, the app reaches the engine only through `window.ZayaBook`
+  (`lib/js/core/book.js`), and `tests/engine-contract.spec.mjs` is the engine-agnostic suite the
+  replacement has to pass.
 - **Slice the app into `src/features`.** The first-party code under `lib/js` still follows the
   served layout rather than the shape of the features. Reorganising it is deferred until the engine
   is replaced, so that both moves land as one change of URL.
@@ -160,7 +164,8 @@ the control panel (Settings → Media Loop). The setting is remembered across se
             ├── style.css     the sheet that pulls the others together
         └── 📁images
         └── 📁js
-            └── 📁core        load.js — glue between the UI, AppState and the engine
+            └── 📁core        book.js — ZayaBook, the one facade over the engine
+            │                 load.js — glue between the UI, AppState and ZayaBook
             └── 📁features
                 └── 📁changelog
                     └── 📁services  ChangelogApiService.js, ChangelogParserService.js
