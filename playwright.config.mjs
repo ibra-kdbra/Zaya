@@ -1,7 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-// Several worktrees run the suite at once, so the port is configurable.
-const PORT = process.env.ZAYA_TEST_PORT || '8080';
+const PORT = process.env.ZAYA_TEST_PORT || 8080;
 
 export default defineConfig({
   testDir: './tests',
