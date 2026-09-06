@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const SKIP = [/\/vendor\//, /\.min\.js$/, /\.bak$/, /node_modules/, /changelog\.bundle\.js$/, /\/cmaps\//];
-const MODULE_DIRS = [/^engine\//, /lib\/js\/features\/themes\//, /lib\/js\/features\/quotes\//,
+const MODULE_DIRS = [/^engine\//, /^engine-next\//, /lib\/js\/features\/themes\//, /lib\/js\/features\/quotes\//,
   /lib\/js\/features\/changelog\//, /lib\/js\/features\/search\//, /lib\/js\/features\/settings\//, /lib\/js\/pro-features\//, /tools\//, /tests\//];
 
 function walk(dir, out = []) {
@@ -21,7 +21,7 @@ function walk(dir, out = []) {
 }
 
 let failed = 0;
-const files = [...walk(join(ROOT, 'lib/js')), ...walk(join(ROOT, 'engine')), ...walk(join(ROOT, 'tools')), ...walk(join(ROOT, 'tests')), join(ROOT, 'sw.js')];
+const files = [...walk(join(ROOT, 'lib/js')), ...walk(join(ROOT, 'engine')), ...walk(join(ROOT, 'engine-next')), ...walk(join(ROOT, 'tools')), ...walk(join(ROOT, 'tests')), join(ROOT, 'sw.js')];
 for (const file of files) {
   const rel = relative(ROOT, file);
   const isModule = file.endsWith('.mjs') || MODULE_DIRS.some(r => r.test(rel));

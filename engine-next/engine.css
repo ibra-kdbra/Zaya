@@ -1,0 +1,99 @@
+/*
+ * engine-next — the container, the stage and the sheet.
+ *
+ * Everything is prefixed `zn-` and scoped under `.zn-book`, so the stylesheet can be loaded
+ * beside the old engine's without either touching the other. Colours come from custom
+ * properties with sensible fallbacks: a host that defines the application's theme tokens gets
+ * them, a bare page still looks right.
+ */
+
+.zn-book {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--zn-background, var(--reader-bg, #20232a));
+  color: var(--zn-foreground, var(--text-primary, #e8eaed));
+  contain: layout paint;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.zn-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: pointer;
+  perspective: 2400px;
+  perspective-origin: 50% 50%;
+}
+
+.zn-stage.zn-grabbing {
+  cursor: grabbing;
+}
+
+/* The WebGL renderer's drawing buffer, and the page bitmaps of the 2D one. */
+.zn-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.zn-spread {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.zn-page {
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+  background: var(--zn-paper, #ffffff);
+  box-shadow: 0 12px 34px rgb(0 0 0 / 38%);
+}
+
+.zn-page[hidden] {
+  display: none;
+}
+
+.zn-page-left {
+  border-radius: 2px 0 0 2px;
+}
+
+.zn-page-right {
+  border-radius: 0 2px 2px 0;
+}
+
+.zn-sheet {
+  position: absolute;
+  top: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.zn-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--zn-paper, #ffffff);
+  box-shadow: 0 12px 34px rgb(0 0 0 / 38%);
+}
+
+.zn-face-back {
+  transform: rotateY(180deg);
+}
+
+/* The document failed to open; the host application shows the message. */
+.zn-failed .zn-stage {
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zn-sheet {
+    will-change: auto;
+  }
+}
