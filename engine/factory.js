@@ -171,8 +171,7 @@ export class FlipBook extends PreviewObject {
               if (self.ui) self.ui.update();
               self.checkCenter();
               self.stage.renderRequestPending = true;
-              if (window.saveLastPage) window.saveLastPage(options.pdfId, currentPage);
-              if (window.appState && window.appState.setLastPage) window.appState.setLastPage(currentPage);
+              reportPageChange(options, currentPage);
             };
 
             const $divLeft = $(self.stage.cssScene.divLeft.element);
@@ -234,8 +233,7 @@ export class FlipBook extends PreviewObject {
             const currentPage = self.target._activePage;
             if (self.ui) self.ui.update();
             self.checkCenter();
-            if (window.saveLastPage) window.saveLastPage(options.pdfId, currentPage);
-            if (window.appState && window.appState.setLastPage) window.appState.setLastPage(currentPage);
+            reportPageChange(options, currentPage);
           };
 
           self.target.resize = () => self.resize();
@@ -294,6 +292,22 @@ export class FlipBook extends PreviewObject {
   prev() {
     if (this.target && this.target.prev) this.target.prev();
   }
+}
+
+/**
+ * Announce a page turn. `options.onPageChanged` is the contract hook (see `docs/engine-api.md`);
+ * `lib/js/core/book.js` supplies it and does the remembering. A book opened without the facade --
+ * the engine's own lightbox -- still falls back to the globals it always used.
+ * @param {object} options the book's options
+ * @param {number} page    the book page now open
+ */
+function reportPageChange(options, page) {
+  if (typeof options.onPageChanged === "function") {
+    options.onPageChanged(page);
+    return;
+  }
+  if (window.saveLastPage) window.saveLastPage(options.pdfId, page);
+  if (window.appState && window.appState.setLastPage) window.appState.setLastPage(page);
 }
 
 // Helper to maintain original DFLIP.isBookletMode check
