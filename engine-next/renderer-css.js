@@ -7,6 +7,10 @@
  * front hands over to the back exactly at ninety degrees. There is no curl — a flat sheet is an
  * honest fallback, and faking paper without a mesh looks worse than not trying.
  *
+ * Zoom is a transform on the spread, which is what a browser is good at: the page bitmaps are
+ * re-rendered at the larger scale behind it, so the sharpening arrives a moment after the
+ * magnification rather than instead of it.
+ *
  * The interface is the WebGL renderer's, method for method, so the engine never asks which it has.
  */
 
@@ -31,6 +35,7 @@ export class CssRenderer {
     this.pageW = 0.72;
     this.pageH = 1;
     this.frame = 0;
+    this.zoom = { level: 1, x: 0, y: 0 };
 
     this.spread = element("zn-spread");
     this.left = element("zn-page zn-page-left");
@@ -41,11 +46,6 @@ export class CssRenderer {
     this.sheet = null;
 
     this.setBackground(book.options.backgroundColor);
-
-    this.onPointerDown = this.onPointerDown.bind(this);
-    this.onPointerUp = this.onPointerUp.bind(this);
-    this.stage.addEventListener("pointerdown", this.onPointerDown);
-    this.drag = null;
   }
 
   setBackground(color) {
@@ -112,8 +112,68 @@ export class CssRenderer {
     });
     this.pageWidthPx = pageWidth;
     this.pageHeightPx = pageHeight;
+    this.applyZoom();
     if (this.sheet) this.placeSheet();
   }
+
+  /* ---- zoom ------------------------------------------------------------------------------- */
+
+  /**
+   * Magnify the spread about the middle of the stage and shift it by a pan in CSS pixels.
+   * @param {number} level 1 is fit-to-stage
+   * @param {number} x pan, CSS pixels
+   * @param {number} y pan, CSS pixels
+   */
+  setZoom(level, x, y) {
+    this.zoom = { level: level || 1, x: x || 0, y: y || 0 };
+    this.applyZoom();
+  }
+
+  applyZoom() {
+    const { level, x, y } = this.zoom;
+    this.spread.style.transformOrigin = "50% 50%";
+    this.spread.style.transform = level === 1 && !x && !y
+      ? "" : `translate(${x}px, ${y}px) scale(${level})`;
+  }
+
+  /** The point a zoom happens about: the middle of the spread as it is laid out. */
+  zoomOrigin() {
+    return {
+      x: this.spread.offsetLeft + this.spread.offsetWidth / 2,
+      y: this.spread.offsetTop + this.spread.offsetHeight / 2,
+    };
+  }
+
+  /** How big the spread is on screen before any magnification, in CSS pixels. */
+  fitSize() {
+    return { width: this.spread.offsetWidth, height: this.spread.offsetHeight };
+  }
+
+  /**
+   * Where each half of the spread is on the stage, in CSS pixels, zoom and all.
+   * @returns {Array<{side: 'left'|'right', x: number, y: number, width: number, height: number}>}
+   */
+  pageBoxes() {
+    const stageRect = this.stage.getBoundingClientRect();
+    const out = [];
+    const single = this.book.pageMode === "single";
+    const hosts = single ? [["left", this.left]] : [["left", this.left], ["right", this.right]];
+    hosts.forEach(([side, host]) => {
+      if (host.hidden) return;
+      const rect = host.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      out.push({
+        side,
+        x: rect.left - stageRect.left,
+        y: rect.top - stageRect.top,
+        width: rect.width,
+        height: rect.height,
+      });
+    });
+    return out;
+  }
+
+  /* ---- the sheet in flight ------------------------------------------------------------------ */
 
   makeSheet(frontCanvas, backCanvas, side) {
     this.destroySheet();
@@ -157,15 +217,38 @@ export class CssRenderer {
     this.frame++;
   }
 
+  /** Build the sheet and hold it at `progress`, for a drag that will move it by hand. */
+  beginTurn(spec, progress) {
+    this.makeSheet(spec.front, spec.back, spec.side);
+    this.applyTurn(progress || 0);
+  }
+
+  /** Move the sheet a drag is holding. */
+  updateTurn(progress) {
+    this.applyTurn(Math.max(0, Math.min(1, progress)));
+  }
+
+  /**
+   * Let a dragged sheet settle to `to`, starting from where it is.
+   * @returns {Promise<{frames: number, ms: number}>}
+   */
+  settleTurn(from, to, duration) {
+    return this.run(from, to, duration);
+  }
+
   /** @returns {Promise<{frames:number, ms:number}>} */
   animateTurn(spec) {
     this.makeSheet(spec.front, spec.back, spec.side);
     const from = spec.backwards ? 1 : 0;
     const to = spec.backwards ? 0 : 1;
-    const duration = Math.max(0, spec.duration || 0);
+    this.applyTurn(from);
+    return this.run(from, to, spec.duration);
+  }
+
+  run(from, to, ms) {
+    const duration = Math.max(0, ms || 0);
     const started = performance.now();
     let frames = 0;
-    this.applyTurn(from);
     return new Promise((resolve) => {
       const step = () => {
         if (this.disposed) return resolve({ frames, ms: 0 });
@@ -187,38 +270,8 @@ export class CssRenderer {
 
   paint() { /* nothing to do */ }
 
-  onPointerDown(event) {
-    if (this.disposed || this.book.busy || event.button !== 0) return;
-    const rect = this.stage.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / Math.max(1, rect.width);
-    this.drag = {
-      id: event.pointerId, startX: event.clientX, width: Math.max(1, rect.width),
-      forward: this.book.direction === "rtl" ? x < 0.5 : x > 0.5,
-    };
-    this.stage.addEventListener("pointerup", this.onPointerUp);
-    this.stage.addEventListener("pointercancel", this.onPointerUp);
-  }
-
-  onPointerUp(event) {
-    if (!this.drag || event.pointerId !== this.drag.id) return;
-    const drag = this.drag;
-    this.drag = null;
-    this.stage.removeEventListener("pointerup", this.onPointerUp);
-    this.stage.removeEventListener("pointercancel", this.onPointerUp);
-    const dx = event.clientX - drag.startX;
-    if (Math.abs(dx) > drag.width * 0.08) {
-      const backwards = this.book.direction === "rtl" ? dx > 0 : dx < 0;
-      if (backwards) this.book.next(); else this.book.prev();
-    } else {
-      if (drag.forward) this.book.next(); else this.book.prev();
-    }
-  }
-
   dispose() {
     this.disposed = true;
-    this.stage.removeEventListener("pointerdown", this.onPointerDown);
-    this.stage.removeEventListener("pointerup", this.onPointerUp);
-    this.stage.removeEventListener("pointercancel", this.onPointerUp);
     this.destroySheet();
     if (this.spread.parentNode) this.spread.parentNode.removeChild(this.spread);
   }
