@@ -25,6 +25,9 @@ Please keep pull requests focused. One fix or feature per PR makes review and ch
 
 ## Project layout
 
+`ARCHITECTURE.md`, beside this file, explains why the tree is shaped this way and where a new
+file belongs. In short:
+
 | Path | What lives there |
 | --- | --- |
 | `index.html`, `changelog.html` | The two pages of the site |
@@ -38,7 +41,7 @@ Please keep pull requests focused. One fix or feature per PR makes review and ch
 | `sw.js` | Service worker (must stay at the site root) |
 | `tests/` | Playwright smoke tests |
 | `tools/` | Dev configuration and checks (eslint, playwright, tailwind, `check-syntax.mjs`, `check-version.mjs`) |
-| `docs/` | Contributing, security, design and third-party notes |
+| `docs/` | Architecture, contributing, security, design and third-party notes |
 
 ## Plugin / extension API
 

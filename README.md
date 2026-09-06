@@ -145,18 +145,22 @@ the control panel (Settings → Media Loop). The setting is remembered across se
     ├── changelog.html        release notes, rendered from CHANGELOG.md
     ├── config.js             per-deployment settings
     ├── sw.js                 service worker
-    └── 📁assets
-    └── 📁lib
+    └── 📁assets              favicons and the screenshot used above
+    └── 📁engine              the flipbook engine (DearFlip fork, non-commercial licence)
+        └── 📁core            book, pages, textures, the preview stage
+        └── 📁features        thumbnails, outline, find, annotations, links
+        └── 📁ui              toolbar, lightbox, popup, share
+        ├── index.js  factory.js  constants.js  utils.js  tween.js
+        ├── engine.css        the engine's own stylesheet
+    └── 📁lib                 first-party application code
         └── 📁css
-            └── 📁page        chrome.css, shell.css, custom-ui.css, storage.css, changelog.css
+            └── 📁page        shell.css, chrome.css, custom-ui.css, storage.css, text-pane.css,
+            │                 print.css, changelog.css
             └── 📁themes      themes.css (all colour themes and design tokens)
-            └── 📁vendor      fonts.css, tailwind.css, fontawesome, toastify (compiled/vendored)
-        └── 📁fonts           self-hosted IBM Plex Sans/Mono
+            ├── style.css     the sheet that pulls the others together
         └── 📁images
         └── 📁js
-            └── 📁core
-                └── 📁dflip   modular flipbook engine
-                ├── load.js
+            └── 📁core        load.js — glue between the UI, AppState and the engine
             └── 📁features
                 └── 📁changelog
                     └── 📁services  ChangelogApiService.js, ChangelogParserService.js
@@ -164,16 +168,21 @@ the control panel (Settings → Media Loop). The setting is remembered across se
                     └── 📁utils     ChangelogConfig.js, ChangelogUtils.js
                     ├── changelog.js
                     ├── changelog.bundle.js  (built by `npm run build:changelog`)
-                └── 📁media
-                └── 📁quotes
-                └── 📁search
-                └── 📁settings
-                └── 📁themes
-            └── 📁libs        jquery, three, pdf.js, marked, toastify (vendored)
+                └── 📁controls  📁documents  📁media  📁print  📁quotes
+                └── 📁search    📁settings    📁text    📁themes
+            └── 📁i18n        en.js, ar.js, i18n.js
             └── 📁ui          controls.js
             └── 📁utils       app-state.js, validation.js, mobile-support.js, …
             ├── app.js        the only script the pages include; loads everything else in order
         └── 📁sound
+    └── 📁vendor              third-party runtime code, licences beside it
+        └── 📁css             tailwind.css, fontawesome, toastify, themify, fonts.css
+        └── 📁fonts           IBM Plex, Font Awesome and Themify faces
+        └── 📁js              jquery, three, pdf.js (+ worker, cmaps), marked, toastify, mockup
+        └── 📁ocr             Tesseract in WebAssembly and its Arabic/English packs
+    └── 📁docs                ARCHITECTURE, CONTRIBUTING, SECURITY, DESIGN, THIRD_PARTY_NOTICES
+    └── 📁tools               eslint, playwright and tailwind config; the check scripts
+    └── 📁tests               Playwright suites
 ```
 
 </details>
