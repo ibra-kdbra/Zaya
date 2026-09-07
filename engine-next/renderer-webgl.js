@@ -20,6 +20,12 @@ import * as THREE from "../vendor/three/three.module.min.js";
 const FOV = 32;
 /** Segments across the sheet. Enough that the curl reads as a curve rather than a fold. */
 const SEGMENTS = 28;
+/*
+ * How far the book can be turned away from flat. Far enough to look along the page the way you
+ * would tip a real book towards a lamp, and not so far that it is edge-on and unreadable.
+ */
+const MAX_PITCH = (60 * Math.PI) / 180;
+const MAX_YAW = (45 * Math.PI) / 180;
 /** How far the paper bulges out of plane, as a fraction of the page width. */
 const CURL = 0.16;
 
@@ -80,6 +86,8 @@ export class WebglRenderer {
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(FOV, 1, 0.05, 200);
+    // How far the lens has been carried around the book: flat on, until the reader says otherwise.
+    this.tilt = { pitch: 0, yaw: 0 };
     this.setBackground(book.options.backgroundColor);
 
     this.pageW = 0.72;                 // world units; corrected as soon as a page is measured
@@ -259,7 +267,7 @@ export class WebglRenderer {
     const worldPerPixel = (2 * dist * Math.tan(halfFov)) / height;
     const offset = (padTop + usable / 2 - height / 2) * worldPerPixel;
 
-    this.fit = { distance: dist, offset, worldPerPixel };
+    this.fit = { distance: dist, offset, worldPerPixel, spreadW, spreadH };
     this.placeCamera();
   }
 
@@ -276,6 +284,21 @@ export class WebglRenderer {
     this.placeCamera();
   }
 
+  /**
+   * Carry the lens around the book. Angles are radians and are clamped, so a reader who keeps
+   * dragging stops at a useful angle rather than looking at the spine edge-on.
+   * @param {number} pitch above (positive) or below the book
+   * @param {number} yaw to one side or the other
+   */
+  setTilt(pitch, yaw) {
+    this.tilt = {
+      pitch: Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch || 0)),
+      yaw: Math.max(-MAX_YAW, Math.min(MAX_YAW, yaw || 0)),
+    };
+    this.placeCamera();
+    return this.tilt;
+  }
+
   placeCamera() {
     if (this.disposed) return;
     const { distance, offset, worldPerPixel } = this.fit;
@@ -285,7 +308,27 @@ export class WebglRenderer {
     const perPixel = worldPerPixel / level;
     const cx = -this.zoom.x * perPixel;
     const cy = offset + this.zoom.y * perPixel;
-    this.camera.position.set(cx, cy, distance / level);
+    /*
+     * The lens rides on a sphere around the point it is looking at, so tilting carries it up and
+     * over the book rather than sliding the book about. At a pitch and yaw of zero this is exactly
+     * the straight-on placement it replaces: (cx, cy, distance / level), looking at (cx, cy, 0).
+     */
+    const { pitch, yaw } = this.tilt;
+    /*
+     * Tipping the book brings its nearest corner towards the lens, and with a perspective lens that
+     * corner grows and runs off the top or the side of the stage. Backing off by exactly how far
+     * that corner came forward keeps the whole book in view at any angle; at zero tilt it adds
+     * nothing, so a flat book is framed exactly as before.
+     */
+    const nearer = (this.fit.spreadW / 2) * Math.abs(Math.sin(yaw))
+      + (this.fit.spreadH / 2) * Math.abs(Math.sin(pitch));
+    const radius = (distance + nearer) / level;
+    const cosPitch = Math.cos(pitch);
+    this.camera.position.set(
+      cx + radius * Math.sin(yaw) * cosPitch,
+      cy + radius * Math.sin(pitch),
+      radius * Math.cos(yaw) * cosPitch,
+    );
     this.camera.lookAt(cx, cy, 0);
     this.camera.updateProjectionMatrix();
     this.requestRender();

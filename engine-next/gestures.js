@@ -11,8 +11,10 @@
  * | gesture | at rest | zoomed in |
  * | --- | --- | --- |
  * | press and drag | the sheet follows the pointer and settles on release | the page pans |
+ * | shift and drag, or the right button | tips the book away from flat | the same |
  * | click or tap | turns the side that was tapped | nothing |
  * | double-click, double-tap | zooms in on that point | zooms back out to fit |
+ * | shift and double-click | lays a tipped book flat again | the same |
  * | the wheel | zooms about the pointer | zooms about the pointer, and pans none |
  * | two fingers apart or together | zooms about their midpoint | the same, and pans with them |
  *
@@ -21,6 +23,15 @@
  * selected nothing and moved nowhere, it is treated as a tap after all, so a page can still be
  * turned by clicking the middle of a paragraph.
  */
+
+/**
+ * A drag that tips the book rather than turning a page. It needs a gesture of its own: dragging
+ * anywhere on the stage turns pages, including the space beside the book, which is exactly where a
+ * reader reaches to flick a corner. Shift works with any pointer; the right button suits a mouse.
+ */
+function isOrbitGesture(event) {
+  return !!(event.shiftKey || (event.pointerType === "mouse" && event.button === 2));
+}
 
 /** How far across the stage a drag must travel for the turn to be complete. */
 const DRAG_SPAN = 0.5;
@@ -72,6 +83,8 @@ export class Gestures {
     stage.addEventListener("pointercancel", this.onPointerUp);
     stage.addEventListener("wheel", this.onWheel, { passive: false });
     stage.addEventListener("dblclick", this.onDoubleClick);
+    this.onContextMenu = (event) => { if (this.drag && this.drag.orbit) event.preventDefault(); };
+    stage.addEventListener("contextmenu", this.onContextMenu);
   }
 
   /** Pointer position relative to the stage. */
@@ -94,7 +107,7 @@ export class Gestures {
 
   onPointerDown(event) {
     if (this.disposed || !this.on.isInteractive()) return;
-    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.pointerType === "mouse" && event.button !== 0 && !isOrbitGesture(event)) return;
     this.cancelPendingTap();
     const point = this.local(event);
     this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
@@ -118,6 +131,8 @@ export class Gestures {
       width: point.width,
       forward: this.forwardSide(point.x / point.width),
       onText,
+      // Shift, or the right button, means the reader is tipping the book rather than turning it.
+      orbit: !onText && isOrbitGesture(event),
       moved: false,
       preview: null,
       progress: 0,
@@ -153,6 +168,15 @@ export class Gestures {
     const dy = event.clientY - drag.startY;
     if (!drag.moved && Math.hypot(dx, dy) < DRAG_SLOP) return;
     drag.moved = true;
+
+    if (drag.orbit && !this.on.isZoomed()) {
+      if (typeof this.on.onOrbit === "function") {
+        this.on.onOrbit(event.clientX - drag.lastX, event.clientY - drag.lastY);
+      }
+      drag.lastX = event.clientX;
+      drag.lastY = event.clientY;
+      return;
+    }
 
     if (this.on.isZoomed()) {
       this.on.onPan(event.clientX - drag.lastX, event.clientY - drag.lastY);
@@ -287,6 +311,8 @@ export class Gestures {
     const selection = typeof window.getSelection === "function" ? window.getSelection() : null;
     if (selection && !selection.isCollapsed) return;   // a double-click selected a word
     const point = this.local(event);
+    // Shift and a double click lays a tipped book flat, as shift and a drag tipped it.
+    if (event.shiftKey && typeof this.on.onOrbitReset === "function") { this.on.onOrbitReset(); return; }
     this.on.onDoubleTap(point.x, point.y);
   }
 
@@ -299,6 +325,7 @@ export class Gestures {
     this.stage.removeEventListener("pointercancel", this.onPointerUp);
     this.stage.removeEventListener("wheel", this.onWheel);
     this.stage.removeEventListener("dblclick", this.onDoubleClick);
+    this.stage.removeEventListener("contextmenu", this.onContextMenu);
     this.pointers.clear();
   }
 }

@@ -131,6 +131,9 @@ export class ZayaBook {
     this.turnToken = 0;
     this.interactive = true;
     this.zoomLevel = 1;
+    // How far the book is tipped away from flat, in radians. Flat until the reader tips it.
+    this.tiltPitch = 0;
+    this.tiltYaw = 0;
     this.panX = 0;
     this.panY = 0;
     this.dragTurn = null;
@@ -615,6 +618,42 @@ export class ZayaBook {
 
   zoomOut() { return this.zoom(this.zoomLevel / ZOOM_STEP); }
 
+  /* ---- tilt ------------------------------------------------------------------------------- */
+
+  /**
+   * Tip the book by a drag, in pixels. A drag across the whole stage turns it about as far as it
+   * will go, so the book follows the hand at a rate that suits the size of the window.
+   */
+  tiltBy(dx, dy) {
+    const perPixel = Math.PI / Math.max(320, this.stage.clientWidth);
+    return this.setTilt(this.tiltPitch + dy * perPixel, this.tiltYaw + dx * perPixel);
+  }
+
+  /** Set the angle outright. Radians; the renderer clamps them to what stays readable. */
+  setTilt(pitch, yaw) {
+    if (!this.renderer || typeof this.renderer.setTilt !== "function") return this.tilt;
+    const applied = this.renderer.setTilt(pitch, yaw) || { pitch: 0, yaw: 0 };
+    this.tiltPitch = applied.pitch;
+    this.tiltYaw = applied.yaw;
+    this.announceTilt();
+    return this.tilt;
+  }
+
+  /** Lay the book flat again. */
+  resetTilt() {
+    return this.setTilt(0, 0);
+  }
+
+  get tilt() {
+    return { pitch: this.tiltPitch, yaw: this.tiltYaw, tilted: !!(this.tiltPitch || this.tiltYaw) };
+  }
+
+  announceTilt() {
+    const detail = this.tilt;
+    emit("zaya-engine:tiltChanged", detail);
+    if (typeof this.options.tiltChange === "function") this.options.tiltChange(detail);
+  }
+
   resetZoom() {
     if (!this.renderer) return MIN_ZOOM;
     const before = this.zoomed;
@@ -905,6 +944,8 @@ export class ZayaBook {
         if (this.zoomed) this.resetZoom();
         else this.zoom(DOUBLE_TAP_ZOOM, { about: { x, y } });
       },
+      onOrbit: (dx, dy) => this.tiltBy(dx, dy),
+      onOrbitReset: () => this.resetTilt(),
     });
   }
 
