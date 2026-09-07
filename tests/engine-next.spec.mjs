@@ -35,7 +35,7 @@ const state = (page) => page.evaluate(() => {
 });
 
 const pageChanges = (page) => page.evaluate(() => window.zayaDemo.events
-  .filter((e) => e.type === 'zaya:pageChanged').map((e) => e.detail));
+  .filter((e) => e.type === 'zaya-engine:pageChanged').map((e) => e.detail));
 
 /** Wait until something has actually been drawn, then describe the bitmaps on screen. */
 async function samples(page) {
@@ -55,11 +55,11 @@ for (const renderMode of ['webgl', 'css']) {
       expect(await open(page, q)).toBe(renderMode);
 
       const events = await page.evaluate(() => window.zayaDemo.events.map((e) => e.type));
-      expect(events).toContain('zaya:pdfLoaded');
-      expect(events).toContain('zaya:bookReady');
+      expect(events).toContain('zaya-engine:pdfLoaded');
+      expect(events).toContain('zaya-engine:bookReady');
 
       const loaded = await page.evaluate(() => window.zayaDemo.events
-        .find((e) => e.type === 'zaya:pdfLoaded').detail);
+        .find((e) => e.type === 'zaya-engine:pdfLoaded').detail);
       expect(loaded.pageCount).toBe(3);
 
       const s = await state(page);
@@ -83,11 +83,13 @@ for (const renderMode of ['webgl', 'css']) {
       const errors = collectErrors(page);
       await open(page, q);
 
+      // A turn lands on the recto of the spread it reaches, which is how the application counts
+      // pages: from the cover of a three-page book you turn to page three, with two beside it.
       await page.evaluate(() => window.zayaDemo.book.next());
-      expect((await state(page)).activePage).toBe(2);
+      expect((await state(page)).activePage).toBe(3);
       // Three pages make two spreads: the cover, then [2, 3]. Nothing follows the last one.
       await page.evaluate(() => window.zayaDemo.book.next());
-      expect((await state(page)).activePage).toBe(2);
+      expect((await state(page)).activePage).toBe(3);
 
       await page.evaluate(() => window.zayaDemo.book.prev());
       expect((await state(page)).activePage).toBe(1);
@@ -99,8 +101,8 @@ for (const renderMode of ['webgl', 'css']) {
       expect((await state(page)).activePage).toBe(1);
 
       const changes = await pageChanges(page);
-      expect(changes.map((c) => c.page)).toEqual([1, 2, 1, 3, 1]);
-      // Page 2 sits on the spread [2, 3]; page 1 is the cover, alone.
+      expect(changes.map((c) => c.page)).toEqual([1, 3, 1, 3, 1]);
+      // Page 3 sits on the spread [2, 3]; page 1 is the cover, alone.
       expect(changes[0].pdfPages).toEqual([1]);
       expect(changes[1].pdfPages).toEqual([2, 3]);
       expect(changes[3].pdfPages).toEqual([2, 3]);
@@ -272,7 +274,7 @@ for (const renderMode of ['webgl', 'css']) {
         .toEqual([{ zoomed: true, level: 1.5 }, { zoomed: false, level: 1 }]);
       // And the engine announces the same thing on `document`, for a listener holding no handle.
       const events = await page.evaluate(() => window.zayaDemo.events
-        .filter((e) => e.type === 'zaya:zoomChanged').map((e) => e.detail.zoomed));
+        .filter((e) => e.type === 'zaya-engine:zoomChanged').map((e) => e.detail.zoomed));
       expect(events).toEqual([true, false]);
     });
 
@@ -352,7 +354,7 @@ for (const renderMode of ['webgl', 'css']) {
       expect((await zoomState(page)).zoomed).toBe(true);
       await page.evaluate(() => window.zayaDemo.book.next());
       expect(await zoomState(page)).toMatchObject({ level: 1, zoomed: false, panX: 0, panY: 0 });
-      expect((await state(page)).activePage).toBe(2);
+      expect((await state(page)).activePage).toBe(3);
     });
   });
 }
@@ -549,7 +551,7 @@ test.describe('chrome actions', () => {
     expect(await page.evaluate(() => window.zayaDemo.book.toggleFullscreen())).toBe(true);
     expect(await page.evaluate(() => document.getElementById('book').classList.contains('zn-fullscreen'))).toBe(true);
     expect(await page.evaluate(() => window.zayaDemo.events
-      .filter((e) => e.type === 'zaya:fullscreenChanged').map((e) => e.detail.fullscreen))).toEqual([true]);
+      .filter((e) => e.type === 'zaya-engine:fullscreenChanged').map((e) => e.detail.fullscreen))).toEqual([true]);
 
     expect(await page.evaluate(() => window.zayaDemo.book.toggleFullscreen())).toBe(false);
     expect(await page.evaluate(() => document.getElementById('book').classList.contains('zn-fullscreen'))).toBe(false);
@@ -607,7 +609,7 @@ test.describe('chrome actions', () => {
 
     await page.evaluate(() => window.zayaDemo.book.setInteractive(true));
     await page.mouse.click(box.x + box.width * 0.85, box.y + box.height / 2);
-    await expect.poll(async () => (await state(page)).activePage).toBe(2);
+    await expect.poll(async () => (await state(page)).activePage).toBe(3);
   });
 
   test('setSoundEnabled is remembered and reported', async ({ page }) => {
@@ -656,7 +658,7 @@ for (const renderMode of ['webgl', 'css']) {
       expect(most).toBeGreaterThan(0.5);
 
       await page.mouse.up();
-      await expect.poll(async () => (await state(page)).activePage).toBe(2);
+      await expect.poll(async () => (await state(page)).activePage).toBe(3);
       expect(await page.evaluate(() => !!window.zayaDemo.book.dragTurn)).toBe(false);
       expect(errors).toEqual([]);
     });
@@ -736,10 +738,15 @@ test.describe('doubleInternal', () => {
     expect(Math.abs(drawn[0].mean - drawn[1].mean)).toBeGreaterThan(1);
   });
 
-  test('a search hit on a scanned page turns to the left of the two leaves it carries', async ({ page }) => {
+  test('a search hit on a scanned page turns to the right of the two leaves it carries', async ({ page }) => {
     await open(page, SCAN);
+    // The contract (docs/engine-api.md §4) records the right-hand leaf. Either would be seen,
+    // since both are on the same spread; one answer everywhere is what matters.
     expect(await page.evaluate(() => [1, 2, 3, 4].map((p) => window.zayaDemo.book.bookPageForPdfPage(p))))
-      .toEqual([1, 2, 4, 6]);
+      .toEqual([1, 2, 5, 7]);
+    // And it round-trips: each leaf maps back to the PDF page it came from.
+    expect(await page.evaluate(() => [1, 2, 5, 7].map((p) => window.zayaDemo.book.pdfPageForBookPage(p))))
+      .toEqual([1, 2, 3, 4]);
   });
 
   test('the text layer covers each half of a scanned page separately', async ({ page }) => {
