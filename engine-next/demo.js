@@ -3,7 +3,7 @@
  * driven end to end without the reader around it, so the tests use it too.
  *
  * Query string: ?pdf= ?render=webgl|css ?dir=ltr|rtl ?hard=none|cover|all ?mode=single|double
- *               ?page= ?duration= ?internal=1 ?padTop= ?padBottom= ?bg=
+ *               ?page= ?duration= ?internal=1 ?padTop= ?padBottom= ?bg= ?text=0 ?readback=0
  */
 
 import { ZayaBook } from "./index.js";
@@ -20,6 +20,10 @@ const demo = window.zayaDemo = {
   events: [],
   paintCalls: [],
   ready: null,
+  /** What the demo's own panels were last built from, so a test can read the data back. */
+  thumbs: [],
+  outline: [],
+  zoomChanges: [],
   /**
    * Are the page bitmaps actually carrying a document, or is the stage empty?
    * Every canvas in the container is sampled through a small 2D canvas, which works for the
@@ -47,7 +51,8 @@ const demo = window.zayaDemo = {
   },
 };
 
-["zaya:pdfLoaded", "zaya:bookReady", "zaya:pageChanged"].forEach((name) => {
+["zaya:pdfLoaded", "zaya:bookReady", "zaya:pageChanged", "zaya:zoomChanged",
+  "zaya:fullscreenChanged"].forEach((name) => {
   document.addEventListener(name, (event) => demo.events.push({ type: name, detail: event.detail }));
 });
 
@@ -76,6 +81,10 @@ function start() {
     paddingTop: Number(params.get("padTop") || 0),
     paddingBottom: Number(params.get("padBottom") || 0),
     backgroundColor: params.get("bg") || "#20232a",
+    textLayer: params.get("text") !== "0",
+    // The tests sample the WebGL drawing buffer, so the demo asks for it to be kept.
+    readback: params.get("readback") !== "0",
+    zoomChange: (zoomed, level) => { demo.zoomChanges.push({ zoomed, level }); update(); },
     paintPage,
   });
   demo.book = book;
@@ -98,7 +107,69 @@ function start() {
 function update() {
   const book = demo.book;
   if (!book || book.disposed) { status.textContent = "disposed"; return; }
-  status.textContent = `${book.renderMode} · ${book.pageMode} · ${book.direction} · page ${book.activePage} of ${book.pageCount}`;
+  status.textContent = `${book.renderMode} · ${book.pageMode} · ${book.direction} · page ` +
+    `${book.activePage} of ${book.pageCount} · ${Math.round(book.zoomLevel * 100)}%`;
+}
+
+/* The panels are the demo's own furniture, built from the data the engine exposes. */
+
+const panels = document.getElementById("panels");
+const thumbStrip = document.getElementById("thumbStrip");
+const outlineList = document.getElementById("outlineList");
+
+function showPanel(which) {
+  panels.hidden = false;
+  thumbStrip.hidden = which !== "thumbs";
+  outlineList.hidden = which !== "outline";
+}
+
+async function buildThumbs() {
+  const book = demo.book;
+  if (!book || !book.pdfDocument) return;
+  showPanel("thumbs");
+  thumbStrip.textContent = "";
+  demo.thumbs = [];
+  for (let pdfPage = 1; pdfPage <= book.pdfDocument.numPages; pdfPage++) {
+    const canvas = await book.getThumbnail(pdfPage, 90);
+    const label = await book.getPageLabel(pdfPage);
+    const figure = document.createElement("figure");
+    const caption = document.createElement("figcaption");
+    caption.textContent = label;
+    figure.appendChild(canvas);
+    figure.appendChild(caption);
+    figure.addEventListener("click", () => demo.book.gotoPage(book.bookPageForPdfPage(pdfPage)).then(update));
+    thumbStrip.appendChild(figure);
+    demo.thumbs.push({ pdfPage, label, width: canvas.width, height: canvas.height });
+  }
+}
+
+async function buildOutline() {
+  const book = demo.book;
+  if (!book) return;
+  showPanel("outline");
+  const entries = await book.getOutline();
+  demo.outline = entries;
+  outlineList.textContent = "";
+  const render = (items, host) => {
+    items.forEach((item) => {
+      const li = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = item.title;
+      button.disabled = !item.pdfPage;
+      button.addEventListener("click", () => {
+        demo.book.gotoPage(demo.book.bookPageForPdfPage(item.pdfPage)).then(update);
+      });
+      li.appendChild(button);
+      if (item.children.length) {
+        const sub = document.createElement("ol");
+        render(item.children, sub);
+        li.appendChild(sub);
+      }
+      host.appendChild(li);
+    });
+  };
+  render(entries, outlineList);
 }
 
 document.addEventListener("zaya:pageChanged", update);
@@ -114,6 +185,15 @@ document.getElementById("hard").addEventListener("change", (e) => {
   demo.book.options.hard = e.target.value;
   if (demo.book.layout) demo.book.layout.hard = e.target.value;
 });
+document.getElementById("zoomIn").addEventListener("click", () => { demo.book.zoomIn(); update(); });
+document.getElementById("zoomOut").addEventListener("click", () => { demo.book.zoomOut(); update(); });
+document.getElementById("zoomReset").addEventListener("click", () => { demo.book.resetZoom(); update(); });
+document.getElementById("fullscreen").addEventListener("click", () => demo.book.toggleFullscreen());
+document.getElementById("textLayer").addEventListener("change", (e) => {
+  demo.book.setTextLayerEnabled(e.target.checked);
+});
+document.getElementById("thumbs").addEventListener("click", buildThumbs);
+document.getElementById("outline").addEventListener("click", buildOutline);
 document.getElementById("dispose").addEventListener("click", () => { demo.book.dispose(); update(); });
 
 start();

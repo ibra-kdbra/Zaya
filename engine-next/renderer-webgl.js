@@ -8,6 +8,11 @@
  *
  * Nothing is drawn unless something changed: the renderer paints on demand, and during a turn
  * on every frame, then stops.
+ *
+ * Zoom is the camera, not the geometry: the lens comes closer and slides sideways, so the
+ * magnified page is drawn from the same textures at whatever sharpness they carry, and the
+ * engine re-renders them larger behind it. Because the camera is the only thing that moves,
+ * projecting the corners of a page mesh gives the text layer exactly the box it needs.
  */
 
 import * as THREE from "../vendor/three/three.module.min.js";
@@ -64,8 +69,9 @@ export class WebglRenderer {
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: false,
-      // Kept so a test (and a screenshot tool) can read the drawing buffer back.
-      preserveDrawingBuffer: true,
+      // Reading the drawing buffer back costs a copy on some drivers, so it is only kept for a
+      // caller that has said it will read it: a test, or a screenshot tool.
+      preserveDrawingBuffer: !!book.options.readback,
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.canvas = this.renderer.domElement;
@@ -85,12 +91,8 @@ export class WebglRenderer {
     this.turn = null;                  // { progress, side, hard } while a sheet is in flight
     this.frame = 0;
     this.pending = false;
-
-    this.onPointerDown = this.onPointerDown.bind(this);
-    this.onPointerMove = this.onPointerMove.bind(this);
-    this.onPointerUp = this.onPointerUp.bind(this);
-    this.stage.addEventListener("pointerdown", this.onPointerDown);
-    this.drag = null;
+    this.zoom = { level: 1, x: 0, y: 0 };
+    this.fit = { distance: 2, offset: 0, worldPerPixel: 1 };
   }
 
   makePage() {
@@ -224,6 +226,7 @@ export class WebglRenderer {
     if (this.disposed) return;
     const width = Math.max(1, this.stage.clientWidth);
     const height = Math.max(1, this.stage.clientHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
 
@@ -245,10 +248,84 @@ export class WebglRenderer {
     const worldPerPixel = (2 * dist * Math.tan(halfFov)) / height;
     const offset = (padTop + usable / 2 - height / 2) * worldPerPixel;
 
-    this.camera.position.set(0, offset, dist);
-    this.camera.lookAt(0, offset, 0);
+    this.fit = { distance: dist, offset, worldPerPixel };
+    this.placeCamera();
+  }
+
+  /* ---- zoom ------------------------------------------------------------------------------- */
+
+  /**
+   * Magnify by bringing the camera in, and pan by sliding it across the page plane.
+   * @param {number} level 1 is fit-to-stage
+   * @param {number} x pan, CSS pixels; positive moves the page right
+   * @param {number} y pan, CSS pixels; positive moves the page down
+   */
+  setZoom(level, x, y) {
+    this.zoom = { level: Math.max(0.05, level || 1), x: x || 0, y: y || 0 };
+    this.placeCamera();
+  }
+
+  placeCamera() {
+    if (this.disposed) return;
+    const { distance, offset, worldPerPixel } = this.fit;
+    const level = this.zoom.level || 1;
+    // The world seen per pixel shrinks with the zoom, so a pan in pixels is a pan in the
+    // magnified picture rather than in the fitted one.
+    const perPixel = worldPerPixel / level;
+    const cx = -this.zoom.x * perPixel;
+    const cy = offset + this.zoom.y * perPixel;
+    this.camera.position.set(cx, cy, distance / level);
+    this.camera.lookAt(cx, cy, 0);
     this.camera.updateProjectionMatrix();
     this.requestRender();
+  }
+
+  /** The point a zoom happens about: the middle of the stage, which is where the lens looks. */
+  zoomOrigin() {
+    return { x: Math.max(1, this.stage.clientWidth) / 2, y: Math.max(1, this.stage.clientHeight) / 2 };
+  }
+
+  /** How big the spread is on screen before any magnification, in CSS pixels. */
+  fitSize() {
+    const perPixel = this.fit.worldPerPixel || 1;
+    const across = this.book.pageMode === "single" ? 1 : 2;
+    return { width: (across * this.pageW) / perPixel, height: this.pageH / perPixel };
+  }
+
+  /**
+   * Where each half of the spread lands on the stage, in CSS pixels, by projecting the corners
+   * of the page plane through the camera as it stands.
+   * @returns {Array<{side: 'left'|'right', x: number, y: number, width: number, height: number}>}
+   */
+  pageBoxes() {
+    const width = Math.max(1, this.stage.clientWidth);
+    const height = Math.max(1, this.stage.clientHeight);
+    const single = this.book.pageMode === "single";
+    const halfH = this.pageH / 2;
+    const spans = single
+      ? [["left", -this.pageW / 2, this.pageW / 2]]
+      : [["left", -this.pageW, 0], ["right", 0, this.pageW]];
+    const out = [];
+    spans.forEach(([side, x0, x1]) => {
+      const mesh = side === "left" ? this.left : this.right;
+      if (!mesh || !mesh.visible) return;
+      const topLeft = this.project(x0, halfH, width, height);
+      const bottomRight = this.project(x1, -halfH, width, height);
+      out.push({
+        side,
+        x: topLeft.x,
+        y: topLeft.y,
+        width: bottomRight.x - topLeft.x,
+        height: bottomRight.y - topLeft.y,
+      });
+    });
+    return out;
+  }
+
+  /** A point on the page plane, in stage pixels. */
+  project(x, y, width, height) {
+    const point = new THREE.Vector3(x, y, 0).project(this.camera);
+    return { x: ((point.x + 1) / 2) * width, y: ((1 - point.y) / 2) * height };
   }
 
   /* ---- painting -------------------------------------------------------------------------- */
@@ -278,11 +355,36 @@ export class WebglRenderer {
     this.makeSheet(spec.front, spec.back);
     const from = spec.backwards ? 1 : 0;
     const to = spec.backwards ? 0 : 1;
-    return this.runTurn(spec, from, to);
+    this.spec = spec;
+    return this.runTurn(spec, from, to, spec.duration);
   }
 
-  runTurn(spec, from, to) {
-    const duration = Math.max(0, spec.duration || 0);
+  /** Build the sheet and hold it at `progress`, for a drag that will move it by hand. */
+  beginTurn(spec, progress) {
+    this.makeSheet(spec.front, spec.back);
+    this.spec = spec;
+    this.updateTurn(progress || 0);
+  }
+
+  /** Move the sheet a drag is holding. */
+  updateTurn(progress) {
+    if (!this.spec) return;
+    const p = Math.max(0, Math.min(1, progress));
+    this.deform(p, this.spec.side, this.spec.hard);
+    this.paint();
+  }
+
+  /**
+   * Let a dragged sheet settle to `to`, starting from where it is.
+   * @returns {Promise<{frames: number, ms: number}>}
+   */
+  settleTurn(from, to, duration) {
+    if (!this.spec) return Promise.resolve({ frames: 0, ms: 0 });
+    return this.runTurn(this.spec, from, to, duration);
+  }
+
+  runTurn(spec, from, to, ms) {
+    const duration = Math.max(0, ms || 0);
     const started = performance.now();
     let frames = 0;
     return new Promise((resolve) => {
@@ -296,6 +398,7 @@ export class WebglRenderer {
         if (t < 1) requestAnimationFrame(step);
         else {
           this.destroySheet();
+          this.spec = null;
           resolve({ frames, ms: performance.now() - started });
         }
       };
@@ -303,59 +406,8 @@ export class WebglRenderer {
     });
   }
 
-  /* ---- drag ------------------------------------------------------------------------------ */
-
-  onPointerDown(event) {
-    if (this.disposed || this.book.busy || event.button !== 0) return;
-    const rect = this.stage.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / Math.max(1, rect.width);
-    const forwardSide = this.book.direction === "rtl" ? x < 0.5 : x > 0.5;
-    this.drag = {
-      id: event.pointerId, startX: event.clientX, forward: forwardSide,
-      moved: false, width: Math.max(1, rect.width),
-    };
-    this.stage.setPointerCapture(event.pointerId);
-    this.stage.classList.add("zn-grabbing");
-    this.stage.addEventListener("pointermove", this.onPointerMove);
-    this.stage.addEventListener("pointerup", this.onPointerUp);
-    this.stage.addEventListener("pointercancel", this.onPointerUp);
-  }
-
-  onPointerMove(event) {
-    if (!this.drag || event.pointerId !== this.drag.id) return;
-    const dx = event.clientX - this.drag.startX;
-    if (!this.drag.moved && Math.abs(dx) < 6) return;
-    this.drag.moved = true;
-    this.drag.progress = Math.min(1, Math.abs(dx) / (this.drag.width * 0.45));
-    // Live preview would need the neighbouring textures ready; the sheet is built on release.
-  }
-
-  onPointerUp(event) {
-    if (!this.drag || event.pointerId !== this.drag.id) return;
-    const drag = this.drag;
-    this.drag = null;
-    this.stage.classList.remove("zn-grabbing");
-    this.stage.removeEventListener("pointermove", this.onPointerMove);
-    this.stage.removeEventListener("pointerup", this.onPointerUp);
-    this.stage.removeEventListener("pointercancel", this.onPointerUp);
-    try { this.stage.releasePointerCapture(drag.id); } catch (err) { /* already gone */ }
-    const dx = event.clientX - drag.startX;
-    const far = Math.abs(dx) > drag.width * 0.08;
-    // A drag turns the way it was dragged; a plain click turns the side it landed on.
-    if (drag.moved && far) {
-      const backwards = this.book.direction === "rtl" ? dx > 0 : dx < 0;
-      if (backwards) this.book.next(); else this.book.prev();
-    } else if (!drag.moved) {
-      if (drag.forward) this.book.next(); else this.book.prev();
-    }
-  }
-
   dispose() {
     this.disposed = true;
-    this.stage.removeEventListener("pointerdown", this.onPointerDown);
-    this.stage.removeEventListener("pointermove", this.onPointerMove);
-    this.stage.removeEventListener("pointerup", this.onPointerUp);
-    this.stage.removeEventListener("pointercancel", this.onPointerUp);
     this.destroySheet();
     [this.left, this.right].forEach((mesh) => {
       this.scene.remove(mesh);

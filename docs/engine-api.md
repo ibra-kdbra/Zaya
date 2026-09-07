@@ -212,6 +212,24 @@ The search panel's own contents (`.df-search-input`, `.df-search-result`, `.df-s
 
 ---
 
+## 6a. Data for panels
+
+The panels in §6 are the fork's, and they are the last part of the engine that builds interface.
+A replacement engine builds none: it exposes the three things only it can work out, and the
+Navigator renders them in Zaya's own markup. Every member here is **KEEP**; the engine ships no
+DOM for any of them.
+
+| Member | Signature | Semantics | Used by | |
+| --- | --- | --- | --- | --- |
+| `getThumbnail(pdfPage, width)` | `(number, number?) → Promise<HTMLCanvasElement>` | A picture of one PDF page, at most `width` CSS pixels across (default 160, clamped into 16…600). The canvas belongs to the engine's own small cache: two calls with the same page and width give back the *same* canvas, and two callers asking at once share one render rather than racing. The caller may put it in the document but must not resize or draw on it. `pdfPage` is clamped into `1…pdfDocument.numPages`. | Navigator's Pages pane | KEEP |
+| `getOutline()` | `() → Promise<Array<{title, pdfPage, children}>>` | The document's outline, as plain data: `title` a string, `pdfPage` a 1-based PDF page with **named and explicit destinations already resolved**, and `children` the same shape, recursively. An entry whose destination cannot be resolved reports `pdfPage: 0`, which the panel shows as a heading rather than a link. `[]` for a document with no outline, and for one whose outline will not load — never a rejection. Built once and remembered. | Navigator's Outline pane | KEEP |
+| `getPageLabel(pdfPage)` | `(number) → Promise<string>` | What a page calls itself: the entry from the document's page-labels table (`"iv"`, `"A-3"`) when it has one, and the page number as a string when it has not. Total: any number, clamped. | Navigator's Pages pane, page field | KEEP |
+
+Turning to an outline entry or a thumbnail is the application's job: map the PDF page with
+`toBookPage` (§4) and call `gotoPage`. The engine offers no navigation of its own here.
+
+---
+
 ## 7. Chrome, sound and zoom
 
 | Member | Signature | Semantics | Used by | |
@@ -224,6 +242,17 @@ The search panel's own contents (`.df-search-input`, `.df-search-result`, `.df-s
 | `interactive` | getter → `boolean` | Whether the stage is currently taking pointer input. A renderer with nothing to orbit reports `true`. | contract tests | KEEP |
 | `soundEnabled` | getter → `boolean` | Whether page turns make a sound. Defaults to the `soundEnable` option, `true` when unset. | More menu | KEEP |
 | `setSoundEnabled(on)` | `(boolean) → void` | Turn the page-turn sound on or off, and update whatever the engine shows for it. The app remembers the choice itself (`zayaSoundEnabled`) and re-applies it to each new book, because the engine forgets it between documents. | More menu | KEEP |
+| `fullscreen` | getter → `boolean` | Whether the book's own container is the fullscreen element. Follows the browser's `fullscreenchange`, so it is right even when the reader leaves fullscreen with the keyboard. | control bar | KEEP |
+| `setTextLayerEnabled(on)` | `(boolean) → void` | Whether the pages carry a transparent, selectable text layer over them. On by default. Selection is a reader's setting and a printing concern, not a rendering one, so the app may switch it off — for a scan with no text worth selecting, say — without the engine deciding for it. | settings, Text pane | KEEP |
+| `textLayerEnabled` | getter → `boolean` | Whether that layer is on. | settings | KEEP |
+
+**Zoom, stated for a replacement engine.** `zoom(delta)` above is the fork's spelling, a step in
+or out. An engine free of it should publish absolute levels — `zoom(level)`, `zoomIn()`,
+`zoomOut()`, `resetZoom()`, with `1` meaning fit-to-stage — and let `core/book.js` map the
+contract's `±1` onto `zoomIn`/`zoomOut`. Whatever the spelling, three things are the contract:
+the `zoomChange` option fires **once** on each crossing of the fit boundary and not once per
+step; a magnified page is re-rendered at the magnified scale rather than merely stretched; and
+the reader can pan a magnified page and get back to fit.
 
 **INTERNAL, migrated away:** `book.ui.switchFullscreen`, `book.ui.share`, `book.ui.download`,
 `book.ui.updateSound`, `book.options.soundEnable`, `book.options.source`,
