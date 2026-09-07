@@ -252,15 +252,21 @@ contract: the `zoomChange` option fires **once** on each crossing of the fit bou
 once per step; a magnified page is re-rendered at the magnified scale rather than merely
 stretched; and the reader can pan a magnified page and get back to fit.
 
-| `tilt` | getter → `{pitch, yaw, tilted}` | How far the book is tipped away from flat, in radians: `pitch` above or below it, `yaw` to one side. `tilted` is false when it lies flat. | control bar | KEEP |
-| `setTilt(pitch, yaw)` | `(number, number) → tilt` | Tip the book. An engine clamps the angles to what stays readable and returns what it applied, so a caller can follow. | control bar | KEEP |
-| `resetTilt()` | `() → tilt` | Lay it flat again. | control bar | KEEP |
+| `tilt` | getter → `{degrees, tilted}` | How far the book is laid down, in degrees. `90` is the book held up facing the reader, which is how it opens; larger lays it towards a table. `tilted` is false at 90. | control bar | KEEP |
+| `setTilt(degrees)` | `(number) → tilt` | Lay the book down or stand it up. One angle, one axis. An engine clamps it to what stays readable and returns what it applied, so a caller can follow. | control bar | KEEP |
+| `resetTilt()` | `() → tilt` | Stand it back up, facing the reader. | control bar | KEEP |
 
-The reader tips the book by holding shift and dragging, or by dragging with the right button, and
-lays it flat again with shift and a double click. It needs a gesture of its own because an ordinary
-drag anywhere on the stage turns a page — including the space beside the book, which is where a
-reader reaches to flick a corner. An engine that cannot tip a book keeps these members and reports
-a flat one.
+The reader lays the book down by holding shift and dragging up or down, or by dragging with the
+right button, and stands it up again with shift and a double click. It needs a gesture of its own
+because an ordinary drag anywhere on the stage turns a page — including the space beside the book,
+which is where a reader reaches to flick a corner.
+
+**One axis, about the book's own middle.** The book turns the way a book is tipped down onto a
+table: the far edge recedes, the near edge comes forward, and the spine stays where it is. It never
+swings left or right, and the lens never travels around it — it looks at the middle of the pages
+square on, and only draws straight back as the book goes down, because the near edge would
+otherwise run off the sides of the stage. That is the difference between stepping back from a table
+and walking around it. An engine that cannot lay a book down keeps these members and reports 90.
 
 > **Why this is written down.** This capability was lost in 7.0.0 and restored in the release after
 > it. The first version of this contract recorded only `book.stage.orbitControl.enabled` under the
@@ -338,8 +344,8 @@ wheel, panning, and tipping the book.
 | control and the wheel | the same — it is how a trackpad pinch and the keyboard zoom arrive | the same |
 | two fingers apart or together | zooms about their midpoint | the same, and pans with them |
 | double-click or double-tap | zooms in on that point | back to fit |
-| shift and drag, or the right button | tips the book away from flat | the same |
-| shift and double-click | lays a tipped book flat | the same |
+| shift and drag up or down, or the right button | lays the book down towards a table, or stands it up | the same |
+| shift and double-click | stands the book back up, facing the reader | the same |
 | a press on a run of text | selects it, and never turns a page | the same |
 
 Two rules behind the table. A gesture on the book and a gesture beside it do the same thing: the

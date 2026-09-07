@@ -21,11 +21,12 @@ const FOV = 32;
 /** Segments across the sheet. Enough that the curl reads as a curve rather than a fold. */
 const SEGMENTS = 28;
 /*
- * How far the book can be turned away from flat. Far enough to look along the page the way you
- * would tip a real book towards a lamp, and not so far that it is edge-on and unreadable.
+ * How far the book can be laid down, in degrees. 90 is a book held up facing the reader, which is
+ * how it opens; 180 would be flat on a table and edge-on to the lens, so the useful travel stops
+ * short of it. The book turns about its own middle and the lens does not move.
  */
-const MAX_PITCH = (60 * Math.PI) / 180;
-const MAX_YAW = (45 * Math.PI) / 180;
+const TILT_UPRIGHT = 90;
+const TILT_MAX = 160;
 /** How far the paper bulges out of plane, as a fraction of the page width. */
 const CURL = 0.16;
 
@@ -86,8 +87,8 @@ export class WebglRenderer {
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(FOV, 1, 0.05, 200);
-    // How far the lens has been carried around the book: flat on, until the reader says otherwise.
-    this.tilt = { pitch: 0, yaw: 0 };
+    // Degrees from upright. The book opens facing the reader and stays there until they lay it down.
+    this.tiltDegrees = TILT_UPRIGHT;
     this.setBackground(book.options.backgroundColor);
 
     this.pageW = 0.72;                 // world units; corrected as soon as a page is measured
@@ -285,18 +286,18 @@ export class WebglRenderer {
   }
 
   /**
-   * Carry the lens around the book. Angles are radians and are clamped, so a reader who keeps
-   * dragging stops at a useful angle rather than looking at the spine edge-on.
-   * @param {number} pitch above (positive) or below the book
-   * @param {number} yaw to one side or the other
+   * Lay the book down, or stand it back up. One angle and one axis: the book turns about the
+   * horizontal line through its own middle, the way a book is tipped down onto a table, and the
+   * lens stays where it is, looking at the middle of the pages. Nothing swings around the book.
+   * @param {number} degrees 90 upright and facing the reader, rising towards flat
    */
-  setTilt(pitch, yaw) {
-    this.tilt = {
-      pitch: Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch || 0)),
-      yaw: Math.max(-MAX_YAW, Math.min(MAX_YAW, yaw || 0)),
-    };
+  setTilt(degrees) {
+    const wanted = Number.isFinite(degrees) ? degrees : TILT_UPRIGHT;
+    this.tiltDegrees = Math.max(TILT_UPRIGHT, Math.min(TILT_MAX, wanted));
+    // Away from the reader, so the far edge of the page recedes and the near edge comes forward.
+    this.scene.rotation.x = -((this.tiltDegrees - TILT_UPRIGHT) * Math.PI) / 180;
     this.placeCamera();
-    return this.tilt;
+    return this.tiltDegrees;
   }
 
   placeCamera() {
@@ -313,22 +314,15 @@ export class WebglRenderer {
      * over the book rather than sliding the book about. At a pitch and yaw of zero this is exactly
      * the straight-on placement it replaces: (cx, cy, distance / level), looking at (cx, cy, 0).
      */
-    const { pitch, yaw } = this.tilt;
     /*
-     * Tipping the book brings its nearest corner towards the lens, and with a perspective lens that
-     * corner grows and runs off the top or the side of the stage. Backing off by exactly how far
-     * that corner came forward keeps the whole book in view at any angle; at zero tilt it adds
-     * nothing, so a flat book is framed exactly as before.
+     * The lens never swings around the book: it stays on the line through the middle of the pages,
+     * looking at them square on. It does draw straight back as the book is laid down, because the
+     * near edge swings towards it and would otherwise run off the sides of the stage — the same
+     * move as stepping back from a table, not walking around it.
      */
-    const nearer = (this.fit.spreadW / 2) * Math.abs(Math.sin(yaw))
-      + (this.fit.spreadH / 2) * Math.abs(Math.sin(pitch));
-    const radius = (distance + nearer) / level;
-    const cosPitch = Math.cos(pitch);
-    this.camera.position.set(
-      cx + radius * Math.sin(yaw) * cosPitch,
-      cy + radius * Math.sin(pitch),
-      radius * Math.cos(yaw) * cosPitch,
-    );
+    const laid = ((this.tiltDegrees - TILT_UPRIGHT) * Math.PI) / 180;
+    const radius = (distance + (this.fit.spreadH / 2) * Math.sin(laid)) / level;
+    this.camera.position.set(cx, cy, radius);
     this.camera.lookAt(cx, cy, 0);
     this.camera.updateProjectionMatrix();
     this.requestRender();
