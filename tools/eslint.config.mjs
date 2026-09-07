@@ -6,10 +6,6 @@ const shared = {
     ...globals.browser,
     ...globals.jquery,
     Toastify: 'readonly',
-    THREE: 'readonly',
-    MOCKUP: 'readonly',
-    pdfjsLib: 'readonly',
-    DFLIP: 'writable',
     appState: 'writable',
     ValidationUtils: 'readonly',
     themeManager: 'writable',
@@ -43,7 +39,7 @@ export default [
     rules
   },
   {
-    files: ['engine/**/*.js', 'engine-next/**/*.js', 'lib/js/core/engine.js', 'lib/js/features/navigator/**/*.js',
+    files: ['engine-next/**/*.js', 'lib/js/core/engine.js', 'lib/js/features/navigator/**/*.js',
       'lib/js/features/themes/**/*.js', 'lib/js/features/quotes/**/*.js',
       'lib/js/features/changelog/**/*.js', 'lib/js/features/search/**/*.js', 'lib/js/features/settings/**/*.js', 'lib/js/pro-features/**/*.js'],
     languageOptions: { ...shared, sourceType: 'module' },
