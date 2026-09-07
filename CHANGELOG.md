@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   link or by its file name and size, so notes, remembered pages and stored copies are untouched.
 
 ### Fixed
+- **The book can be tipped away from flat again.** Holding shift and dragging — or dragging with
+  the right button — carries the view around the book, so a page can be looked along at an angle
+  rather than only face on; shift and a double click lays it flat. This was in Zaya until 7.0.0 and
+  went missing in the engine replacement. It needs a gesture of its own because an ordinary drag
+  anywhere on the stage turns a page, including the space beside the book, which is exactly where a
+  reader reaches to flick a corner. Tipping works in both renderers, and the whole book stays in
+  view at any angle. `docs/engine-api.md` now records it as part of the contract, with a note on
+  how it came to be lost, so that a future engine cannot quietly drop it.
 - **A page turn is quicker, and does less work while it runs.** The turn took 700ms with a curve
   that eased in and out of it, which read as floaty rather than smooth; it now takes 480ms. Two
   costs it carried on every frame are gone: the sheet's material is unlit, so the vertex normals

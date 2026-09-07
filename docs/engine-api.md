@@ -252,9 +252,28 @@ contract: the `zoomChange` option fires **once** on each crossing of the fit bou
 once per step; a magnified page is re-rendered at the magnified scale rather than merely
 stretched; and the reader can pan a magnified page and get back to fit.
 
+| `tilt` | getter → `{pitch, yaw, tilted}` | How far the book is tipped away from flat, in radians: `pitch` above or below it, `yaw` to one side. `tilted` is false when it lies flat. | control bar | KEEP |
+| `setTilt(pitch, yaw)` | `(number, number) → tilt` | Tip the book. An engine clamps the angles to what stays readable and returns what it applied, so a caller can follow. | control bar | KEEP |
+| `resetTilt()` | `() → tilt` | Lay it flat again. | control bar | KEEP |
+
+The reader tips the book by holding shift and dragging, or by dragging with the right button, and
+lays it flat again with shift and a double click. It needs a gesture of its own because an ordinary
+drag anywhere on the stage turns a page — including the space beside the book, which is where a
+reader reaches to flick a corner. An engine that cannot tip a book keeps these members and reports
+a flat one.
+
+> **Why this is written down.** This capability was lost in 7.0.0 and restored in the release after
+> it. The first version of this contract recorded only `book.stage.orbitControl.enabled` under the
+> internal members below, because the application's sole use of the old engine's orbit control was
+> to switch it *off* while the pointer was over a drawer. Read from the call sites alone it looked
+> like plumbing; it was in fact the only way a reader could tip the book, and freezing the contract
+> from what the application called rather than from what the reader could do let it fall out of the
+> rebuild unnoticed. A capability with no call site is exactly the kind this document exists to
+> protect.
+
 **INTERNAL, migrated away:** `book.ui.switchFullscreen`, `book.ui.share`, `book.ui.download`,
 `book.ui.updateSound`, `book.options.soundEnable`, `book.options.source`,
-`book.stage.orbitControl.enabled`.
+`book.stage.orbitControl.enabled` (its *capability* is now the `tilt` members above).
 
 ---
 

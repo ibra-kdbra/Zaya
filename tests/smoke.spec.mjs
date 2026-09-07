@@ -156,6 +156,50 @@ test.describe('Zoom', () => {
   });
 });
 
+test.describe('Tilting the book', () => {
+  /*
+   * Lost in 7.0.0 and restored after it: the reader can tip the book away from flat. Held here
+   * rather than only in the engine's own tests, because what matters is that a reader can do it.
+   */
+  test('shift and a drag tips it, an ordinary drag still turns the page', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf');
+    await waitForBook(page);
+    const tilt = () => page.evaluate(() => window.ZayaBook.current.tilt);
+    expect(await tilt()).toEqual({ pitch: 0, yaw: 0, tilted: false });
+
+    const box = await page.locator('#flipbookContainer').boundingBox();
+    const y = box.y + box.height / 2;
+    /*
+     * Tipping needs a gesture of its own: an ordinary drag anywhere on the stage turns a page,
+     * including the space beside the book, which is where a reader reaches to flick a corner.
+     */
+    await page.keyboard.down('Shift');
+    await page.mouse.move(box.x + box.width * 0.5, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.5 + 130, y - 90, { steps: 14 });
+    await page.mouse.up();
+    await page.keyboard.up('Shift');
+    await expect.poll(async () => (await tilt()).tilted, { timeout: 10_000 }).toBe(true);
+    const tipped = await tilt();
+    expect(tipped.yaw).toBeGreaterThan(0);      // dragged to the right
+    expect(tipped.pitch).toBeLessThan(0);       // and upwards
+
+    // Dragging on the book still turns its pages rather than tipping it.
+    const before = await activePage(page);
+    await page.mouse.move(box.x + box.width * 0.75, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.3, y, { steps: 16 });
+    await page.mouse.up();
+    await expect.poll(() => activePage(page), { timeout: 15_000 }).not.toBe(before);
+
+    await page.keyboard.down('Shift');
+    await page.mouse.dblclick(box.x + box.width * 0.5, y);
+    await page.keyboard.up('Shift');
+    await expect.poll(async () => (await tilt()).tilted, { timeout: 10_000 }).toBe(false);
+  });
+});
+
 test.describe('Keyboard', () => {
   /*
    * The engine takes pointer input only, so page turns from the keyboard are the application's
