@@ -50,7 +50,7 @@ replacement engine may accept more, but must not *require* more.
 | `height` | `string \| number` | The stage height. Zaya passes `"100%"`; a bare number is pixels. | KEEP |
 | `paddingTop` | `number` | Pixels kept clear at the top of the stage, so the app header does not sit over the page. Zaya passes `56`. | KEEP |
 | `paddingBottom` | `number` | Pixels kept clear at the bottom, for the control bar. Zaya passes `40`. | KEEP |
-| `duration` | `number` | Milliseconds one page turn takes. Zaya passes `700`. | KEEP |
+| `duration` | `number` | Milliseconds one page turn takes. Zaya passes `480`. | KEEP |
 | `backgroundColor` | CSS colour | The colour behind the book. | KEEP |
 | `direction` | `"ltr" \| "rtl"` | Reading direction, fixed for the life of the book: changing it reopens the document (§3). | KEEP |
 | `openPage` | `number` | The book page to open on, 1-based. Out-of-range values are clamped, never rejected. | KEEP |

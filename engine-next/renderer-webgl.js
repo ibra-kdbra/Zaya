@@ -205,13 +205,20 @@ export class WebglRenderer {
       if (!mesh) return;
       const base = mesh.userData.base;
       const position = mesh.geometry.attributes.position;
+      /*
+       * Written straight into the attribute's array rather than through setX/setY/setZ. This runs
+       * for every vertex of both sheets on every frame of every turn, and the accessors cost three
+       * bounds-checked calls where one indexed write will do.
+       */
+      const out = position.array;
+      const invW = this.pageW ? 1 / this.pageW : 0;
       for (let i = 0; i < position.count; i++) {
-        const r = base[i * 3];                       // distance from the spine, 0 … pageW
-        const u = this.pageW ? r / this.pageW : 0;
-        const dz = bulge * Math.sin(Math.PI * u);
-        position.setX(i, side * (r * cos + dz * sin));
-        position.setY(i, base[i * 3 + 1]);
-        position.setZ(i, r * sin + dz * cos);
+        const o = i * 3;
+        const r = base[o];                           // distance from the spine, 0 … pageW
+        const dz = bulge * Math.sin(Math.PI * (r * invW));
+        out[o] = side * (r * cos + dz * sin);
+        out[o + 1] = base[o + 1];
+        out[o + 2] = r * sin + dz * cos;
       }
       position.needsUpdate = true;
       /*

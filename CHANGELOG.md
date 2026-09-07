@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   link or by its file name and size, so notes, remembered pages and stored copies are untouched.
 
 ### Fixed
+- **A page turn is quicker, and does less work while it runs.** The turn took 700ms with a curve
+  that eased in and out of it, which read as floaty rather than smooth; it now takes 480ms. Two
+  costs it carried on every frame are gone: the sheet's material is unlit, so the vertex normals
+  being recomputed for both sheets were read by nothing, and the vertices are now written straight
+  into the geometry's array rather than through three bounds-checked accessors each. Neither of
+  those changed the frame rate measurably on the machine this was tested on, where the frame rate
+  is set by a software renderer rather than by the page; they are removals of work that was doing
+  nothing, and the shorter turn is the part a reader will feel.
 - **The wheel zooms again.** It did nothing unless the control key was held, which left both the
   magnification and the panning that depends on it out of reach — a page could only be enlarged by
   double-clicking it. The wheel now zooms on its own, and a notch is a step rather than a leap: one
