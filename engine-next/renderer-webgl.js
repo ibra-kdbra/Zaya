@@ -214,7 +214,11 @@ export class WebglRenderer {
         position.setZ(i, r * sin + dz * cos);
       }
       position.needsUpdate = true;
-      mesh.geometry.computeVertexNormals();
+      /*
+       * No normals are recomputed here. The sheet's material is unlit (MeshBasicMaterial with a
+       * shading term of its own), so nothing ever reads them, and computing them for both meshes
+       * on every frame of every turn was pure cost.
+       */
       mesh.material.userData.shade.value = hard ? 0 : Math.sin(Math.PI * progress) * 0.35;
       mesh.visible = true;
     });

@@ -309,13 +309,23 @@ for (const renderMode of ['webgl', 'css']) {
       expect((await zoomState(page)).scale).toBeLessThanOrEqual(4);
     });
 
-    test('the wheel with a modifier zooms about the pointer, and a double click toggles', async ({ page }) => {
+    test('the wheel zooms about the pointer, with or without a modifier, and a double click toggles', async ({ page }) => {
       await open(page, q);
       const box = await page.locator('#book').boundingBox();
       await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.4);
-      await page.mouse.wheel(0, -400);
-      expect((await zoomState(page)).level).toBe(1);   // no modifier: the wheel is not ours
 
+      // The bare wheel zooms: it is what a reader reaches for, and the stage has nothing to scroll.
+      await page.mouse.wheel(0, -100);
+      await expect.poll(async () => (await zoomState(page)).level > 1).toBe(true);
+      const oneNotch = (await zoomState(page)).level;
+      // A notch is a step rather than a leap; it used to multiply the page by half again.
+      expect(oneNotch).toBeGreaterThan(1.02);
+      expect(oneNotch).toBeLessThan(1.25);
+      await page.evaluate(() => window.zayaDemo.book.resetZoom());
+      await expect.poll(async () => (await zoomState(page)).level).toBe(1);
+
+      // A trackpad pinch and the keyboard zoom arrive as a wheel with the control key, and mean
+      // the same thing here.
       await page.keyboard.down('Control');
       await page.mouse.wheel(0, -400);
       await page.keyboard.up('Control');
