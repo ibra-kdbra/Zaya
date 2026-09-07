@@ -6,7 +6,8 @@ import { spawnSync } from 'node:child_process';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const SKIP = [/\/vendor\//, /\.min\.js$/, /\.bak$/, /node_modules/, /changelog\.bundle\.js$/, /\/cmaps\//];
-const MODULE_DIRS = [/^engine\//, /^engine-next\//, /lib\/js\/features\/themes\//, /lib\/js\/features\/quotes\//,
+const MODULE_DIRS = [/^engine\//, /^engine-next\//, /^lib\/js\/core\/engine\.js$/, /lib\/js\/features\/navigator\//,
+  /lib\/js\/features\/themes\//, /lib\/js\/features\/quotes\//,
   /lib\/js\/features\/changelog\//, /lib\/js\/features\/search\//, /lib\/js\/features\/settings\//, /lib\/js\/pro-features\//, /tools\//, /tests\//];
 
 function walk(dir, out = []) {

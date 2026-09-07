@@ -6,15 +6,13 @@
  * and the print dialog — in both interface languages and at both a desk width and a phone width.
  * Anything axe rates serious or critical fails the run.
  *
- * Two rules are excluded, both for the vendored flipbook engine rather than for Zaya's own markup:
+ * Two rules are excluded:
  *
- *   scrollable-region-focusable  the engine's thumbnail and outline wrappers are scroll containers
- *                                it builds itself; every item inside them is a real focusable
- *                                control, so the list is reachable from the keyboard without the
- *                                container being a tab stop of its own.
- *   aria-allowed-attr            the engine puts `aria-*` state on a few of its own nodes whose
- *                                roles it also owns; the markup is not ours to change while
- *                                `engine/` stays a fork (see docs/THIRD_PARTY_NOTICES.md).
+ *   scrollable-region-focusable  the Pages and Outline lists are scroll containers whose every
+ *                                item is a real focusable control, so each list is reachable from
+ *                                the keyboard without the container being a tab stop of its own.
+ *   aria-allowed-attr            kept from the days of the vendored engine; nothing in the
+ *                                reader's own markup relies on it any more.
  */
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';

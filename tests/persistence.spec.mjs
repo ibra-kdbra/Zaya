@@ -43,6 +43,9 @@ test.describe('Page memory', () => {
     await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}&page=3`);
     await waitForBook(page);
     await expect.poll(() => activePage(page), { timeout: 15_000 }).toBe(3);
+    // The page a document opens on is remembered like any other; the next load reads it back,
+    // so wait for the write rather than racing the reload against it.
+    await expect.poll(() => page.evaluate((k) => window.getLastPage(k), key), { timeout: 15_000 }).toBe(3);
 
     // Junk is ignored, so the remembered page (now 3) wins again.
     await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}&page=not-a-number`);
@@ -57,7 +60,7 @@ test.describe('Page memory', () => {
     await goToPage(page, 2, await keyFor(page, LOCAL_URL_PDF));
 
     await page.evaluate(() => window.appState.toggleRTL());
-    await expect.poll(() => page.evaluate(() => window.flipbookInstance && window.flipbookInstance.direction), { timeout: 20_000 }).toBe(2);
+    await expect.poll(() => page.evaluate(() => window.ZayaBook.current && window.ZayaBook.current.direction), { timeout: 20_000 }).toBe('rtl');
     await expect.poll(() => activePage(page), { timeout: 20_000 }).toBe(2);
     expect((await readState(page)).storedRTL).toBe('true');
 
@@ -179,7 +182,7 @@ test.describe('Local files', () => {
 
     // Reloading the same document (RTL toggle) must keep the blob alive.
     await page.evaluate(() => window.appState.toggleRTL());
-    await expect.poll(() => page.evaluate(() => window.flipbookInstance && window.flipbookInstance.direction), { timeout: 20_000 }).toBe(2);
+    await expect.poll(() => page.evaluate(() => window.ZayaBook.current && window.ZayaBook.current.direction), { timeout: 20_000 }).toBe('rtl');
     expect(await page.evaluate(() => window.__revoked)).not.toContain(blobUrl);
 
     // Switching to another document releases it, and leaves exactly one live pdf resource.
@@ -310,7 +313,7 @@ test.describe('Settings and URL options', () => {
     await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}&theme=not-a-theme&mode=sideways&rtl=perhaps&page=0`);
     await waitForBook(page);
     await expect(page.locator('html')).toHaveClass(/theme-default/);
-    expect(await page.evaluate(() => window.dFlipBook.target.pageMode)).toBe(2); // double, the default
+    expect(await page.evaluate(() => window.ZayaBook.current.pageMode)).toBe('double'); // the default
     expect(await page.evaluate(() => window.appState.get('isRTL'))).toBe(true); // stored preference untouched
     expect(await activePage(page)).toBe(1); // page=0 clamped
 
@@ -720,20 +723,20 @@ test.describe('Stiff pages', () => {
     await page.goto(`/index.html?pdf=${LOCAL_URL_PDF}`);
     await waitForBook(page);
 
-    expect(await page.evaluate(() => window.dFlipBook.options.hard)).toBe('none');
+    expect(await page.evaluate(() => window.ZayaBook.current.hardCover)).toBe('none');
 
     await openPanel(page, 'Settings');
     await page.locator('#hardCoverCover').click();
     await expect(page.locator('#hardCoverCover')).toHaveAttribute('aria-selected', 'true');
     // Changing it reopens the document, so wait for the new book before reading its options.
     await waitForBook(page);
-    await expect.poll(() => page.evaluate(() => window.dFlipBook.options.hard), { timeout: 30_000 }).toBe('cover');
+    await expect.poll(() => page.evaluate(() => window.ZayaBook.current.hardCover), { timeout: 30_000 }).toBe('cover');
     expect(await page.evaluate(() => localStorage.getItem('hardCover'))).toBe('cover');
 
     await page.reload();
     await waitForBook(page);
     expect(await page.evaluate(() => window.appState.get('hardCover'))).toBe('cover');
-    await expect.poll(() => page.evaluate(() => window.dFlipBook.options.hard), { timeout: 30_000 }).toBe('cover');
+    await expect.poll(() => page.evaluate(() => window.ZayaBook.current.hardCover), { timeout: 30_000 }).toBe('cover');
 
     // A hand-edited value from another release falls back to the default.
     await page.evaluate(() => localStorage.setItem('hardCover', 'granite'));
@@ -1018,12 +1021,12 @@ test.describe('Every feature follows the open document', () => {
 
     // The recognised text is there without recognising anything again.
     await page.evaluate(() => window.ZayaNavigator.open('search'));
-    const input = page.locator('.df-search-input');
+    const input = page.locator('.nav-search-input');
     await expect(input).toBeVisible({ timeout: 15_000 });
     await input.fill('kalimah');
-    await expect(page.locator('.df-search-result')).toHaveCount(2, { timeout: 20_000 });
-    await expect(page.locator('.df-ocr-text')).toContainText('recognised on this device', { timeout: 10_000 });
-    await expect(page.locator('.df-ocr-progress')).toHaveText('');
+    await expect(page.locator('.nav-search-result')).toHaveCount(2, { timeout: 20_000 });
+    await expect(page.locator('.nav-ocr-text')).toContainText('recognised on this device', { timeout: 10_000 });
+    await expect(page.locator('.nav-ocr-progress')).toHaveText('');
   });
 
   test('switching documents empties the search box, its results and its highlight', async ({ page }) => {
@@ -1032,10 +1035,10 @@ test.describe('Every feature follows the open document', () => {
     await waitForBook(page);
 
     await page.evaluate(() => window.ZayaNavigator.open('search'));
-    const input = page.locator('.df-search-input');
+    const input = page.locator('.nav-search-input');
     await expect(input).toBeVisible({ timeout: 15_000 });
     await input.fill('flipbooks');
-    await expect(page.locator('.df-search-result').first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('.nav-search-result').first()).toBeVisible({ timeout: 20_000 });
 
     await openPanel(page, 'Document');
     await page.locator('#pdfUrl').fill(await keyFor(page, SCANNED_URL_PDF));
@@ -1045,7 +1048,7 @@ test.describe('Every feature follows the open document', () => {
     await expect.poll(() => page.evaluate(() => window.ZayaBook.current.pageCount), { timeout: 20_000 }).toBe(2);
 
     await page.evaluate(() => window.ZayaNavigator.open('search'));
-    await expect(page.locator('#navPaneSearch .df-search-input')).toHaveValue('', { timeout: 15_000 });
-    expect(await page.locator('#navPaneSearch .df-search-result').count()).toBe(0);
+    await expect(page.locator('#navPaneSearch .nav-search-input')).toHaveValue('', { timeout: 15_000 });
+    expect(await page.locator('#navPaneSearch .nav-search-result').count()).toBe(0);
   });
 });

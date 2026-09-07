@@ -1,291 +1,312 @@
-/* Share Popup Overhaul */
-.df-share-wrapper {
+/*
+ * The share box (ui/share-box.js): the address of the page being read, and three ways to pass
+ * it on. It sits over the book, in the reader's own surface.
+ */
+.share-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 10000 !important;
-  position: absolute !important; /* Center over the book container */
-  top: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  bottom: auto !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.df-share-box {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-primary) !important;
-  border-radius: 16px !important;
-  padding: 24px !important;
-  width: 90% !important;
-  max-width: 300px !important; /* Smaller box */
-  box-shadow: var(--shadow-primary) !important;
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 16px !important;
-  /* Reset min.css positioning to allow Flexbox centering */
-  left: auto !important;
-  top: auto !important;
-  transform: none !important;
+.share-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 90%;
+  max-width: 300px;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  box-shadow: var(--shadow-primary);
 }
 
-.df-share-header {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  margin-bottom: 8px !important;
+.share-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-.df-share-title {
-  color: var(--text-primary) !important;
-  font-family: var(--font-sans) !important;
-  font-size: 18px !important;
-  font-weight: 600 !important;
+.share-title {
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
 }
 
-.df-share-close {
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 20px;
-  transition: color 0.2s;
+.share-close {
   padding: 5px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.share-close:hover { color: var(--text-error); }
+
+.share-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 8px;
 }
 
-.df-share-close:hover {
-  color: var(--text-error);
+.share-action {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border-radius: 10px;
+  background: var(--bg-accent);
+  border: 1px solid var(--border-accent);
+  color: var(--text-primary);
+  font-size: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.3s ease, box-shadow 0.3s ease;
 }
-
-.df-share-url {
-  background: var(--bg-tertiary) !important;
-  border: 1px solid var(--border-secondary) !important;
-  border-radius: 8px !important;
-  color: var(--text-primary) !important;
-  padding: 12px !important;
-  font-family: var(--font-sans) !important;
-  font-size: 13px !important;
-  width: 100% !important;
-  resize: none !important;
-  height: 60px !important;
-  box-sizing: border-box !important;
-}
-
-.df-share-button {
-  height: 44px !important;
-  line-height: 44px !important;
-  border-radius: 10px !important;
-  text-align: center !important;
-  font-size: 20px !important;
-  transition: all 0.3s ease !important;
-  margin: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 44px !important; /* Square buttons */
-  flex: 0 0 auto !important;
-  background: var(--bg-accent) !important;
-  border: 1px solid var(--border-accent) !important;
-  color: var(--text-primary) !important;
-  cursor: pointer !important;
-}
-
-.df-share-buttons-container {
-  display: flex !important;
-  gap: 16px !important;
-  justify-content: center !important;
-  margin-bottom: 8px !important;
-}
-
-.df-share-button:hover {
-  
+.share-action:hover {
   filter: brightness(1.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.share-url {
+  box-sizing: border-box;
+  width: 100%;
+  height: 60px;
+  padding: 12px;
+  resize: none;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
 }
 
 /* ---------------------------------------------------------------------------
- * Navigator panels (Pages / Outline / Search).
- * The engine builds these three `.df-sidemenu` containers; the Navigator drawer
- * adopts them into `#navigatorBody`, so every skin here is scoped to that host —
- * that also lets it win over the generic engine rules in chrome.css / min.css.
+ * Navigator panes (Pages / Outline / Search).
+ *
+ * All three are the application's own (`features/navigator/panes.js` and
+ * `features/search/search-panel.js`); the engine builds no interface. They live in
+ * `#navigatorBody`, and every rule here is scoped to that host so a pane can never
+ * be styled anywhere else by accident.
  * ------------------------------------------------------------------------- */
-
-/* Standalone (un-adopted) side panels keep a readable surface */
-.df-sidemenu {
-  background: var(--bg-primary) !important;
-  border-right: 1px solid var(--border-primary) !important;
-  border-radius: 0 12px 12px 0 !important;
-  top: 20px !important;
-  bottom: 80px !important;
-  height: auto !important;
-  width: 300px !important;
-  z-index: 999 !important;
-}
-
-.df-thumb-wrapper, .df-outline-wrapper, .df-search-wrapper {
-  background: transparent !important;
-  box-shadow: none !important;
-}
 
 /* --------------------------------------------------------------- Pages tab */
 
-/* The virtualised list positions every row at `index * --thumb-row-h`; the tile
-   is derived from that height so the two can never drift apart. */
-#navigatorBody .df-thumb-container {
-  --thumb-row-h: 232px;
-  --thumb-gap: 16px;
-  --thumb-caption-h: 26px;
-  text-align: left !important;
+/*
+ * One tile is a picture of a page with its number under it. The picture is
+ * `--tile-h` tall and three quarters as wide; the number sits in a strip of
+ * `--tile-cap` below it, and `--tile-gap` separates one row from the next.
+ * `--nav-page-cols` is set by the pane itself: one column per 200 pixels.
+ */
+#navigatorBody .nav-pages {
+  --tile-h: 190px;
+  --tile-cap: 26px;
+  --tile-gap: 16px;
 }
 
-#navigatorBody .df-thumb-wrapper { padding: 14px 0 24px 0; }
+#navigatorBody .nav-pages-list {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: grid;
+  grid-template-columns: repeat(var(--nav-page-cols, 1), 1fr);
+  justify-items: center;
+  align-content: start;
+  row-gap: var(--tile-gap);
+  padding: 0 0 calc(24px + env(safe-area-inset-bottom)) 0;
+  background: transparent;
+  /* Page one comes first on the left in either interface: this is a numbered sequence, not prose */
+  direction: ltr;
+}
 
-#navigatorBody .df-thumb-container .df-vrow {
-  /* Column cell = 100% / --thumb-cols; the tile is centred inside its cell */
-  --thumb-w: min(
-    calc((var(--thumb-row-h) - var(--thumb-gap) - var(--thumb-caption-h)) * 0.75),
-    calc(100% / var(--thumb-cols, 1) - 14px)
-  );
-  left: calc(var(--thumb-col, 0) * (100% / var(--thumb-cols, 1)) + ((100% / var(--thumb-cols, 1)) - var(--thumb-w)) / 2) !important;
-  right: auto !important;
-  margin: 0 !important;
-  height: calc(var(--thumb-row-h) - var(--thumb-gap)) !important;
-  width: var(--thumb-w) !important;
-  padding: 0 !important;
-  border: 0 !important;
-  /* The caption strip lives in the bottom border, so the inset ring frames the page alone */
-  border-bottom: var(--thumb-caption-h) solid transparent !important;
-  border-radius: 4px !important;
-  overflow: visible !important;
-  background-color: var(--bg-tertiary) !important;
-  background-clip: padding-box !important;
-  background-size: contain !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  box-shadow: inset 0 0 0 1px var(--border-secondary) !important;
-  transition: box-shadow 150ms ease !important;
-  transform: none !important;
+#navigatorBody .nav-page {
+  position: relative;
+  width: calc(var(--tile-h) * 0.75);
+  height: calc(var(--tile-h) + var(--tile-cap));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+#navigatorBody .nav-page:focus-visible { outline: none; }
+
+/* The ring frames the page alone, so the number underneath sits outside it */
+#navigatorBody .nav-page-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--tile-h);
+  overflow: hidden;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+}
+#navigatorBody .nav-page canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* The ring is its own layer: an inset shadow would sit under the picture, not around it */
+#navigatorBody .nav-page-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--border-secondary);
+  transition: box-shadow 150ms ease;
+  pointer-events: none;
 }
 
-#navigatorBody .df-thumb-container .df-vrow:hover,
-#navigatorBody .df-thumb-container .df-vrow:focus-visible {
-  background-color: var(--bg-tertiary) !important;
-  box-shadow: inset 0 0 0 1px var(--text-accent) !important;
-  transform: none !important;
-  outline: none;
+#navigatorBody .nav-page:hover .nav-page-img::after,
+#navigatorBody .nav-page:focus-visible .nav-page-img::after {
+  box-shadow: inset 0 0 0 1px var(--text-accent);
 }
-
-#navigatorBody .df-thumb-container .df-vrow.df-selected {
-  background-color: var(--bg-tertiary) !important;
-  box-shadow: inset 0 0 0 2px var(--text-accent) !important;
+#navigatorBody .nav-page.is-current .nav-page-img::after {
+  box-shadow: inset 0 0 0 2px var(--text-accent);
 }
 
 /* The page number sits under its tile, in the caption strip */
-#navigatorBody .df-vrow > div {
-  position: absolute !important;
-  top: auto !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: calc(-1 * var(--thumb-caption-h)) !important;
-  width: auto !important;
-  height: var(--thumb-caption-h) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: flex !important;
+#navigatorBody .nav-page-num {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--tile-cap);
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent !important;
-  border-radius: 0 !important;
-  color: var(--text-secondary) !important;
-  font-family: var(--font-mono) !important;
-  font-size: 12px !important;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
-
-#navigatorBody .df-vrow.df-selected > div {
-  color: var(--text-accent) !important;
+#navigatorBody .nav-page.is-current .nav-page-num {
+  color: var(--text-accent);
   font-weight: 600;
 }
 
 /* ------------------------------------------------------------- Outline tab */
 
-#navigatorBody .df-outline-container { color: var(--text-primary) !important; }
-#navigatorBody .df-outline-wrapper { padding: 10px 12px calc(24px + env(safe-area-inset-bottom)) 12px !important; }
-
-#navigatorBody .df-outline-item {
-  position: relative;
-  margin: 0 !important;
-  padding: 0 !important;
-  color: var(--text-primary) !important;
-  font-family: var(--font-sans) !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
+#navigatorBody .nav-outline { color: var(--text-primary); }
+#navigatorBody .nav-outline-list {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 12px calc(24px + env(safe-area-inset-bottom)) 12px;
+  background: transparent;
 }
 
-#navigatorBody .df-outline-item > a {
-  display: flex !important;
-  align-items: center;
-  min-height: 44px;
-  padding: 9px 10px 9px 36px !important;
-  border-radius: 9px;
-  color: var(--text-primary) !important;
+#navigatorBody .nav-outline-item {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+}
+
+#navigatorBody .nav-outline-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 9px 10px 9px 36px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1.35;
-  text-decoration: none !important;
+  text-align: start;
+  cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease;
 }
 
-#navigatorBody .df-outline-item > a:hover,
-#navigatorBody .df-outline-item > a:focus-visible {
-  background: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  box-shadow: none !important;
+#navigatorBody .nav-outline-link:hover,
+#navigatorBody .nav-outline-link:focus-visible {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  box-shadow: none;
   outline: none;
 }
-#navigatorBody .df-outline-item > a:active { color: var(--text-accent) !important; }
+#navigatorBody .nav-outline-link:active { color: var(--text-accent); }
+/* An entry whose destination could not be resolved is a heading, and turns nothing */
+#navigatorBody .nav-outline-link.is-heading { cursor: default; color: var(--text-secondary); }
+#navigatorBody .nav-outline-link.is-heading:hover { background: transparent; }
 
 /* Nested levels: one hairline guide per depth, indent from it */
-/* Only nested levels get the guide; the wrapper itself carries the class too */
-#navigatorBody .df-outline-item > .df-outline-items {
-  margin: 0 0 0 17px !important;
-  padding-left: 10px !important;
+#navigatorBody .nav-outline-kids {
+  margin: 0 0 0 17px;
+  padding-left: 10px;
   border-left: 1px solid var(--border-secondary);
 }
-#navigatorBody .df-outline-items > .df-outline-item { margin-left: 0 !important; }
-#navigatorBody .df-outline-wrapper.df-outline-items { margin: 0 !important; padding-left: 12px !important; border-left: none; }
+#navigatorBody .nav-outline-kids[hidden] { display: none; }
 
 /* Chevron: a 34x44 hit area in the gutter the links leave free */
-#navigatorBody .df-outline-toggle {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 34px !important;
-  height: 44px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  float: none !important;
-  display: flex !important;
+#navigatorBody .nav-outline-toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: transparent !important;
-  color: var(--text-secondary) !important;
+  background: transparent;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: color 150ms ease;
   z-index: 1;
 }
-#navigatorBody .df-outline-toggle:hover { background: transparent !important; color: var(--text-accent) !important; }
-#navigatorBody .df-outline-toggle:before { color: inherit !important; font-size: 11px; }
+#navigatorBody .nav-outline-toggle:hover { background: transparent; color: var(--text-accent); }
+#navigatorBody .nav-outline-toggle::before {
+  content: "\f054";                      /* Font Awesome chevron-right */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 11px;
+  color: inherit;
+  transition: transform 150ms ease;
+}
+#navigatorBody .nav-outline-toggle[aria-expanded="true"]::before { transform: rotate(90deg); }
 
 /* -------------------------------------------------------------- Search tab */
 
-#navigatorBody .df-search-wrapper {
+#navigatorBody .nav-search-wrapper {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -293,7 +314,7 @@
   padding: 0;
 }
 
-#navigatorBody .df-search-form {
+#navigatorBody .nav-search-form {
   position: relative;
   flex: 0 0 auto;
   margin: 0;
@@ -301,7 +322,7 @@
 }
 
 /* Search glyph inside the field (Font Awesome is this product's icon system) */
-#navigatorBody .df-search-form::before {
+#navigatorBody .nav-search-form::before {
   content: "\f002";
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
@@ -314,7 +335,7 @@
   pointer-events: none;
 }
 
-#navigatorBody .df-search-input {
+#navigatorBody .nav-search-input {
   width: 100%;
   height: 44px;
   box-sizing: border-box;
@@ -328,9 +349,9 @@
   outline: none;
   transition: border-color 150ms ease;
 }
-#navigatorBody .df-search-input::placeholder { color: var(--text-secondary); opacity: 0.85; }
-#navigatorBody .df-search-input:focus { border-color: var(--text-accent); box-shadow: none; }
-#navigatorBody .df-search-input::-webkit-search-cancel-button {
+#navigatorBody .nav-search-input::placeholder { color: var(--text-secondary); opacity: 0.85; }
+#navigatorBody .nav-search-input:focus { border-color: var(--text-accent); box-shadow: none; }
+#navigatorBody .nav-search-input::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
   width: 22px;
@@ -341,7 +362,7 @@
 }
 
 /* The one-line answer: how many, on how many pages */
-#navigatorBody .df-search-status {
+#navigatorBody .nav-search-status {
   flex: 0 0 auto;
   min-height: 18px;
   padding: 0 16px 10px 16px;
@@ -351,7 +372,7 @@
   color: var(--text-secondary);
 }
 
-#navigatorBody .df-search-results {
+#navigatorBody .nav-search-results {
   flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -363,7 +384,7 @@
 }
 
 /* Nothing typed yet: say what this field does */
-#navigatorBody .df-search-wrapper:has(.df-search-input:placeholder-shown) .df-search-results:empty::before {
+#navigatorBody .nav-search-wrapper:has(.nav-search-input:placeholder-shown) .nav-search-results:empty::before {
   content: "Type at least two characters. Matches are listed by page, with the words in context.";
   display: block;
   max-width: 32ch;
@@ -375,7 +396,7 @@
   color: var(--text-secondary);
 }
 
-#navigatorBody .df-search-result {
+#navigatorBody .nav-search-result {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-secondary);
   border-radius: 10px;
@@ -384,20 +405,20 @@
   transition: border-color 150ms ease, background-color 150ms ease;
 }
 
-#navigatorBody .df-search-result:hover,
-#navigatorBody .df-search-result:focus-visible {
+#navigatorBody .nav-search-result:hover,
+#navigatorBody .nav-search-result:focus-visible {
   border-color: var(--border-accent);
   outline: none;
   transform: none;
 }
-#navigatorBody .df-search-result:focus-visible { outline: 2px solid var(--text-accent); outline-offset: 2px; }
+#navigatorBody .nav-search-result:focus-visible { outline: 2px solid var(--text-accent); outline-offset: 2px; }
 
-#navigatorBody .df-search-result.df-selected {
+#navigatorBody .nav-search-result.is-current {
   border-color: var(--text-accent);
   box-shadow: none;
 }
 
-#navigatorBody .df-search-result-head {
+#navigatorBody .nav-search-result-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -410,7 +431,7 @@
   color: var(--text-accent);
 }
 
-#navigatorBody .df-search-result-count {
+#navigatorBody .nav-search-result-count {
   flex: 0 0 auto;
   min-width: 20px;
   text-align: center;
@@ -424,7 +445,7 @@
   padding: 2px 7px;
 }
 
-#navigatorBody .df-search-snippet {
+#navigatorBody .nav-search-snippet {
   font-family: var(--font-sans);
   font-size: 12.5px;
   line-height: 1.5;
@@ -434,9 +455,9 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-#navigatorBody .df-search-snippet + .df-search-snippet { margin-top: 4px; }
+#navigatorBody .nav-search-snippet + .nav-search-snippet { margin-top: 4px; }
 
-#navigatorBody .df-search-snippet mark {
+#navigatorBody .nav-search-snippet mark {
   background: var(--bg-accent-active);
   color: var(--text-primary);
   border-radius: 3px;
@@ -469,10 +490,10 @@
 }
 
 /* Side panels must be scrollable by touch, never zoom the book */
-.df-sidemenu,
-.df-thumb-wrapper,
-.df-outline-wrapper,
-.df-search-results {
+.nav-pane,
+.nav-pages-list,
+.nav-outline-list,
+.nav-search-results {
   touch-action: pan-y !important;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -480,33 +501,16 @@
 
 /* Mobile Adjustments */
 @media (max-width: 768px) {
-  /* Same specificity as min.css so the page indicator is not hidden on narrow containers */
-  .df-container.df-xs .df-ui-controls .df-ui-btn.df-ui-page {
-    display: inline-block !important;
-  }
-
-  .df-sidemenu {
-    width: min(80vw, 300px) !important;
-    top: 10px !important;
-    bottom: 70px !important;
-  }
-
-  /* A phone sheet is wide: the page tiles grow with it (the row height is set in JS to match) */
-  #navigatorBody .df-thumb-container {
-    --thumb-row-h: 320px;
-    --thumb-gap: 20px;
-    --thumb-caption-h: 28px;
-  }
-
-  /* Overlay the book instead of squeezing it into the remaining ~120px */
-  .df-container.df-sidemenu-open .df-book-stage {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
+  /* A phone sheet is wide enough for two columns, so the tiles grow with it */
+  #navigatorBody .nav-pages {
+    --tile-h: 218px;
+    --tile-cap: 28px;
+    --tile-gap: 20px;
   }
 }
 
 /* --- Recognise text (OCR) offer inside the search pane ------------------------------------- */
-#navigatorBody .df-ocr {
+#navigatorBody .nav-ocr {
   flex: 0 0 auto;
   margin: 0 14px 12px 14px;
   padding: 12px 14px;
@@ -517,19 +521,19 @@
   border-radius: 10px;
   background: var(--bg-tertiary);
 }
-#navigatorBody .df-ocr[hidden] { display: none; }
-#navigatorBody .df-ocr-text,
-#navigatorBody .df-ocr-progress {
+#navigatorBody .nav-ocr[hidden] { display: none; }
+#navigatorBody .nav-ocr-text,
+#navigatorBody .nav-ocr-progress {
   margin: 0;
   font-family: var(--font-sans);
   font-size: 12.5px;
   line-height: 1.5;
   color: var(--text-secondary);
 }
-#navigatorBody .df-ocr-progress { color: var(--text-primary); font-variant-numeric: tabular-nums; }
-#navigatorBody .df-ocr-progress:empty { display: none; }
-#navigatorBody .df-ocr-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-#navigatorBody .df-ocr-langs {
+#navigatorBody .nav-ocr-progress { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+#navigatorBody .nav-ocr-progress:empty { display: none; }
+#navigatorBody .nav-ocr-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#navigatorBody .nav-ocr-langs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2px;
@@ -538,7 +542,7 @@
   border-radius: 10px;
   background: var(--bg-primary);
 }
-#navigatorBody .df-ocr-langbtn {
+#navigatorBody .nav-ocr-langbtn {
   flex: 1 1 0;
   min-width: 0;
   min-height: 40px;
@@ -556,67 +560,10 @@
   cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease;
 }
-#navigatorBody .df-ocr-langbtn:first-child { grid-column: 1 / -1; }
-#navigatorBody .df-ocr-langbtn:hover { color: var(--text-primary); }
-#navigatorBody .df-ocr-langbtn[aria-checked="true"] { background: var(--bg-accent); color: var(--text-primary); }
-#navigatorBody .df-ocr-langbtn:focus-visible { outline: 2px solid var(--text-accent); outline-offset: -2px; }
-#navigatorBody .df-ocr-langbtn:disabled { cursor: default; opacity: 0.6; }
-#navigatorBody .df-ocr-hint { margin: -4px 0 0; font-family: var(--font-sans); font-size: 12px; color: var(--text-secondary); }
-#navigatorBody .df-ocr-run { flex: 0 0 auto; }
-
-/* ---------------------------------------------------------------------------
- * 2D (CSS) renderer
- *
- * Used when WebGL is unavailable, or when the mode is pinned with `?render=css`.
- * `lib/css/min.css` already lays the book out; these rules only give the leaves a
- * real third dimension so a turn shows the other side of the sheet, and undo the
- * flat-stack z-index rules that would otherwise hide a face or a page canvas.
- * ------------------------------------------------------------------------- */
-
-.df-container .df-book-wrapper { perspective: 2400px; perspective-origin: 50% 50%; }
-
-.df-book-page.df-css-page {
-  transform-style: preserve-3d;
-  will-change: transform;
-  background-color: transparent;
-}
-
-.df-book-page.df-css-page .df-page-front,
-.df-book-page.df-css-page .df-page-back {
-  z-index: auto;
-  top: 0;
-  left: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform-origin: 50% 50%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  box-shadow: 0 1px 6px rgb(0 0 0 / 0.28);
-}
-
-/* A page rendered with search marks arrives as a live canvas rather than an image URL. */
-.df-book-page.df-css-page .df-page-front > canvas,
-.df-book-page.df-css-page .df-page-back > canvas {
-  position: absolute;
-  z-index: auto;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* The annotation / link overlay sits above the page image. */
-.df-book-page.df-css-page .df-page-content {
-  z-index: 3;
-  background: none;
-  pointer-events: auto;
-}
-
-.df-book-page.df-css-page .df-page-content.df-page-loading {
-  background: linear-gradient(90deg, rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.04));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .df-book-page.df-css-page { transition: none !important; }
-}
+#navigatorBody .nav-ocr-langbtn:first-child { grid-column: 1 / -1; }
+#navigatorBody .nav-ocr-langbtn:hover { color: var(--text-primary); }
+#navigatorBody .nav-ocr-langbtn[aria-checked="true"] { background: var(--bg-accent); color: var(--text-primary); }
+#navigatorBody .nav-ocr-langbtn:focus-visible { outline: 2px solid var(--text-accent); outline-offset: -2px; }
+#navigatorBody .nav-ocr-langbtn:disabled { cursor: default; opacity: 0.6; }
+#navigatorBody .nav-ocr-hint { margin: -4px 0 0; font-family: var(--font-sans); font-size: 12px; color: var(--text-secondary); }
+#navigatorBody .nav-ocr-run { flex: 0 0 auto; }

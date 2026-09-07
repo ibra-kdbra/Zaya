@@ -39,7 +39,7 @@ export function collectErrors(page) {
 
 /** Wait until the flipbook has rendered something. */
 export async function waitForBook(page) {
-  await expect(page.locator('#flipbookContainer canvas, #flipbookContainer .df-book-page').first())
+  await expect(page.locator('#flipbookContainer canvas').first())
     .toBeVisible({ timeout: 30_000 });
   await expect.poll(() => page.evaluate(() => !!(window.ZayaBook && window.ZayaBook.isReady)), { timeout: 15_000 })
     .toBe(true);

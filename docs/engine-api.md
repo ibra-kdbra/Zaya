@@ -1,20 +1,23 @@
 # The engine contract
 
-Zaya draws its pages with an engine it does not own: the fork under `engine/`, derived from
-DearFlip Lite and licensed CC BY-NC-ND 4.0. Replacing it with permissively-licensed code is the
-one structural change the project is still waiting on, and this file is the specification that
-replacement is to be written from.
+Zaya draws its pages with an engine, and this file is everything the application is allowed to
+know about it. It is a specification rather than a description: it was written from the outside
+so that an engine could be built from it alone, and that is what happened — `engine-next/` was
+written against this page and now draws every page the reader sees. The fork it replaced,
+`engine/`, is still in the tree and is no longer loaded by anything.
 
-It is written from the outside. Everything below is stated as *what the application asks for* and
-*what it must observe in return* — never as a description of how the fork happens to be built —
-so that an engine written against this page owes nothing to the fork's code or structure.
+Everything below is stated as *what the application asks for* and *what it must observe in
+return*, never as a description of how either engine happens to be built. Where the two engines
+answered a question differently, the answer recorded here is the one that holds.
 
 Two files enforce it:
 
-- **`lib/js/core/book.js`** implements the contract as `window.ZayaBook`, today by delegating to
-  the fork. It is the only file under `lib/` allowed to know how the engine is put together.
+- **`lib/js/core/book.js`** implements the contract as `window.ZayaBook`, by translating it onto
+  `engine-next/`. It is the only file under `lib/` allowed to know how the engine is put
+  together, and it is where anything the engine leaves to the application — saving a download,
+  showing the share box, painting search marks, building the Navigator's panes — is arranged.
 - **`tests/engine-contract.spec.mjs`** exercises every KEEP member through `window.ZayaBook` on
-  the fixtures. It asserts behaviour, not markup, so a replacement engine runs the same file.
+  the fixtures. It asserts behaviour, not markup, so another engine would run the same file.
 
 Each member is marked **KEEP** (part of the contract; the app may rely on it) or **INTERNAL**
 (the app must not touch it; listed here so that what was migrated away is on the record).
@@ -24,7 +27,10 @@ Each member is marked **KEEP** (part of the contract; the app may rely on it) or
 ## 1. The namespace
 
 `window.ZayaBook` is a classic script, listed in `lib/js/app.js` straight after the engine. It
-publishes the namespace only; the engine itself is looked up when a document is opened.
+publishes the namespace only; the engine itself is looked up when a document is opened. The
+engine is a set of ES modules, so one line of module — `lib/js/core/engine.js` — imports it and
+leaves the constructor on `window.ZayaEngine`; the loader runs that before the facade's first
+`create`, and nothing else in `lib/` reads it.
 
 | Member | Signature | Semantics | Used by | |
 | --- | --- | --- | --- | --- |
@@ -56,12 +62,19 @@ replacement engine may accept more, but must not *require* more.
 | `onPageChanged` | `(bookPage) => void` | Called on every page turn, with the book page now open. The facade wraps this to write page memory and `AppState`, so a replacement engine needs to know nothing about either. | KEEP |
 | `zoomChange` | `(isZoomed) => void` | Called when the reader zooms in or back out. Zaya uses it to stop the document scrolling behind a zoomed page. | KEEP |
 
-Options the fork also reads — `webgl`, `pageMode`, `singlePageMode`, `pageSize`, `transparent`,
-`forceFit`, `autoPlay`, `search`, `icons`, `mockupjsSrc`, `pdfjsSrc`, `soundFile`,
-`imagesLocation`, `cMapUrl`, `enableDownload`, `controlsPosition` — are **INTERNAL**: Zaya passes
-none of them, and a replacement engine owes nothing for them. Asset locations in particular are
-the engine's own business; the fork resolves them from its module URL and nothing in `lib/`
-supplies them.
+Anything else an engine offers is **INTERNAL**. `engine-next` takes several options of its own —
+`renderMode`, `soundUrl`, `paintPage`, `textLayer`, `pageMode`, `doubleInternal`, `readback` —
+and `core/book.js` fills them in from the contract's options, from `?render=`, and from the
+sound the application ships; nothing outside that file passes them. Asset locations are the
+engine's own business: it resolves them from its module URL and nothing in `lib/` supplies them.
+
+Two of those deserve a note, because they used to be nobody's decision:
+
+- **the renderer.** `window.ZAYA_RENDER_MODE` and `?render=` (§8) are read by the facade, not by
+  the engine, and arrive as an option. The application still does not *choose* the renderer;
+  it only passes on what the page or the URL asked for.
+- **the sound.** The engine plays a page turn; which file it plays comes from the application,
+  which is what ships it (`lib/sound/`).
 
 ---
 
@@ -91,7 +104,7 @@ whether the reader sees them one at a time or as spreads.
 
 | Member | Signature | Semantics | Used by | |
 | --- | --- | --- | --- | --- |
-| `activePage` | getter → `number` | The page now open — the left-hand page of the spread in double mode. `1` before anything is open. | control bar, print, text pane, page memory | KEEP |
+| `activePage` | getter → `number` | The page now open. `1` before anything is open. `gotoPage(n)` makes it exactly `n`; a turn made with `next` or `prev` lands on the **recto** of the spread it reaches — the odd-numbered leaf — so turning forward from the cover of a three-page book reports `3`, and the reader sees pages two and three. | control bar, print, text pane, page memory | KEEP |
 | `pageCount` | getter → `number` | Book pages in the document. `0` when none is open. | control bar, print, search panel | KEEP |
 | `gotoPage(n)` | `(number) → number` | Turn to page `n`, animating. `n` is clamped into `1…pageCount`; a non-number is treated as `1`. Returns the page the book is on when the call returns (the animation may still be running). | control bar, search results, tests | KEEP |
 | `next()` | `() → void` | Turn one page (one spread in double mode) forward *in reading order*: leftward in a right-to-left book. No-op at the end. | control bar | KEEP |
@@ -121,7 +134,7 @@ codes (`1`/`2`). These were read directly by `core/load.js`, `features/controls/
 | `pdfDocument` | getter → `PDFDocumentProxy \| null` | The pdf.js document proxy for the open PDF, so the app can render pages itself. Zaya prints from it (`features/print/print.js`) and indexes its text for search and the Text pane. `null` before the document is open and after teardown. The engine owns the proxy's lifetime: it must stay usable until `dispose()`. | print, search, text pane | KEEP |
 | `spreadPerPdfPage` | getter → `boolean` | Whether one PDF page carries a whole two-page spread — a scanned booklet, where the page count of the book is roughly twice the page count of the PDF. | text pane, print | KEEP |
 | `toPdfPage(bookPage)` | `(number) → number` | Book page → PDF page. Identity for an ordinary document. When `spreadPerPdfPage`, book pages 1 and 2 are the covers on PDF pages 1 and 2, and from book page 3 on each PDF page carries two: `ceil((bookPage − 1) / 2) + 1`. Always returns at least `1` and never more than `pdfDocument.numPages`. | text pane, print | KEEP |
-| `toBookPage(pdfPage)` | `(number) → number` | The inverse: identity for an ordinary document, `pdfPage * 2 − 1` beyond PDF page 2 when `spreadPerPdfPage`. Clamped into `1…pageCount`. | search results | KEEP |
+| `toBookPage(pdfPage)` | `(number) → number` | The inverse: identity for an ordinary document, `pdfPage * 2 − 1` beyond PDF page 2 when `spreadPerPdfPage`. That is the right-hand of the two leaves the scanned page carries; the left-hand one would do as well, since both are on the same spread, and this is simply the answer the application and its tests have always used. Clamped into `1…pageCount`. | search results | KEEP |
 | `visiblePdfPages()` | `() → number[]` | The PDF pages on screen right now, in reading order, with duplicates removed: one page in single mode, the pair of the spread in double mode (the even page and the odd one after it), mapped through `toPdfPage`. Empty before the document is ready. | text pane | KEEP |
 
 Both mappings are total functions: they never throw and never leave the document, whatever number
@@ -158,59 +171,44 @@ identically in whichever renderer is running.
 
 ## 6. Panels
 
-The engine builds three side panels — thumbnails, outline and search — because they need the
-stage to suppress orbiting and scrolling while the pointer is over them. Zaya's Navigator
-(`features/controls/custom-controls.js`) re-parents them into its own drawer as tabs; the Text
-pane beside them is Zaya's own and no concern of the engine's.
+The engine builds no interface at all. The Navigator's four tabs are the application's own:
+`features/navigator/panes.js` builds the Pages and Outline panes from the data in §6a and hosts
+the Search pane that `features/search/search-panel.js` fills, and `features/text/text-pane.js`
+builds the Text pane beside them. The three members below are what the facade publishes so that
+the Navigator does not have to know which module builds what.
 
 | Member | Signature | Semantics | Used by | |
 | --- | --- | --- | --- | --- |
-| `ensurePanel(name)` | `("thumbs"\|"outline"\|"search") → Element \| null` | Build the panel if it does not exist, and return its root element. Idempotent — a second call builds nothing. `null` for an unknown name, and for a panel the document cannot support (no outline, no text). | Navigator | KEEP |
-| `panel(name)` | `("thumbs"\|"outline"\|"search") → Element \| null` | The panel's root element if it has been built, else `null`. | Navigator | KEEP |
-| `setPanelActive(name, on)` | `(string, boolean) → void` | Tell the engine's own toolbar which panel the app considers open, so its buttons agree with the drawer. Silently does nothing for an unknown name. | Navigator | KEEP |
-| `updateUi(force)` | `(boolean?) → void` | Redraw the engine's own chrome — page numbers, button states — after the app has changed something behind its back. `force` redraws even when nothing looks changed. | Navigator, `core/load.js` | KEEP |
+| `ensurePanel(name)` | `("thumbs"\|"outline"\|"search") → Element \| null` | Build the pane if it does not exist, and return its root element. Idempotent — a second call builds nothing. `null` for an unknown name, and before a document is open. | Navigator | KEEP |
+| `panel(name)` | `("thumbs"\|"outline"\|"search") → Element \| null` | The pane's root element if it has been built, else `null`. | Navigator | KEEP |
+| `setPanelActive(name, on)` | `(string, boolean) → void` | Mark which pane the application considers open. Silently does nothing for an unknown name. | Navigator | KEEP |
+| `updateUi(force)` | `(boolean?) → void` | Redraw the engine's own chrome after the app has changed something behind its back. `engine-next` draws none, so this does nothing; it stays because an engine that drew its own controls would need telling. | Navigator, `core/load.js` | KEEP |
 
 ### The DOM contract
 
-A panel root must be an element that:
+A pane root is an element that:
 
-- carries `df-sidemenu`, and `df-sidemenu-visible` exactly while it is showing. The Navigator
-  toggles that second class to open and close a tab, and watches it so that a panel the engine
-  opens by itself (`?search=`, the engine's own toolbar) opens the drawer too;
-- survives being moved into another parent. The Navigator appends it to `#navigatorBody` and
-  gives it an id (`navPaneThumbs` / `navPaneOutline` / `navPaneSearch`), `role="tabpanel"`,
-  `tabindex` and `data-nav-tab`; the engine must not move it back or re-create it in place;
+- carries `nav-pane`, and `nav-pane-visible` exactly while it is showing. The Navigator toggles
+  that second class to open and close a tab, and watches it so that a pane opened from elsewhere
+  (`?search=`, "search this selection" in the Text pane) opens the drawer too;
+- lives in `#navigatorBody` and carries an id (`navPaneThumbs` / `navPaneOutline` /
+  `navPaneSearch` / `navPaneText`), `role="tabpanel"`, `tabindex` and `data-nav-tab`;
 - is rebuilt per document, and the old one discarded. Exactly one of each kind may exist.
 
-The Navigator recognises panels, and decides whether one is empty, by these class names. They are
-part of the contract until the panels are rebuilt as Zaya's own, and a replacement engine must
-produce them:
+The Navigator decides whether a pane is empty by looking inside it, so these names are shared
+between `panes.js`, `search-panel.js` and the stylesheets, and are changed in one pass or not at
+all:
 
 | Selector | What it marks |
 | --- | --- |
-| `.df-thumb-container` | the thumbnails panel root |
-| `.df-vrow` | one thumbnail row inside it |
-| `.df-outline-container` | the outline panel root |
-| `.df-outline-item` | one outline entry |
-| `.df-search-container` | the search panel root, which the app fills |
-| `.df-sidemenu`, `.df-sidemenu-visible` | any panel, and the one showing |
+| `.nav-pages`, `.nav-page` | the Pages pane, and one page tile in it |
+| `.nav-outline`, `.nav-outline-item` | the Outline pane, and one entry in it |
+| `.nav-search`, `.nav-search-result` | the Search pane, and one result in it |
+| `.nav-pane`, `.nav-pane-visible` | any pane, and the one showing |
 
-Also styled by the app or queried by tests, and so equally part of the DOM contract:
-`.df-container` (the stage root, on `#flipbookContainer` itself), `.df-book-page`,
-`.df-book-stage`, `.df-book-wrapper`, `.df-css-page`, `.df-page-front`, `.df-page-back`,
-`.df-ui` and its buttons (`.df-ui-btn`, `.df-ui-page`, `.df-ui-download`, `.df-ui-controls`),
-`.df-next-button` / `.df-prev-button`, `.df-share-*`, `.df-fullscreen-active`, `.df-rtl`.
-A replacement engine is free to rename all of these, provided it renames them in
-`lib/css/page/shell.css`, `custom-ui.css` and `chrome.css`, in the Navigator's selector table and
-in `ZayaBook.stageSelector` at the same time. The contract tests do not depend on them.
-
-The search panel's own contents (`.df-search-input`, `.df-search-result`, `.df-search-status`,
-`.df-ocr*`) are built by `lib/js/features/search/search-panel.js` and are **not** the engine's.
-
-**INTERNAL, migrated away:** `book.contentProvider.initThumbs`,
-`book.contentProvider.initOutline`, `book.ui.thumbnail`, `book.ui.outline`, `book.ui.update`.
-
----
+The engine's own markup is entirely its business. `engine-next` marks the container it was given
+`zn-book`, puts a `zn-stage` inside it, and names everything below that `zn-*`; the application
+styles none of it, and `ZayaBook.stageSelector` is the only place any of it is written down.
 
 ## 6a. Data for panels
 
@@ -235,24 +233,24 @@ Turning to an outline entry or a thumbnail is the application's job: map the PDF
 | Member | Signature | Semantics | Used by | |
 | --- | --- | --- | --- | --- |
 | `toggleFullscreen()` | `() → void` | Enter or leave fullscreen, through whatever mechanism the engine uses, so its own stage follows. | control bar | KEEP |
-| `share()` | `() → void` | Open the engine's share box for the current page. | control bar | KEEP |
-| `download()` | `() → boolean` | Offer the open document for download. Returns whether anything happened; falls back to opening `source` in a new tab when the engine has no download control of its own. | More menu | KEEP |
+| `share()` | `() → void` | Show the share box for the page now open. The engine works out the address — this page's, with `?page=` on it — and the facade puts the box on screen (`ui/share-box.js`). | control bar | KEEP |
+| `download()` | `() → boolean` | Offer the open document for download. Returns whether anything was started. The engine resolves the document to a URL or a blob and the facade saves it; with no book open it falls back to opening `source` in a new tab. | More menu | KEEP |
 | `zoom(delta)` | `(number) → void` | Zoom in (`+1`) or out (`−1`) one step. Zooming past the fit-to-page step calls the `zoomChange` option. | control bar | KEEP |
 | `setInteractive(on)` | `(boolean) → void` | Let the stage go, or take it back. The app switches this off while the pointer is over a drawer, so dragging in a panel does not orbit the book beneath it, and back on when the pointer leaves. A renderer with nothing to orbit may ignore it. | control bar | KEEP |
 | `interactive` | getter → `boolean` | Whether the stage is currently taking pointer input. A renderer with nothing to orbit reports `true`. | contract tests | KEEP |
 | `soundEnabled` | getter → `boolean` | Whether page turns make a sound. Defaults to the `soundEnable` option, `true` when unset. | More menu | KEEP |
-| `setSoundEnabled(on)` | `(boolean) → void` | Turn the page-turn sound on or off, and update whatever the engine shows for it. The app remembers the choice itself (`zayaSoundEnabled`) and re-applies it to each new book, because the engine forgets it between documents. | More menu | KEEP |
+| `setSoundEnabled(on)` | `(boolean) → void` | Turn the page-turn sound on or off. The app remembers the choice itself (`zayaSoundEnabled`) and re-applies it to each new book, because the engine forgets it between documents. | More menu | KEEP |
 | `fullscreen` | getter → `boolean` | Whether the book's own container is the fullscreen element. Follows the browser's `fullscreenchange`, so it is right even when the reader leaves fullscreen with the keyboard. | control bar | KEEP |
 | `setTextLayerEnabled(on)` | `(boolean) → void` | Whether the pages carry a transparent, selectable text layer over them. On by default. Selection is a reader's setting and a printing concern, not a rendering one, so the app may switch it off — for a scan with no text worth selecting, say — without the engine deciding for it. | settings, Text pane | KEEP |
 | `textLayerEnabled` | getter → `boolean` | Whether that layer is on. | settings | KEEP |
 
-**Zoom, stated for a replacement engine.** `zoom(delta)` above is the fork's spelling, a step in
-or out. An engine free of it should publish absolute levels — `zoom(level)`, `zoomIn()`,
-`zoomOut()`, `resetZoom()`, with `1` meaning fit-to-stage — and let `core/book.js` map the
-contract's `±1` onto `zoomIn`/`zoomOut`. Whatever the spelling, three things are the contract:
-the `zoomChange` option fires **once** on each crossing of the fit boundary and not once per
-step; a magnified page is re-rendered at the magnified scale rather than merely stretched; and
-the reader can pan a magnified page and get back to fit.
+**Zoom.** `zoom(delta)` above is a step in or out, and that is what the application asks for.
+An engine is free to speak in absolute levels instead — `engine-next` does, with `zoom(level)`,
+`zoomIn()`, `zoomOut()` and `resetZoom()`, `1` meaning fit-to-stage — and `core/book.js` maps
+the contract's `±1` onto its `zoomIn` / `zoomOut`. Whatever the spelling, three things are the
+contract: the `zoomChange` option fires **once** on each crossing of the fit boundary and not
+once per step; a magnified page is re-rendered at the magnified scale rather than merely
+stretched; and the reader can pan a magnified page and get back to fit.
 
 **INTERNAL, migrated away:** `book.ui.switchFullscreen`, `book.ui.share`, `book.ui.download`,
 `book.ui.updateSound`, `book.options.soundEnable`, `book.options.source`,
@@ -285,7 +283,8 @@ can tell what the open book was given.
 ## 9. Events
 
 Four events are dispatched on `document`. **None of them is the engine's** — this is the boundary
-the facade draws, and a replacement engine dispatches nothing at all. They are listed because
+the facade draws. An engine that wants to announce itself must do so under a name of its own:
+`engine-next` uses a `zaya-engine:` prefix, and nothing in `lib/` listens to it. They are listed because
 they are the contract's observable side and the plugin API's (`docs/CONTRIBUTING.md`).
 
 | Event | Dispatched by | Detail | When |
@@ -306,15 +305,13 @@ Zaya also emits `zaya:themeChanged`, `zaya:languageChanged`, `zaya:pageTextChang
 
 ## 10. What the engine may not do
 
-The fork still reaches out of its own root in four places. Three are contract violations that a
-replacement engine must not repeat; the fourth is allowed.
+An engine reads and writes nothing outside its own container and its own construction options.
+It does not call `window.saveLastPage`, `window.appState`, `window.ZayaNavigator`,
+`window.ZayaDocumentError` or `window.ZayaCurrentDocKey`; it does not close a drawer; it does not
+decide what a failed load looks like. Everything it has to say it says through the callbacks in
+§1, and the facade decides what the application does about it.
 
-| Site | What it does | Verdict |
-| --- | --- | --- |
-| `engine/factory.js` | reports page turns through `options.onPageChanged` | **allowed** — that is the contract hook |
-| `engine/factory.js` | falls back to `window.saveLastPage` / `window.appState` when no `onPageChanged` is given | INTERNAL, for books opened by the engine's own lightbox; a replacement engine drops it |
-| `engine/ui/ui.js` | calls `window.ZayaNavigator.close()` | INTERNAL — a replacement engine reports the dismissal and lets the app decide |
-| `engine/core/texture-library.js` | calls `window.ZayaDocumentError()` on a failed load, and `window.ZayaCurrentDocKey()` for the search panel's storage key | INTERNAL — both belong in construction options or a failure callback |
-
-Untangling those three is step E2. They are recorded here so the replacement is not written
-against them by accident.
+The fork under `engine/` broke that rule in three places — it wrote page memory directly, closed
+the Navigator itself, and reported document errors through a global — which is why the rule is
+written down rather than assumed. `engine-next` breaks it nowhere: its only reference to the page
+outside its container is `document.fullscreenchange`, which is where the browser puts it.

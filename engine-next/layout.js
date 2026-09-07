@@ -55,13 +55,15 @@ export class Layout {
   }
 
   /**
-   * PDF page → book page. For a `doubleInternal` document this is the *left* of the two book
-   * pages the PDF page carries, which is where a search hit should turn the book to.
+   * PDF page → book page. For a `doubleInternal` document this is the *right* of the two book
+   * pages the PDF page carries, as `docs/engine-api.md` §4 records it. Either leaf would do —
+   * both sit on the same spread, so a reader sent to one sees the other beside it — and the
+   * contract's answer is the one the application and its tests have used since 6.1.
    */
   bookPageForPdfPage(pdfPage) {
     const p = Math.max(1, Math.min(this.pdfPageCount, Math.round(pdfPage) || 1));
     if (!this.doubleInternal) return p;
-    return p <= 2 ? p : p * 2 - 2;
+    return p <= 2 ? p : p * 2 - 1;
   }
 
   /**
@@ -97,21 +99,39 @@ export class Layout {
     return this.direction === "rtl" ? [recto, verso] : [verso, recto];
   }
 
-  /** The first book page of the spread that follows the one holding `bookPage`. */
-  nextPage(bookPage) {
-    const n = this.clamp(bookPage);
-    const step = this.pageMode === "single" ? 1 : 2;
-    const target = this.pageMode === "single" ? n + 1 : Math.floor(n / 2) * 2 + step;
-    return target > this.pageCount ? null : this.clamp(target);
+  /**
+   * The recto — the odd, right-hand-in-a-left-to-right-book page — of the spread holding
+   * `bookPage`. A turn is named by it: the cover is spread 1 and is its own recto, and every
+   * spread after that is `[2k, 2k+1]`, so stepping the recto by two is stepping one spread.
+   */
+  rectoOf(bookPage) {
+    return Math.floor(this.clamp(bookPage) / 2) * 2 + 1;
   }
 
-  /** The first book page of the spread before the one holding `bookPage`. */
+  /**
+   * Where a forward turn lands, or `null` at the end of the book.
+   *
+   * In double mode that is the recto of the next spread rather than its verso: a reader who
+   * turns from the cover of a three-page book is looking at pages two and three, and the page
+   * they have turned *to* is three. `docs/engine-api.md` §3 and the contract tests both count
+   * it that way, and the page number the application shows comes straight from here.
+   */
+  nextPage(bookPage) {
+    const n = this.clamp(bookPage);
+    if (this.pageMode === "single") return n + 1 > this.pageCount ? null : n + 1;
+    const recto = this.rectoOf(n) + 2;
+    if (recto <= this.pageCount) return recto;
+    // An even-length book ends on a verso with nothing facing it; that page is still a page.
+    const verso = recto - 1;
+    return verso <= this.pageCount && verso > n ? verso : null;
+  }
+
+  /** The same, backwards. */
   prevPage(bookPage) {
     const n = this.clamp(bookPage);
     if (this.pageMode === "single") return n <= 1 ? null : n - 1;
-    const verso = Math.floor(n / 2) * 2;
-    if (verso <= 0) return null;                 // already on the cover spread
-    return this.clamp(verso - 2 >= 1 ? verso - 2 : 1);
+    const target = this.rectoOf(n) - 2;
+    return target < 1 ? null : target;
   }
 
   /** The sheet that turns when moving from `from` to `to` (1-based), or 0 if nothing turns. */

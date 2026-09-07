@@ -6,10 +6,10 @@
  * reader application needs is on that object, and the engine announces what it does on
  * `document` so parts of the application that never held a reference can follow along:
  *
- *   zaya:pdfLoaded  { pageCount }              the document opened
- *   zaya:bookReady  { }                        the first spread is painted
- *   zaya:pageChanged{ page, pdfPages }         the reader is looking at something else
- *   zaya:zoomChanged{ zoomed, level }          the reader magnified a page, or came back to fit
+ *   zaya-engine:pdfLoaded  { pageCount }              the document opened
+ *   zaya-engine:bookReady  { }                        the first spread is painted
+ *   zaya-engine:pageChanged{ page, pdfPages }         the reader is looking at something else
+ *   zaya-engine:zoomChanged{ zoomed, level }          the reader magnified a page, or came back to fit
  *
  * The engine owns four things and no more: which pages are on screen, how they are drawn, how a
  * turn is animated, and how close the reader is standing to the paper. Search, thumbnails,
@@ -38,7 +38,7 @@ const DEFAULTS = {
   soundUrl: "",
   singlePageMode: null,
   pageMode: null,
-  doubleInternal: false,
+  doubleInternal: "auto",
   renderMode: "auto",
   textLayer: true,
   readback: false,
@@ -58,6 +58,12 @@ const ZOOM_STEP = 1.5;
 const DOUBLE_TAP_ZOOM = 2;
 /** How long to wait after the last zoom before re-rendering the pages at the new scale. */
 const RESHARPEN_MS = 180;
+/**
+ * How wide a page has to be, against its height, before it is read as a spread rather than a
+ * page. Ordinary paper in landscape is around 1.41; the threshold sits below that and well
+ * above the 1.0 of a square scan, so a book photographed open is caught and a wide page is not.
+ */
+const LANDSCAPE_SPREAD_RATIO = 1.3;
 
 function prefersReducedMotion() {
   try {
@@ -160,12 +166,12 @@ export class ZayaBook {
 
       this.layout = new Layout({
         pdfPageCount: this.pdfDocument.numPages,
-        doubleInternal: !!this.options.doubleInternal,
+        doubleInternal: await this.resolveDoubleInternal(),
         direction: this.direction,
         hard: this.options.hard,
       });
       this.pageCount = this.layout.pageCount;
-      emit("zaya:pdfLoaded", { pageCount: this.pageCount });
+      emit("zaya-engine:pdfLoaded", { pageCount: this.pageCount });
 
       await this.measurePage();
       if (this.disposed) return this;
@@ -194,8 +200,10 @@ export class ZayaBook {
       await this.paintSpread();
       if (this.disposed) return this;
 
-      emit("zaya:bookReady", { pageCount: this.pageCount });
-      emit("zaya:pageChanged", { page: this.activePage, pdfPages: this.visiblePdfPages() });
+      emit("zaya-engine:bookReady", { pageCount: this.pageCount });
+      // The page a document opens on is a page change like any other: whoever is keeping track
+      // of where the reader is has not been told about it yet.
+      this.announce();
       if (typeof this.options.onReady === "function") this.options.onReady(this);
       return this;
     } catch (err) {
@@ -217,6 +225,31 @@ export class ZayaBook {
       }
     }
     return new CssRenderer(this, this.stage);
+  }
+
+  /**
+   * Whether every interior page of this file carries two book pages side by side.
+   *
+   * The option answers it outright when it is a boolean. Left at `"auto"` — the default, because
+   * no caller can be expected to know before the file is open — the shape of the paper decides:
+   * a page appreciably wider than it is tall, in a document long enough to be a book, is a
+   * photograph of an open book rather than a page of one. A single landscape sheet is not: a
+   * poster, a slide deck and a spreadsheet print are all wide and all have one page per page,
+   * so the test asks for an interior page of a document with at least three of them.
+   *
+   * @returns {Promise<boolean>}
+   */
+  async resolveDoubleInternal() {
+    const asked = this.options.doubleInternal;
+    if (asked === true || asked === false) return asked;
+    if (this.pdfDocument.numPages < 3) return false;
+    try {
+      const page = await this.pdfDocument.getPage(2);
+      const viewport = page.getViewport({ scale: 1 });
+      return viewport.height > 0 && viewport.width / viewport.height >= LANDSCAPE_SPREAD_RATIO;
+    } catch (err) {
+      return false;                         // an unreadable page is not evidence of anything
+    }
   }
 
   /**
@@ -471,7 +504,7 @@ export class ZayaBook {
 
   announce() {
     const detail = { page: this.activePage, pdfPages: this.visiblePdfPages() };
-    emit("zaya:pageChanged", detail);
+    emit("zaya-engine:pageChanged", detail);
     if (typeof this.options.onPageChange === "function") this.options.onPageChange(detail.page, detail.pdfPages);
   }
 
@@ -623,7 +656,7 @@ export class ZayaBook {
 
   announceZoom() {
     const detail = { zoomed: this.zoomed, level: this.zoomLevel };
-    emit("zaya:zoomChanged", detail);
+    emit("zaya-engine:zoomChanged", detail);
     if (typeof this.options.zoomChange === "function") this.options.zoomChange(detail.zoomed, detail.level);
   }
 
@@ -740,7 +773,7 @@ export class ZayaBook {
     this.container.classList.toggle("zn-fullscreen", this.fullscreen);
     this.resize();
     if (typeof this.options.onFullscreenChange === "function") this.options.onFullscreenChange(this.fullscreen);
-    emit("zaya:fullscreenChanged", { fullscreen: this.fullscreen });
+    emit("zaya-engine:fullscreenChanged", { fullscreen: this.fullscreen });
   }
 
   /**

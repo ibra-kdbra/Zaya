@@ -38,7 +38,7 @@ test.describe('Text pane', () => {
     // The tab is remembered like the other three.
     expect(await page.evaluate(() => window.appState.get('navigatorTab'))).toBe('text');
 
-    await page.evaluate(() => window.dFlipBook.target.gotoPage(3));
+    await page.evaluate(() => window.ZayaBook.current.gotoPage(3));
     await expect(page.locator('#navPaneText')).toContainText('Third and final page', { timeout: 20_000 });
     await expect(page.locator('#navPaneText')).not.toContainText('Zaya smoke test document');
   });
@@ -62,7 +62,7 @@ test.describe('Text pane', () => {
     await stubNetwork(page);
     await page.goto('/index.html?pdf=https://example.com/sample.pdf');
     await waitForBook(page);
-    await page.evaluate(() => window.dFlipBook.target.gotoPage(2));
+    await page.evaluate(() => window.ZayaBook.current.gotoPage(2));
     await openTextPane(page);
     await expect(page.locator('#navPaneText')).toContainText('quick brown fox', { timeout: 20_000 });
 
@@ -98,7 +98,7 @@ test.describe('Text pane', () => {
     await expect(page.locator('.text-actions')).toBeHidden();
 
     await selectParagraph(page);
-    await page.evaluate(() => window.dFlipBook.target.gotoPage(3));
+    await page.evaluate(() => window.ZayaBook.current.gotoPage(3));
     await expect(page.locator('.text-actions')).toBeHidden({ timeout: 10_000 });
   });
 
@@ -118,7 +118,7 @@ test.describe('Text pane', () => {
     await stubNetwork(page);
     await page.goto('/index.html?pdf=https://example.com/sample.pdf');
     await waitForBook(page);
-    await page.evaluate(() => window.dFlipBook.target.gotoPage(3));
+    await page.evaluate(() => window.ZayaBook.current.gotoPage(3));
     await openTextPane(page);
     await expect(page.locator('#navPaneText')).toContainText('zebra', { timeout: 20_000 });
 
@@ -138,8 +138,8 @@ test.describe('Text pane', () => {
     await expect(page.locator('.text-actions')).toBeVisible({ timeout: 10_000 });
     await page.locator('.text-action', { hasText: 'Search' }).click();
     await expect(page.locator('#navTabSearch')).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('.df-search-input')).toHaveValue('zebra', { timeout: 10_000 });
-    await expect(page.locator('.df-search-result')).toHaveCount(1, { timeout: 20_000 });
+    await expect(page.locator('.nav-search-input')).toHaveValue('zebra', { timeout: 10_000 });
+    await expect(page.locator('.nav-search-result')).toHaveCount(1, { timeout: 20_000 });
   });
 
   test('Arabic pages read right to left', async ({ page }) => {
@@ -172,6 +172,6 @@ test.describe('Text pane', () => {
     await expect(page.locator('#navPaneText .text-pane-state')).toContainText('no text', { timeout: 25_000 });
     await page.locator('#navPaneText .text-pane-link').click();
     await expect(page.locator('#navTabSearch')).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('.df-ocr')).toContainText('no text layer', { timeout: 20_000 });
+    await expect(page.locator('.nav-ocr')).toContainText('no text layer', { timeout: 20_000 });
   });
 });

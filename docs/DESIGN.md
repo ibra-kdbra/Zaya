@@ -84,10 +84,9 @@ switcher sits.
 - **Docking.** `body.dock-left` / `body.dock-right` publish the drawer widths as `--dock-l` /
   `--dock-r`. `#flipbookContainer` takes them as margins (with `width:auto`, because the markup
   carries `w-full`), the bottom bar re-centres on the remaining area, and `ZayaDrawers.syncDock()`
-  calls `dFlipBook.resize()` once the 180ms slide has settled. The margin itself is never
-  animated: the WebGL stage would relayout on every frame. While docked, the engine's own
-  side-menu shift in `preview-object.js` is skipped, so the book centres in what is left, and an
-  outside tap no longer dismisses — a docked drawer is layout, not an overlay.
+  calls `ZayaBook.current.resize()` once the 180ms slide has settled. The margin itself is never
+  animated: the WebGL stage would relayout on every frame. While docked, an outside tap no longer
+  dismisses — a docked drawer is layout, not an overlay.
 - **The rail.** 68px wide (enough for "Document" at 11px), items ≥52px tall, an 18px icon over an
   11px label, `title` for the tooltip. The active item takes a `--bg-accent` fill and a 3px
   `--text-accent` bar on the outer edge; its label stays `--text-primary`, because the accent
