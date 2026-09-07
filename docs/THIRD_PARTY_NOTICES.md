@@ -7,7 +7,6 @@
 | Themify Icons | `vendor/css/themify-icons.min.css`, `vendor/fonts/` | 1.0.1 | SIL OFL 1.1 (fonts) / MIT (CSS) |
 | Font Awesome Free | `vendor/css/fontawesome.min.css`, `vendor/fonts/webfonts/` (woff2 only) | 6.5.1 | CC BY 4.0 (icons) / SIL OFL 1.1 (fonts) / MIT (CSS) |
 | Toastify JS | `vendor/js/toastify.min.js`, `vendor/css/toastify.min.css` | 1.12.0 | MIT |
-| marked | `vendor/js/marked.min.js` (changelog page only) | 12.0.2 | MIT |
 | Tailwind CSS | precompiled to `vendor/css/tailwind.css` from `lib/css/tailwind.src.css` (`npm run build:css`) | 3.4 | MIT |
 | Tesseract.js | `vendor/ocr/tesseract.min.js`, `vendor/ocr/worker.min.js` (loaded only when the reader asks to recognise scanned pages) | 6.0.1 | Apache-2.0 |
 | Tesseract.js-core (Tesseract OCR compiled to WebAssembly) | `vendor/ocr/core/tesseract-core-simd-lstm.wasm.js`, `tesseract-core-lstm.wasm.js` | 6.1.2 (Tesseract 5) | Apache-2.0 |

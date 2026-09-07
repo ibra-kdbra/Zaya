@@ -11,7 +11,7 @@ everything below.
 | the top level | The served entry points and nothing else: `index.html`, `changelog.html`, `sw.js` (a service worker only controls pages at or below its own path, so it has to live here), `config.js` for per-deployment settings, plus the repository's own metadata. | MIT |
 | `lib/` | The first-party application: `lib/js/app.js` (the loader), `lib/js/core/load.js`, `lib/js/ui/`, `lib/js/features/`, `lib/js/utils/`, `lib/js/i18n/`, the stylesheets under `lib/css/`, and the images and sounds the app itself ships. | MIT |
 | `engine-next/` | **The page-turn engine.** Written clean-room from the contract below and from first principles — no line of it derives from the fork it replaced. Self-contained ES modules over pdf.js 4 and three.js r169 from `vendor/pdfjs/` and `vendor/three/`, with its own `engine.css` and a demo page. Reached only through the facade below. See `engine-next/README.md`. | MIT |
-| `vendor/` | Third-party runtime code, unmodified: `vendor/three` and `vendor/pdfjs` (the ESM builds `engine-next/` uses), `vendor/js` (Toastify and marked), `vendor/css`, `vendor/fonts` and `vendor/ocr` (Tesseract and its language packs). Each licence sits beside the files it covers. | various, all permissive, all noted |
+| `vendor/` | Third-party runtime code, unmodified: `vendor/three` and `vendor/pdfjs` (the ESM builds `engine-next/` uses), `vendor/js` (Toastify), `vendor/css`, `vendor/fonts` and `vendor/ocr` (Tesseract and its language packs). Each licence sits beside the files it covers. | various, all permissive, all noted |
 
 Three roots are not served at all: `docs/` (these notes, contributing, security, design and the
 third-party notices), `tools/` (eslint, playwright and tailwind configuration and the two check

@@ -953,4 +953,15 @@ export class ZayaBook {
   }
 }
 
+/*
+ * The files the engine fetches only when it is first asked to draw: the WebGL renderer and the
+ * three.js build it imports. Everything else in the engine is reached by a static import and is
+ * therefore already loaded. The application uses this to keep the engine available offline; the
+ * paths resolve against this module, so moving a file moves its entry with it.
+ */
+export const LAZY_ASSETS = [
+  new URL("./renderer-webgl.js", import.meta.url).href,
+  new URL("../vendor/three/three.module.min.js", import.meta.url).href
+];
+
 export default ZayaBook;

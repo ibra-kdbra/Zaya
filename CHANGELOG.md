@@ -5,6 +5,32 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.1.0] - 2026-09-07
+
+### Added
+- **The reader works offline after one visit rather than two.** A service worker takes control of a
+  page only after that page has already fetched its scripts, so a first visit used to leave nothing
+  behind but the handful of files precached at install: a reader who came once, then opened Zaya
+  again with no connection, got an empty shell. The page now tells the worker what it actually
+  loaded — the application's own scripts, the page-turn engine, three.js and pdf.js with its worker —
+  and the worker keeps them. One ordinary visit is now enough to open a book from disk with the
+  network switched off entirely. Files already held are skipped, so this costs nothing on later
+  visits, and the re-request is answered from the browser's own cache rather than the network. The
+  engine names the two files it fetches only when it first draws — its WebGL renderer and three.js —
+  so a reader who never opened a book before losing the connection still gets the real engine rather
+  than the plainer 2D fallback.
+
+### Fixed
+- **A link with `?rtl=1` sometimes opened the book left to right**, and the arrow keys then turned
+  the pages the wrong way. The reading direction in the address is applied when the application
+  finishes starting, but the first book was opened from a timer that could fire before that, so
+  which one won depended on how quickly the scripts arrived. The first book now waits for the
+  application to be ready, which is what the timer was standing in for. Present since 7.0.0.
+
+### Removed
+- `vendor/js/marked.min.js`. The changelog page parsed its Markdown with `marked` until it grew its
+  own parser; the file had been shipped to every reader since, referenced by nothing.
+
 ## [7.0.0] - 2026-09-07
 
 Zaya has its own engine now. Every page you turn is drawn by `engine-next/`, written for this
