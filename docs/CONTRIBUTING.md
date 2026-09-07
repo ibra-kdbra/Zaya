@@ -47,10 +47,10 @@ file belongs. In short:
 ## Talking to the flipbook
 
 Everything the app asks of the page-turn engine goes through `window.ZayaBook`, and
-`docs/engine-api.md` is the contract it publishes. Never read `window.dFlipBook`,
-`window.flipbookInstance` or `DFLIP.activeBook`, and never reach into a book's `target`,
-`contentProvider`, `ui` or `options`: those are the engine's insides, and the engine is being
-replaced. If the contract is missing something your feature needs, add it to
+`docs/engine-api.md` is the contract it publishes. `lib/js/core/book.js` is the only file allowed
+to know that `engine-next/` exists; never read `window.dFlipBook` or `window.flipbookInstance`,
+which survive only as deprecated aliases for old plugins, and never reach past the handle into the
+engine object behind it. If the contract is missing something your feature needs, add it to
 `lib/js/core/book.js` and to `docs/engine-api.md` in the same change, and cover it in
 `tests/engine-contract.spec.mjs`.
 

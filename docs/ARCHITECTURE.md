@@ -10,9 +10,9 @@ everything below.
 | --- | --- | --- |
 | the top level | The served entry points and nothing else: `index.html`, `changelog.html`, `sw.js` (a service worker only controls pages at or below its own path, so it has to live here), `config.js` for per-deployment settings, plus the repository's own metadata. | MIT |
 | `lib/` | The first-party application: `lib/js/app.js` (the loader), `lib/js/core/load.js`, `lib/js/ui/`, `lib/js/features/`, `lib/js/utils/`, `lib/js/i18n/`, the stylesheets under `lib/css/`, and the images and sounds the app itself ships. | MIT |
-| `engine/` | The page-turn engine: a fork of DearFlip Lite, modularised into ES modules, with its own stylesheet as `engine/engine.css`. It is neither ours nor a library we merely use, which is why it has a root of its own — it is the one part of the tree we intend to delete. Reached only through the facade below. | CC BY-NC-ND 4.0, non-commercial only |
-| `engine-next/` | The clean-room replacement for `engine/`, written from the public interface the reader uses and from first principles — no line of it derives from the fork it replaces. Self-contained ES modules over pdf.js 4 and three.js r169 from `vendor/pdfjs/` and `vendor/three/`, with its own `engine.css` and a demo page. Nothing in the reader loads it yet; it stays behind that flag until the switch-over, when `engine/` and `vendor/js/mockup.min.js` are deleted and the licence restriction goes with them. See `engine-next/README.md`. | MIT |
-| `vendor/` | Third-party runtime code, unmodified but for the patches recorded in `THIRD_PARTY_NOTICES.md`: `vendor/js` (jQuery, three.js, pdf.js and its worker and CMaps, marked, Toastify, the engine's mockup build), `vendor/three` and `vendor/pdfjs` (the ESM builds `engine-next/` uses), `vendor/css`, `vendor/fonts` and `vendor/ocr` (Tesseract and its language packs). Each licence sits beside the files it covers. | various, all noted |
+| `engine-next/` | **The page-turn engine.** Written clean-room from the contract below and from first principles — no line of it derives from the fork it replaces. Self-contained ES modules over pdf.js 4 and three.js r169 from `vendor/pdfjs/` and `vendor/three/`, with its own `engine.css` and a demo page. Reached only through the facade below. See `engine-next/README.md`. | MIT |
+| `engine/` | The fork of DearFlip Lite that used to draw the pages. **Nothing loads it.** It is still in the tree only so that its removal, and the removal of the vendored libraries that went with it, is one reviewable change of its own; when it goes, the non-commercial licence goes with it. | CC BY-NC-ND 4.0, non-commercial only |
+| `vendor/` | Third-party runtime code, unmodified but for the patches recorded in `THIRD_PARTY_NOTICES.md`: `vendor/three` and `vendor/pdfjs` (the ESM builds `engine-next/` uses), `vendor/js` (jQuery, Toastify, marked, and the classic three.js, pdf.js and mockup builds the old fork needed, which nothing loads any more), `vendor/css`, `vendor/fonts` and `vendor/ocr` (Tesseract and its language packs). Each licence sits beside the files it covers. | various, all noted |
 
 Three roots are not served at all: `docs/` (these notes, contributing, security, design and the
 third-party notices), `tools/` (eslint, playwright and tailwind configuration and the two check
@@ -25,9 +25,11 @@ Ask one question at a time, in this order:
 1. **Did somebody else write it?** Then `vendor/`, with its licence file beside it and a row added
    to `docs/THIRD_PARTY_NOTICES.md`. Never a CDN: the site must work offline and under a strict
    Content-Security-Policy.
-2. **Is it part of the page-turn engine?** Then `engine/`, and only if there is no way to do it
-   from the outside. The engine is on its way out; every line added to it is a line to port later.
-   Whatever the answer, the new file does not talk to it directly — see the facade rule below.
+2. **Is it part of the page-turn engine?** Then `engine-next/`, and only if there is no way to do
+   it from the outside: the engine draws pages and takes pointer input, and everything else — a
+   panel, a button, a keyboard shortcut, a stored preference — belongs to the application. Never
+   `engine/`, which is only waiting to be deleted. Whatever the answer, the new file does not
+   talk to the engine directly — see the facade rule below.
 3. **Does the browser fetch it?** Then somewhere under `lib/` — `lib/js/features/<feature>/` for a
    feature, `lib/js/utils/` for something several features share, `lib/js/ui/` for the chrome,
    `lib/css/page/` for a stylesheet, and register it in the loader (below).
@@ -35,17 +37,29 @@ Ask one question at a time, in this order:
 
 ## The engine facade
 
-**Only `lib/js/core/book.js` may import, reference or otherwise know about `engine/`.** It
-publishes `window.ZayaBook`; everything else in `lib/` works through that and through nothing
-else. No other file may read `window.dFlipBook`, `window.flipbookInstance`, `DFLIP.activeBook`,
-or reach into a book's `target`, `contentProvider`, `ui`, `stage` or `options`.
+**Only `lib/js/core/book.js` may reference or otherwise know about `engine-next/`.** It publishes
+`window.ZayaBook`; everything else in `lib/` works through that and through nothing else. No
+other file may read `window.dFlipBook` or `window.flipbookInstance`, or reach past the handle
+into the engine object behind it.
 
-`docs/engine-api.md`, beside this file, is the contract `ZayaBook` publishes: it is written from
-the application's usage and the engine's observable behaviour rather than from the fork's
-internals, precisely so that a clean-room replacement can be written from it. Each member is
-marked as part of the contract or as internal. `tests/engine-contract.spec.mjs` exercises every
-kept member through `ZayaBook` alone and asserts behaviour rather than markup, so the same file
-runs against the replacement.
+The engine is a set of ES modules and the facade is a classic script, so one line of module sits
+between them: `lib/js/core/engine.js` imports `engine-next/index.js` and leaves the constructor
+on `window.ZayaEngine`. The loader runs it in the batch before the first document is opened. It
+exists only so that the facade can stay a classic script and keep publishing `ZayaBook`
+synchronously; it translates nothing.
+
+`docs/engine-api.md`, beside this file, is the contract `ZayaBook` publishes: it was written from
+the application's usage and the engine's observable behaviour rather than from any engine's
+internals, precisely so that a clean-room replacement could be written from it — which is what
+`engine-next/` is. Each member is marked as part of the contract or as internal.
+`tests/engine-contract.spec.mjs` exercises every kept member through `ZayaBook` alone and asserts
+behaviour rather than markup, which is how the same file ran unchanged against both engines.
+
+The engine draws pages and nothing else. The Navigator's Pages, Outline and Search panes are the
+application's own (`lib/js/features/navigator/panes.js` and `lib/js/features/search/`), built
+from the three pieces of data only the engine can supply: a picture of a page, the outline with
+its destinations resolved, and what a page calls itself. Saving a download, the share box, the
+arrow keys and the page-turn sound file are the application's too.
 
 Two consequences. Replacing the engine is a rewrite of one file under `lib/` plus whatever
 replaces `engine/` — not a pass over every feature. And a feature that finds itself wanting
@@ -53,8 +67,10 @@ something the contract does not offer adds it to `ZayaBook` and to `engine-api.m
 reaching past them; that addition is then a requirement on the replacement, so it is worth being
 sure it is needed.
 
-`window.dFlipBook` and `window.flipbookInstance` survive as deprecated aliases for one release,
-for plugins written before the facade existed. They are not for `lib/`.
+`window.dFlipBook` and `window.flipbookInstance` survive as deprecated aliases for plugins
+written before the facade existed. They no longer point at an engine object — nothing shaped like
+the fork's exists any more — but at the `ZayaBook` handle, which is the only thing a plugin can
+honestly be handed. They are not for `lib/`.
 
 ## The ordered loader
 
@@ -62,23 +78,31 @@ for plugins written before the facade existed. They are not for `lib/`.
 load order and nothing else. It appends `<script>` elements with `async = false`, so the browser
 fetches them in parallel and runs them in the order they were appended, in three batches:
 
-1. **Vendored libraries** — jQuery, Toastify, three.js, pdf.js and the engine's mockup build.
-   `pdf.worker.min.js` is deliberately absent: pdf.js spawns it as a Web Worker itself, from the
-   path the engine hands it.
+1. **Vendored libraries** — jQuery and Toastify. The engine brings its own three.js and pdf.js
+   as ES modules and imports them itself, so neither is listed here; the pdf.js worker is absent
+   too, because pdf.js spawns it as a Web Worker of its own.
 2. **Utilities, state, i18n and the engine** — `lib/js/utils/*`, the dictionaries, then
-   `engine/index.js` and `lib/js/core/book.js`. Entries listed in the `MODULES` set are loaded as
-   `type="module"`, which the browser defers, so they run after the classic scripts of the same
-   batch — which is why the facade, a classic script, may be listed after the engine and still run
-   before it: it only publishes `ZayaBook`, and looks the engine up when a book is opened.
+   `lib/js/core/engine.js` and `lib/js/core/book.js`. Entries listed in the `MODULES` set are
+   loaded as `type="module"`, which the browser defers, so they run after the classic scripts of
+   the same batch — which is why the facade, a classic script, may be listed after the engine
+   module and still run before it: it only publishes `ZayaBook`, and looks the engine up when a
+   book is opened.
 3. **The application** — `core/load.js`, the UI and every feature.
 
 Two consequences worth knowing. Everything is a global on `window` unless it is in `MODULES`;
 that is why `tools/eslint.config.mjs` turns `no-undef` off for `lib/js` and lists the module
-directories separately, and why `tools/check-syntax.mjs` keeps its own list of which files to parse
-as ESM. And the engine resolves its own asset locations at load time from `import.meta.url`:
-`engine/index.js` walks up to the site root and points the engine at `vendor/js/…` for its
-libraries, worker and CMaps, and at `lib/images` and `lib/sound` for its images and page-turn
-sound. Moving `engine/index.js` means fixing that walk.
+directories separately, and why `tools/check-syntax.mjs` keeps its own list of which files to
+parse as ESM. And the engine resolves its own asset locations from `import.meta.url`, so moving
+`engine-next/` moves nothing else with it. Its stylesheet is reached the other way round, as an
+`@import` at the top of `lib/css/style.css`, which is what puts it before the application's own
+sheets in the cascade.
+
+One loose end the version rule below does not quite cover: `?v=` is appended by the loader, so
+`lib/js/core/engine.js` carries it, but the engine modules it imports do not, because a static
+`import` resolves against the module's path and drops its query. It costs nothing today — the
+immutable year-long cache header is set on `/lib/` alone, and the service worker fetches every
+script from the network while it is online and names its cache after the release — and it is
+written down here rather than worked around.
 
 ## The document key
 

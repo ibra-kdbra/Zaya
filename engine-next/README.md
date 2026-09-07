@@ -1,11 +1,12 @@
 # engine-next
 
-The replacement for `engine/`. It is written from scratch against the interface the reader
-already uses — nothing was copied, adapted or read from the DearFlip-derived code it replaces —
-so it carries the repository's own MIT licence and the commercial restriction goes away with the
-old directory.
+The page-turn engine. It is written from scratch against the interface the reader already uses —
+nothing was copied, adapted or read from the DearFlip-derived code it replaces — so it carries
+the repository's own MIT licence, and the commercial restriction goes away with `engine/`.
 
-It is not wired into the reader. `engine-next/demo.html` is the only thing that loads it today:
+The reader loads it through `lib/js/core/engine.js`, a one-line module that hands the constructor
+to `lib/js/core/book.js`; that facade is the only file in the application allowed to know this
+directory exists. `engine-next/demo.html` drives it on its own, for development:
 open it with `?pdf=…&render=webgl|css&dir=ltr|rtl&mode=single|double&hard=none|cover|all&duration=…`,
 and `&internal=1` for a scan of an open book, `&text=0` to drop the text layer.
 Its default document is `tests/fixtures/sample.pdf`, which `.vercelignore` keeps out of a deploy, so
@@ -71,6 +72,7 @@ const book = ZayaBook.create(container, "book.pdf", {
   soundUrl: "",
   singlePageMode: null,      // null follows the viewport; pageMode overrides both
   pageMode: null,            // "single" | "double"
+  doubleInternal: "auto",    // "auto" reads it off the shape of the paper; true | false to say
   renderMode: "auto",        // "auto" | "webgl" | "css"
   textLayer: true,           // a selectable text layer over the pages, at rest
   readback: false,           // keep the WebGL drawing buffer readable (tests, screenshots)
@@ -86,9 +88,11 @@ await book.ready;
 `engine.css` must be on the page. The document is loaded behind the call: the book comes back
 straight away and `book.ready` resolves once the first spread is painted.
 
-The events go to `document`, so a part of the application holding no reference can still follow:
-`zaya:pdfLoaded` (`{pageCount}`), `zaya:bookReady`, `zaya:pageChanged` (`{page, pdfPages}`),
-`zaya:zoomChanged` (`{zoomed, level}`), `zaya:fullscreenChanged` (`{fullscreen}`).
+The events go to `document`, under a prefix of the engine's own so that nothing it says can be
+mistaken for something the application said (`docs/engine-api.md` §9 keeps the unprefixed names
+for the reader's own events):
+`zaya-engine:pdfLoaded` (`{pageCount}`), `zaya-engine:bookReady`, `zaya-engine:pageChanged` (`{page, pdfPages}`),
+`zaya-engine:zoomChanged` (`{zoomed, level}`), `zaya-engine:fullscreenChanged` (`{fullscreen}`).
 
 `options.paintPage` is how search marks land on a page: the engine calls it with the page's
 canvas context and the pdf.js viewport it was rendered with, so `viewport.convertToPdfPoint`
@@ -119,8 +123,10 @@ The full list of properties and methods is in `docs/engine-api.md`.
 * **Chrome actions**: `toggleFullscreen` with the state exposed and followed, `download`
   resolving a URL or a blob for the application to save, `share` returning this address with
   `?page=`, `setInteractive`, `setSoundEnabled`, `resize`.
-* `doubleInternal` scans, with a fixture (`tests/fixtures/sample-double-internal.pdf`) and
-  tests for the mapping, the half-page textures and the text layer over each half.
+* `doubleInternal` scans, recognised by default from the shape of the paper — an interior page
+  appreciably wider than it is tall, in a document long enough to be a book, is a photograph of an
+  open book rather than a page of one — with a fixture (`tests/fixtures/sample-double-internal.pdf`)
+  and tests for the mapping, the half-page textures and the text layer over each half.
 * Hard covers, the page-turn sound, the padding and background options.
 * Both renderers, with the 2D one taking over automatically when WebGL is missing.
 * The `paintPage` hook, the search-highlight refresh, and the two page-number mappings.
@@ -128,6 +134,14 @@ The full list of properties and methods is in `docs/engine-api.md`.
   the neighbouring spreads pre-rendered in idle time.
 
 ### Two decisions worth knowing about
+
+**A search hit turns to the right-hand leaf of a scanned page.** For a `doubleInternal` scan,
+where every page of the file carries two book pages, `bookPageForPdfPage` used to answer with the
+left of the two (`p * 2 - 2`) while `docs/engine-api.md` §4 recorded `p * 2 - 1`. The contract
+won. The application and its tests have encoded `p * 2 - 1` since 6.1; both leaves land on the
+same spread in double mode, so nothing a reader sees changes either way; and one source of truth
+for the mapping is worth more than either answer is on its own merits.
+
 
 **Turning a page comes back to fit.** A magnified spread is a place the reader chose *on that
 spread*; carrying the magnification and the pan onto the next one lands them somewhere they did
@@ -142,25 +156,23 @@ waits `300 ms`, the same way the browser resolves click against double-click, an
 no second click and no selection arrived. A press that lands between two lines reaches the stage
 directly and turns at once.
 
-## What remains, for step E3
+## Where the application takes over
 
-* **`bookPageForPdfPage` disagrees with the contract for a `doubleInternal` scan.** `layout.js`
-  returns the *left* of the two book pages a scanned page carries (`p * 2 - 2`), because that is
-  where a search hit should turn the book to; `docs/engine-api.md` §4 records the fork's
-  `p * 2 - 1`, the right-hand one. Both round-trip through `toPdfPage`. E3 has to pick one and
-  say so in the contract; nothing else depends on the choice.
-* **Wiring it behind `lib/js/core/book.js`.** Every member the contract needs now exists, but
-  under this engine's own names: `zoom(level)` rather than the contract's `zoom(delta)`,
-  `download()` resolving a URL rather than saving a file, `share()` returning a link rather than
-  opening a box. The facade is where those meet, and where the app's Navigator turns
-  `getThumbnail` / `getOutline` into the Pages and Outline panes.
-* **The search panel and its index** stay the application's (`lib/js/features/search/`); what the
-  engine owes is `paintPage`, which is done. `ensureSearch`, `openSearch` and `searchInput` are
-  facade concerns.
-* **Keyboard navigation and focus.** The engine takes pointer input only. Arrow keys, `Home`,
-  `End` and a focus ring on the stage are the application's chrome today and should stay there,
-  but somebody has to check that the text layer does not swallow them.
-* **Page flip sound assets** are not shipped; `soundUrl` has to be pointed at one.
+The engine draws pages and takes pointer input. Everything else the reader sees around a book is
+the application's, and the seam is `lib/js/core/book.js`:
+
+* **The panels.** `getThumbnail`, `getOutline` and `getPageLabel` are data; the Navigator's Pages
+  and Outline panes are `lib/js/features/navigator/panes.js`, and the Search pane and its index
+  are `lib/js/features/search/`. What the engine owes search is `paintPage`, so a hit is marked in
+  the page texture and prints as it shows.
+* **The chrome.** `zoom(level)` against the contract's `zoom(delta)`, `download()` resolving a URL
+  or a blob against a file actually being saved, `share()` returning a link against a box being
+  put on screen: the facade is where each of those pairs meets.
+* **The keyboard.** The engine binds no keys at all. Arrow keys, `Home`, `End` and every shortcut
+  belong to the application (`lib/js/ui/controls.js`); the text layer takes pointer input only,
+  so it swallows none of them.
+* **The sound.** The engine plays a page turn from `options.soundUrl`; the file is the
+  application's, from `lib/sound/`.
 * **A lightbox** has no equivalent and needs none: it is an application shell around a book.
 
 ### Performance notes
@@ -199,10 +211,13 @@ for a change. Checked on the demo page, which carries the same directives:
 * `img-src`, `connect-src` and `default-src` need nothing new: the CMaps and the standard fonts
   are fetched from `'self'`, and a document opened from disk arrives as bytes, not a `blob:` URL.
 
-Two things the switch-over will have to do, neither of them a policy change:
+Two notes from the switch-over, neither of them a policy change:
 
-* Add `?v=<version>` to the engine's own URLs and to `engine.css`, and register them in the
-  loader, the same as every other served path.
-* Decide what happens to the old `vendor/js/pdf.min.js`, its worker and its CMaps. Two copies of
-  pdf.js can coexist — they are separate module scopes, and the OCR feature is happy with either —
-  but shipping both is about 1.7 MB of CMaps twice over.
+* `engine.css` is reached through `lib/css/style.css`, which is where the fork's stylesheet was
+  imported, so it lands in the same place in the cascade. The engine's modules are loaded through
+  `lib/js/core/engine.js`, which the loader versions with `?v=`; a static `import` drops the
+  query, so the modules under this directory are not versioned individually. They are outside the
+  immutable cache header, which is set on `/lib/` alone, and the service worker takes every script
+  from the network while it is online, so nothing goes stale. `docs/ARCHITECTURE.md` says so too.
+* The old `vendor/js/pdf.min.js`, its worker and its CMaps are no longer loaded by anything. They
+  go with `engine/` when that is deleted, and about 1.7 MB of duplicated CMaps goes with them.
