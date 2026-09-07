@@ -3,13 +3,16 @@
  *
  * Strategy:
  *  - Precache the app shell on install (best effort: one missing file must not block install).
+ *  - Once the page is controlled it reports what it actually loaded, and those files are stored too
+ *    (PRIME_CACHE). On the very first visit the worker takes control only after the page has already
+ *    fetched its scripts, so without this the reader would work offline from the second visit on.
  *  - Same-origin static assets: stale-while-revalidate (fast repeat loads, background refresh).
  *  - HTML navigations: network-first with cache fallback (so deploys are picked up immediately).
  *  - Everything else (PDFs, CDNs, YouTube, APIs) goes straight to the network and is never cached.
  *  - Cache name carries the app version so a deploy invalidates the old cache on activate.
  */
 
-const VERSION = '7.0.0';
+const VERSION = '7.1.0';
 const CACHE_NAME = `zaya-assets-v${VERSION}`;
 const MAX_ENTRIES = 300;
 
@@ -66,6 +69,34 @@ async function trimCache(cache) {
   const keys = await cache.keys();
   if (keys.length <= MAX_ENTRIES) return;
   await Promise.all(keys.slice(0, keys.length - MAX_ENTRIES).map((k) => cache.delete(k)));
+}
+
+/**
+ * Store files the page reports having loaded, skipping whatever is already held. Anything that
+ * cannot be fetched is left for the next visit: priming is opportunistic and never fails loudly.
+ * Returns how many were newly stored.
+ */
+async function primeCache(urls) {
+  const cache = await caches.open(CACHE_NAME);
+  let stored = 0;
+  for (const raw of urls.slice(0, MAX_ENTRIES)) {
+    let url;
+    try { url = new URL(raw, self.location.href); } catch (e) { continue; }
+    if (!isSameOrigin(url) || url.searchParams.has('t')) continue;
+    if (/\.pdf($|\?)/i.test(url.pathname)) continue;
+    if (!/\.(js|mjs|css|woff2?|ttf|eot|svg|png|jpe?g|gif|json|mp3)$/i.test(url.pathname)) continue;
+    const request = new Request(url.href, { credentials: 'same-origin' });
+    if (await cache.match(request)) continue;
+    try {
+      const response = await fetch(request);
+      if (response && response.ok && response.type === 'basic') {
+        await cache.put(request, response.clone());
+        stored += 1;
+      }
+    } catch (e) { /* offline, or gone: the next visit tries again */ }
+  }
+  await trimCache(cache);
+  return stored;
 }
 
 async function staleWhileRevalidate(request) {
@@ -133,6 +164,11 @@ self.addEventListener('message', (event) => {
     case 'CLEAR_CACHE':
       caches.delete(CACHE_NAME)
         .then((ok) => reply({ type: 'CACHE_STATUS', cleared: ok }))
+        .catch((err) => reply({ type: 'CACHE_ERROR', error: String(err) }));
+      break;
+    case 'PRIME_CACHE':
+      primeCache(Array.isArray(data.urls) ? data.urls : [])
+        .then((primed) => reply({ type: 'CACHE_STATUS', primed }))
         .catch((err) => reply({ type: 'CACHE_ERROR', error: String(err) }));
       break;
     case 'SKIP_WAITING':

@@ -763,7 +763,7 @@ test.describe('Deploy guard', () => {
       // The guard reloads the page mid-flight; a fetch cut off by that navigation must not fail the test.
       try {
         const res = await route.fetch();
-        const html = (await res.text()).replace('data-zaya-version="7.0.0"', 'data-zaya-version="0.0.1"');
+        const html = (await res.text()).replace('data-zaya-version="7.1.0"', 'data-zaya-version="0.0.1"');
         await route.fulfill({ response: res, body: html, headers: { ...res.headers(), 'content-type': 'text/html' } });
       } catch (e) {
         try { await route.continue(); } catch (e2) { /* the request is gone */ }
@@ -773,10 +773,66 @@ test.describe('Deploy guard', () => {
     await page.goto('/index.html');
     // The guard reloads exactly once, then boots normally on the second pass.
     await expect.poll(() => page.evaluate(() => { try { return sessionStorage.getItem('zaya:reloaded-for'); } catch (e) { return null; } }).catch(() => null), { timeout: 15_000 }).toBe('0.0.1');
-    await expect(page.locator('#currentVersion')).toHaveText(/v7\.0\.0|Unreleased/, { timeout: 30_000 });
+    await expect(page.locator('#currentVersion')).toHaveText(/v7\.1\.0|Unreleased/, { timeout: 30_000 });
     const cacheNames = await page.evaluate(async () => ('caches' in window) ? (await caches.keys()).filter((k) => k.startsWith('zaya-')) : []);
     // Only the freshly (re)installed worker's cache may exist; nothing from before the reload.
     expect(cacheNames.length).toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe('Offline', () => {
+  /*
+   * A first visit is controlled by the worker only after the page has already fetched its scripts,
+   * so the install-time shell is all it would hold: the reader used to work offline from the second
+   * visit onwards. The page now reports what it loaded and the worker keeps it.
+   */
+  test('one visit is enough to read from disk with no network at all', async ({ page, context }) => {
+    await page.goto('/index.html');
+    await expect.poll(
+      () => page.evaluate(async () => {
+        if (!('caches' in window)) return 0;
+        const name = (await caches.keys()).find((k) => k.startsWith('zaya-assets-'));
+        return name ? (await (await caches.open(name)).keys()).length : 0;
+      }).catch(() => 0),
+      { timeout: 30_000 }
+    ).toBeGreaterThan(50);
+
+    // Everything the reader needs to draw a page, not merely the shell.
+    const held = await page.evaluate(async () => {
+      const name = (await caches.keys()).find((k) => k.startsWith('zaya-assets-'));
+      const paths = (await (await caches.open(name)).keys()).map((r) => new URL(r.url).pathname);
+      return {
+        engine: paths.filter((p) => p.startsWith('/engine-next/')).length,
+        libraries: paths.filter((p) => /\/vendor\/(three|pdfjs)\//.test(p)).length,
+        app: paths.filter((p) => p.startsWith('/lib/js/')).length
+      };
+    });
+    expect(held.engine).toBeGreaterThan(5);
+    expect(held.libraries).toBeGreaterThan(1);
+    expect(held.app).toBeGreaterThan(20);
+
+    // Now with the network genuinely gone, on a page that has never been loaded before.
+    await context.setOffline(true);
+    const offline = await context.newPage();
+    const errors = [];
+    offline.on('pageerror', (e) => errors.push(String(e)));
+    await offline.goto('/index.html');
+    await offline.setInputFiles("#pdfFile", SAMPLE_PDF_PATH);
+    await expect.poll(
+      () => offline.evaluate(() => {
+        const b = window.ZayaBook && window.ZayaBook.current;
+        return !!(b && b.isReady()) && b.pageCount;
+      }).catch(() => 0),
+      { timeout: 45_000 }
+    ).toBe(3);
+    const painted = await offline.evaluate(() => {
+      const canvas = document.querySelector('#flipbookContainer canvas');
+      return !!(canvas && canvas.width > 0 && canvas.height > 0);
+    });
+    expect(painted).toBe(true);
+    expect(errors).toEqual([]);
+    await context.setOffline(false);
+    await offline.close();
   });
 });
 
