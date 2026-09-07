@@ -15,8 +15,14 @@
       ]
     },
     {
+      "_comment": "Revalidate rather than pin. The ?v= on these URLs carries the release, not the build, so two deploys of the same release serve different bytes at identical URLs; a year-long immutable header pinned the first of them in every browser that had visited, and no fix could reach a returning reader until the version changed. A conditional request costs one 304; the service worker is what serves these offline.",
       "source": "/lib/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, no-cache" }]
+    },
+    {
+      "_comment": "The engine's modules are imported by path and carry no ?v= at all, so they must revalidate for the same reason.",
+      "source": "/engine-next/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, no-cache" }]
     },
     {
       "source": "/sw.js",

@@ -5,7 +5,13 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.3.0] - 2026-09-08
+
+Mostly one discovery: a fix could be deployed and still not reach anybody. Files under `/lib/`
+were served with a year-long immutable cache header, and the `?v=` on their URLs carries the
+*release*, not the build — so two deploys of the same release served different bytes at identical
+URLs, and every browser that had visited kept the first of them. Three rounds of "it still does not
+work" were, at least in part, a browser faithfully replaying old code.
 
 ### Added
 - **The angle is in Settings, under View.** Laying the book down was a held modifier and nothing
@@ -14,6 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   back up. The slider and the gesture are one setting and follow each other.
 
 ### Fixed
+- **A deployed fix reaches the reader.** Everything under `/lib/` was pinned in the browser for a
+  year, on the assumption that its `?v=` changes whenever its contents do. It does not: the query
+  carries the release, so every deploy between releases served new bytes at an address the browser
+  had been told never to check again. Those files revalidate now, which costs one conditional
+  request and gives a correct answer; the service worker is what serves them offline, and it always
+  was. The engine's own modules, which are imported by path and carry no `?v=` at all, are named
+  explicitly for the same reason. This release also bumps the version, because that is the only
+  thing that dislodges a URL a browser has already been told to keep.
 - **Two page turns in quick succession no longer lose the second.** A turn marks the book busy
   until it has finished tidying up, and a request arriving in that window was dropped — the code
   said the last request would win, and it was in fact the first. Pressing next twice quickly, or
