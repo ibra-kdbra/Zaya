@@ -2,7 +2,15 @@ import { expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 export const SAMPLE_PDF = readFileSync(new URL('./fixtures/sample.pdf', import.meta.url));
+export const OUTLINE_PDF = readFileSync(new URL('./fixtures/sample-outline.pdf', import.meta.url));
+export const SCANNED_PDF = readFileSync(new URL('./fixtures/sample-scanned.pdf', import.meta.url));
 export const SAMPLE_PDF_PATH = new URL('./fixtures/sample.pdf', import.meta.url).pathname;
+export const OUTLINE_PDF_PATH = new URL('./fixtures/sample-outline.pdf', import.meta.url).pathname;
+export const SCANNED_PDF_PATH = new URL('./fixtures/sample-scanned.pdf', import.meta.url).pathname;
+
+/** The document key of a file picked from disk: its name and its size (lib/js/utils/pageMemory.js). */
+export const localKey = (name, size) => `${name}::${size}`;
+export const SAMPLE_KEY = localKey('sample.pdf', SAMPLE_PDF.length);
 
 /** Serve the bundled fixture for any remote PDF so the tests never touch the network. */
 export async function stubNetwork(page) {

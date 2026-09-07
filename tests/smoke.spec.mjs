@@ -175,8 +175,9 @@ test.describe('URL options and backup', () => {
     expect(payload.quotes.map((q) => q.quote)).toContain('A quote worth keeping');
 
     // Importing the same file again adds nothing (deduplicated), importing a new quote adds one
+    // The Notes tab lists the open document's notes, so the new one is filed against it.
     const result = await page.evaluate(async (p) => {
-      p.quotes.push({ quote: 'Imported from backup', pdfUrl: '', pdfName: 'Backup' });
+      p.quotes.push({ quote: 'Imported from backup', pdfUrl: window.ZayaCurrentDocKey(), pdfName: 'Backup' });
       p.preferences.theme = 'dracula';
       const file = new File([JSON.stringify(p)], 'b.json', { type: 'application/json' });
       return window.ZayaBackup.importBackup(file);
