@@ -62,7 +62,8 @@ gradient or `--shadow-primary` into a coloured glow is wrong.
 - `lib/css/page/chrome.css` – the fixed controls around the book (top-right cluster, version
   label, bottom bar, side-panel skins, focus rings). The last sheet `style.css` imports.
 - `lib/css/page/custom-ui.css` – the search panel, thumbnails and outline skins.
-- `engine/engine.css` – the flipbook engine's own stylesheet, beside the engine it belongs to.
+- `engine-next/engine.css` – the page-turn engine's own stylesheet, beside the engine it belongs
+  to, pulled in by the `@import` at the top of `style.css` so it sits before the app's own sheets.
 - `vendor/css/tailwind.css` – utilities used by the markup, precompiled (`npm run build:css`).
 
 ## Navigation model by device class

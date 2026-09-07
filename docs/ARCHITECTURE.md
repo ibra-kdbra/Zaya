@@ -10,9 +10,8 @@ everything below.
 | --- | --- | --- |
 | the top level | The served entry points and nothing else: `index.html`, `changelog.html`, `sw.js` (a service worker only controls pages at or below its own path, so it has to live here), `config.js` for per-deployment settings, plus the repository's own metadata. | MIT |
 | `lib/` | The first-party application: `lib/js/app.js` (the loader), `lib/js/core/load.js`, `lib/js/ui/`, `lib/js/features/`, `lib/js/utils/`, `lib/js/i18n/`, the stylesheets under `lib/css/`, and the images and sounds the app itself ships. | MIT |
-| `engine-next/` | **The page-turn engine.** Written clean-room from the contract below and from first principles — no line of it derives from the fork it replaces. Self-contained ES modules over pdf.js 4 and three.js r169 from `vendor/pdfjs/` and `vendor/three/`, with its own `engine.css` and a demo page. Reached only through the facade below. See `engine-next/README.md`. | MIT |
-| `engine/` | The fork of DearFlip Lite that used to draw the pages. **Nothing loads it.** It is still in the tree only so that its removal, and the removal of the vendored libraries that went with it, is one reviewable change of its own; when it goes, the non-commercial licence goes with it. | CC BY-NC-ND 4.0, non-commercial only |
-| `vendor/` | Third-party runtime code, unmodified but for the patches recorded in `THIRD_PARTY_NOTICES.md`: `vendor/three` and `vendor/pdfjs` (the ESM builds `engine-next/` uses), `vendor/js` (jQuery, Toastify, marked, and the classic three.js, pdf.js and mockup builds the old fork needed, which nothing loads any more), `vendor/css`, `vendor/fonts` and `vendor/ocr` (Tesseract and its language packs). Each licence sits beside the files it covers. | various, all noted |
+| `engine-next/` | **The page-turn engine.** Written clean-room from the contract below and from first principles — no line of it derives from the fork it replaced. Self-contained ES modules over pdf.js 4 and three.js r169 from `vendor/pdfjs/` and `vendor/three/`, with its own `engine.css` and a demo page. Reached only through the facade below. See `engine-next/README.md`. | MIT |
+| `vendor/` | Third-party runtime code, unmodified: `vendor/three` and `vendor/pdfjs` (the ESM builds `engine-next/` uses), `vendor/js` (Toastify and marked), `vendor/css`, `vendor/fonts` and `vendor/ocr` (Tesseract and its language packs). Each licence sits beside the files it covers. | various, all permissive, all noted |
 
 Three roots are not served at all: `docs/` (these notes, contributing, security, design and the
 third-party notices), `tools/` (eslint, playwright and tailwind configuration and the two check
@@ -23,13 +22,14 @@ scripts) and `tests/` (Playwright). `.vercelignore` keeps them out of a deploy.
 Ask one question at a time, in this order:
 
 1. **Did somebody else write it?** Then `vendor/`, with its licence file beside it and a row added
-   to `docs/THIRD_PARTY_NOTICES.md`. Never a CDN: the site must work offline and under a strict
-   Content-Security-Policy.
+   to `docs/THIRD_PARTY_NOTICES.md`. It must be permissively licensed — the repository carries no
+   non-commercial or no-derivatives component and is not to acquire one. Never a CDN either: the
+   site must work offline and under a strict Content-Security-Policy.
 2. **Is it part of the page-turn engine?** Then `engine-next/`, and only if there is no way to do
    it from the outside: the engine draws pages and takes pointer input, and everything else — a
-   panel, a button, a keyboard shortcut, a stored preference — belongs to the application. Never
-   `engine/`, which is only waiting to be deleted. Whatever the answer, the new file does not
-   talk to the engine directly — see the facade rule below.
+   panel, a button, a keyboard shortcut, a stored preference — belongs to the application.
+   Whatever the answer, the new file does not talk to the engine directly — see the facade rule
+   below.
 3. **Does the browser fetch it?** Then somewhere under `lib/` — `lib/js/features/<feature>/` for a
    feature, `lib/js/utils/` for something several features share, `lib/js/ui/` for the chrome,
    `lib/css/page/` for a stylesheet, and register it in the loader (below).
@@ -62,7 +62,7 @@ its destinations resolved, and what a page calls itself. Saving a download, the 
 arrow keys and the page-turn sound file are the application's too.
 
 Two consequences. Replacing the engine is a rewrite of one file under `lib/` plus whatever
-replaces `engine/` — not a pass over every feature. And a feature that finds itself wanting
+replaces `engine-next/` — not a pass over every feature. And a feature that finds itself wanting
 something the contract does not offer adds it to `ZayaBook` and to `engine-api.md`, rather than
 reaching past them; that addition is then a requirement on the replacement, so it is worth being
 sure it is needed.
@@ -78,9 +78,9 @@ honestly be handed. They are not for `lib/`.
 load order and nothing else. It appends `<script>` elements with `async = false`, so the browser
 fetches them in parallel and runs them in the order they were appended, in three batches:
 
-1. **Vendored libraries** — jQuery and Toastify. The engine brings its own three.js and pdf.js
-   as ES modules and imports them itself, so neither is listed here; the pdf.js worker is absent
-   too, because pdf.js spawns it as a Web Worker of its own.
+1. **Vendored libraries** — Toastify, and nothing else. The engine brings its own three.js and
+   pdf.js as ES modules and imports them itself, so neither is listed here; the pdf.js worker is
+   absent too, because pdf.js spawns it as a Web Worker of its own.
 2. **Utilities, state, i18n and the engine** — `lib/js/utils/*`, the dictionaries, then
    `lib/js/core/engine.js` and `lib/js/core/book.js`. Entries listed in the `MODULES` set are
    loaded as `type="module"`, which the browser defers, so they run after the classic scripts of
@@ -145,7 +145,7 @@ URL moved — is exactly the case this rule exists for.
 owns and what it borrows. The intended shape is `src/features/<feature>/`, each feature holding its
 own scripts, styles and strings.
 
-That move is deliberately held back until the engine is replaced. Both changes rewrite the same set
-of URLs, and doing them together means one round of cache invalidation, one version bump and one
-pass over the loader, rather than two. Until then, keep new work inside the existing feature
-directories so that the eventual move is a rename rather than a redesign.
+That move was deliberately held back until the engine was replaced. Both changes rewrite the same
+set of URLs, and separating them from the engine work kept 7.0.0 to one subject. It is now the next
+milestone; until it happens, keep new work inside the existing feature directories so that the move
+is a rename rather than a redesign.
