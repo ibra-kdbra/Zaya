@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Laying the book down works from anywhere on the page.** It stood aside whenever the press
+  landed on a run of text, so that the reader could select a passage instead — and since text
+  covers most of a page, that meant it almost never worked at all. Holding shift, or using the
+  right button, now says plainly that the book is wanted rather than the words, and no selection is
+  started under the drag. A plain drag across a passage still selects it, as it did.
 - **Laying the book down works the way a book does.** The first attempt at restoring this let the
   view swing around the book on two axes, left and right as well as up and down, which is not what
   a book does and read as an unsteady camera rather than a book on a table. It is one angle on one
