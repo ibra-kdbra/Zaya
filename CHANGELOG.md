@@ -5,7 +5,13 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.2.0] - 2026-09-07
+
+Four things a reader reaches for, three of which the engine replacement had quietly taken away.
+Zaya's own engine arrived in 7.0.0 and the reader has been finding the gaps since: the wheel no
+longer zoomed, a magnified page could not be moved, and the book could not be tipped away from
+flat. None of them were broken — each was simply out of reach, and the fourth, a book called by
+its own name, had never worked at all.
 
 ### Added
 - **A book is called by its own name.** The header showed the host a link came from — every book
