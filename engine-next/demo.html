@@ -29,6 +29,13 @@
   #status { margin-left: auto; font-variant-numeric: tabular-nums; color: #aab2c0; }
   #book { flex: 1 1 auto; min-height: 0; }
   #error { padding: 12px 14px; color: #ff9a9a; }
+  #panels { border-top: 1px solid #2c313a; background: #1b1e24; max-height: 190px; overflow: auto; }
+  .strip { display: flex; gap: 10px; padding: 10px 14px; }
+  .strip figure { margin: 0; text-align: center; color: #aab2c0; font-size: 12px; }
+  .strip canvas { display: block; border: 1px solid #3a414c; border-radius: 3px; background: #fff; }
+  #outlineList { margin: 0; padding: 10px 14px 10px 32px; }
+  #outlineList ol { padding-left: 18px; }
+  #outlineList button { padding: 2px 8px; border: 0; background: none; color: #9dc4ff; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -54,10 +61,25 @@
       <option value="all">All hard</option>
     </select>
   </label>
+  <button id="zoomOut" type="button">Zoom out</button>
+  <button id="zoomIn" type="button">Zoom in</button>
+  <button id="zoomReset" type="button">Fit</button>
+  <button id="fullscreen" type="button">Fullscreen</button>
+  <label><input id="textLayer" type="checkbox" checked> Text layer</label>
+  <button id="thumbs" type="button">Thumbnails</button>
+  <button id="outline" type="button">Outline</button>
   <button id="dispose" type="button">Dispose</button>
   <span id="status">loading…</span>
 </header>
 <div id="book"></div>
+<!--
+  The panels below are the demo's own, built from what the engine exposes as data. The engine
+  ships no panel of its own: see the "Data for panels" section of docs/engine-api.md.
+-->
+<aside id="panels" hidden>
+  <div id="thumbStrip" class="strip" hidden></div>
+  <ol id="outlineList" hidden></ol>
+</aside>
 <p id="error" hidden></p>
 
 <script type="module" src="demo.js"></script>
