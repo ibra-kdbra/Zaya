@@ -79,24 +79,22 @@ See `docs/CONTRIBUTING.md`, `docs/SECURITY.md`, `docs/ARCHITECTURE.md`, `docs/DE
 
 Open milestones, in the order they matter:
 
-- **Replace the flipbook engine** ([issue #21](https://github.com/ibra-kdbra/Zaya/issues/21)). The
-  page-turn engine under `engine/` is a fork of DearFlip Lite and carries a non-commercial licence
-  (see `docs/THIRD_PARTY_NOTICES.md`). A permissively-licensed replacement is the one change the
-  rest of the project waits on. The contract that replacement is to be written from is frozen in
-  `docs/engine-api.md`, the app reaches the engine only through `window.ZayaBook`
-  (`lib/js/core/book.js`), and `tests/engine-contract.spec.mjs` is the engine-agnostic suite the
-  replacement has to pass.
 - **Slice the app into `src/features`.** The first-party code under `lib/js` still follows the
-  served layout rather than the shape of the features. Reorganising it is deferred until the engine
-  is replaced, so that both moves land as one change of URL.
+  served layout rather than the shape of the features. This was held back until the engine was
+  replaced, so that both moves landed as one change of URL; it is now the next one.
 - **More recognition languages.** Only Arabic and English packs are vendored today; the language
   packs and the picker are ready for more.
 - **Selection on the page itself.** Text can be selected in the Navigator's Text tab; selecting it
   on the rendered page, where the reader is looking, is still to come.
 
+Closed in 7.0.0: **replace the flipbook engine**
+([issue #21](https://github.com/ibra-kdbra/Zaya/issues/21)). Zaya's pages are now drawn by
+`engine-next/`, written from the contract in `docs/engine-api.md` rather than from the fork it
+replaces, and the fork and its non-commercial licence are out of the repository.
+
 ## Tech Stack
 
-[![Tech Stack](https://skillicons.dev/icons?i=threejs,js,jquery,css,html,tailwindcss,svg)](https://skillicons.dev)
+[![Tech Stack](https://skillicons.dev/icons?i=threejs,js,css,html,tailwindcss,svg)](https://skillicons.dev)
 
 ## Custom default PDF
 
@@ -153,12 +151,12 @@ the control panel (Settings → Media Loop). The setting is remembered across se
     ├── config.js             per-deployment settings
     ├── sw.js                 service worker
     └── 📁assets              favicons and the screenshot used above
-    └── 📁engine              the flipbook engine (DearFlip fork, non-commercial licence)
-        └── 📁core            book, pages, textures, the preview stage
-        └── 📁features        thumbnails, outline, find, annotations, links
-        └── 📁ui              toolbar, lightbox, popup, share
-        ├── index.js  factory.js  constants.js  utils.js  tween.js
+    └── 📁engine-next         the page-turn engine (first-party, MIT)
+        ├── index.js          the constructor the facade builds a book with
+        ├── document.js  layout.js  renderer-webgl.js  renderer-css.js  text-layer.js
+        ├── gestures.js  data.js  sound.js
         ├── engine.css        the engine's own stylesheet
+        ├── demo.html         drives the engine on its own, under the deployment's CSP
     └── 📁lib                 first-party application code
         └── 📁css
             └── 📁page        shell.css, chrome.css, custom-ui.css, storage.css, text-pane.css,
@@ -186,7 +184,9 @@ the control panel (Settings → Media Loop). The setting is remembered across se
     └── 📁vendor              third-party runtime code, licences beside it
         └── 📁css             tailwind.css, fontawesome, toastify, themify, fonts.css
         └── 📁fonts           IBM Plex, Font Awesome and Themify faces
-        └── 📁js              jquery, three, pdf.js (+ worker, cmaps), marked, toastify, mockup
+        └── 📁js              marked, toastify
+        └── 📁pdfjs           pdf.js 4 (ESM), its worker, cmaps and standard fonts
+        └── 📁three           three.js r169 (ESM)
         └── 📁ocr             Tesseract in WebAssembly and its Arabic/English packs
     └── 📁docs                ARCHITECTURE, CONTRIBUTING, SECURITY, DESIGN, THIRD_PARTY_NOTICES
     └── 📁tools               eslint, playwright and tailwind config; the check scripts
@@ -199,8 +199,10 @@ the control panel (Settings → Media Loop). The setting is remembered across se
 
 - **[PDF.js](https://mozilla.github.io/pdf.js/)** — renders PDF files in the browser.
 - **[Three.js](https://threejs.org/)** — the WebGL layer behind the page-turn animation.
-- **[DFlip](https://github.com/dearhive/dearflip-js-flipbook)** — the flipbook engine Zaya's core is
-  derived from, refactored into ES modules under `engine/`.
+- **[DFlip](https://github.com/dearhive/dearflip-js-flipbook)** — the flipbook engine Zaya ran on
+  from its first release until 6.3.0, as a modularised fork. It was retired in 7.0.0 and no code of
+  it remains: `engine-next/` was written from Zaya's own engine contract (`docs/engine-api.md`) and
+  derives nothing from it.
 - **[Tesseract.js](https://tesseract.projectnaptha.com/)** — on-device text recognition for scanned pages
   (`vendor/ocr/`, loaded on demand).
 
@@ -208,4 +210,14 @@ Full attribution and licences are in `docs/THIRD_PARTY_NOTICES.md`.
 
 ## Licence
 
-MIT. See `LICENSE`.
+MIT throughout. See `LICENSE`.
+
+Zaya's own code — the application, the page-turn engine under `engine-next/`, the styles and the
+tooling — is MIT. The third-party code it vendors is permissively licensed too: three.js under
+MIT, pdf.js and Tesseract under Apache-2.0, the icon and text fonts under OFL and CC BY, each with
+its licence file beside the files it covers. `docs/THIRD_PARTY_NOTICES.md` lists every component,
+its version and its licence.
+
+Until 6.3.0 the page-turn engine was a fork of DearFlip Lite under CC BY-NC-ND 4.0, and this
+section carried a warning that part of the repository was non-commercial only. That component was
+removed in 7.0.0, so the warning is gone with it.

@@ -3,12 +3,12 @@
 Zaya draws its pages with an engine, and this file is everything the application is allowed to
 know about it. It is a specification rather than a description: it was written from the outside
 so that an engine could be built from it alone, and that is what happened — `engine-next/` was
-written against this page and now draws every page the reader sees. The fork it replaced,
-`engine/`, is still in the tree and is no longer loaded by anything.
+written against this page and now draws every page the reader sees. The fork it replaced was
+deleted in 7.0.0 and no code of it remains in the tree.
 
 Everything below is stated as *what the application asks for* and *what it must observe in
-return*, never as a description of how either engine happens to be built. Where the two engines
-answered a question differently, the answer recorded here is the one that holds.
+return*, never as a description of how the engine happens to be built. Where the fork and its
+replacement answered a question differently, the answer recorded here is the one that holds.
 
 Two files enforce it:
 

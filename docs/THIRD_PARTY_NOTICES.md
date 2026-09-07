@@ -2,12 +2,8 @@
 
 | Component | Location | Version | License |
 | --- | --- | --- | --- |
-| DearFlip (dFlip) Lite, modularised | `engine/` (including `engine/engine.css`), `vendor/js/mockup.min.js` | 1.7.3.5 | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) – personal / non-commercial use only |
-| pdf.js | `vendor/js/pdf.min.js`, `pdf.worker.min.js`, `compatibility.js`, `cmaps/` | 2.3.200 (one-line patch: the regenerator-runtime `Function()` fallback was replaced with a `globalThis` assignment so it runs under a CSP without `unsafe-eval`) | Apache-2.0 |
-| three.js | `vendor/js/three.min.js` | r89-era build bundled with dFlip | MIT |
-| pdf.js (engine-next) | `vendor/pdfjs/pdf.min.mjs`, `pdf.worker.min.mjs`, `cmaps/`, `standard_fonts/`, `vendor/pdfjs/LICENSE` | 4.10.38 (unmodified ESM build) | Apache-2.0 |
-| three.js (engine-next) | `vendor/three/three.module.min.js`, `vendor/three/LICENSE` | r169 (0.169.0, unmodified ESM build) | MIT |
-| jQuery | `vendor/js/jquery.min.js` | 3.x | MIT |
+| pdf.js | `vendor/pdfjs/pdf.min.mjs`, `pdf.worker.min.mjs`, `cmaps/`, `standard_fonts/`, `vendor/pdfjs/LICENSE` | 4.10.38 (unmodified ESM build) | Apache-2.0 |
+| three.js | `vendor/three/three.module.min.js`, `vendor/three/LICENSE` | r169 (0.169.0, unmodified ESM build) | MIT |
 | Themify Icons | `vendor/css/themify-icons.min.css`, `vendor/fonts/` | 1.0.1 | SIL OFL 1.1 (fonts) / MIT (CSS) |
 | Font Awesome Free | `vendor/css/fontawesome.min.css`, `vendor/fonts/webfonts/` (woff2 only) | 6.5.1 | CC BY 4.0 (icons) / SIL OFL 1.1 (fonts) / MIT (CSS) |
 | Toastify JS | `vendor/js/toastify.min.js`, `vendor/css/toastify.min.css` | 1.12.0 | MIT |
@@ -20,4 +16,24 @@
 
 Everything else in this repository is © ibra-kdbra and released under the MIT License (see `LICENSE`).
 
-> **Important:** the DearFlip-derived files are *not* covered by the MIT license and may not be used commercially without a license from DearHive. See the roadmap in `README.md` for the plan to replace them.
+## The non-commercial component is gone
+
+Up to and including 6.3.0 the page-turn engine was `engine/`, a modularised fork of DearFlip
+(dFlip) Lite, distributed under CC BY-NC-ND 4.0 — personal and non-commercial use only. It was
+covered by neither the MIT licence above nor anything like it, and this file carried a warning
+saying so.
+
+That engine was replaced in 7.0.0 by `engine-next/`, which was written from `docs/engine-api.md`
+— the contract the application publishes — rather than from the code it replaced, and which is
+MIT like the rest of the first-party tree. In the same release `engine/`, its stylesheet and the
+vendored builds that existed only to feed it (the classic three.js and pdf.js with its worker,
+compatibility shim and CMaps, and `mockup.min.js`) were deleted from the repository, and jQuery
+went with them.
+
+So the repository now contains no component under a non-commercial or no-derivatives licence.
+Zaya's own code is MIT, and the third-party code that remains is the permissively-licensed set
+listed in the table above — chiefly three.js under MIT and pdf.js under Apache-2.0, each with its
+licence file beside it. That is a statement about what is in this repository and under what
+terms; it is not legal advice, and anyone redistributing Zaya should read the licences above and
+satisfy themselves in their own situation. The history of this repository still contains the
+removed files, as git history does.

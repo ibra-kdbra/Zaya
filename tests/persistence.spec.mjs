@@ -278,7 +278,9 @@ test.describe('Settings and URL options', () => {
     await page.locator('#switchAudioMode').click();
     await page.evaluate(() => {
       window.themeManager.setTheme('nord');
-      $('#mediaLoopToggle').prop('checked', true).trigger('change');
+      const loop = document.getElementById('mediaLoopToggle');
+      loop.checked = true;
+      loop.dispatchEvent(new Event('change'));
       window.appState.setMediaVolume(23);
     });
 
@@ -372,7 +374,11 @@ test.describe('Media player', () => {
     await expect(page.locator('#youtubePlayerContainer')).toBeVisible();
 
     // Loop on -> the next embed carries the loop params, and the choice is persisted.
-    await page.evaluate(() => $('#videoMediaLoopToggle').prop('checked', true).trigger('change'));
+    await page.evaluate(() => {
+      const loop = document.getElementById('videoMediaLoopToggle');
+      loop.checked = true;
+      loop.dispatchEvent(new Event('change'));
+    });
     expect(await page.evaluate(() => localStorage.getItem('mediaLoop'))).toBe('true');
     await page.locator('#loadYoutubeBtn').click();
     await expect(src).toHaveAttribute('src', /loop=1&playlist=dQw4w9WgXcQ/, { timeout: 10_000 });
@@ -390,7 +396,11 @@ test.describe('Media player', () => {
     await waitForBook(page);
     await openPanel(page, 'Media');
     await page.locator('#switchAudioMode').click();
-    await page.evaluate(() => $('#mediaLoopToggle').prop('checked', true).trigger('change'));
+    await page.evaluate(() => {
+      const loop = document.getElementById('mediaLoopToggle');
+      loop.checked = true;
+      loop.dispatchEvent(new Event('change'));
+    });
 
     await page.setInputFiles('#localAudioFile', wavFixture(2));
     await expect(page.locator('#localAudioFileName')).toHaveText('tone.wav');
@@ -753,7 +763,7 @@ test.describe('Deploy guard', () => {
       // The guard reloads the page mid-flight; a fetch cut off by that navigation must not fail the test.
       try {
         const res = await route.fetch();
-        const html = (await res.text()).replace('data-zaya-version="6.3.0"', 'data-zaya-version="0.0.1"');
+        const html = (await res.text()).replace('data-zaya-version="7.0.0"', 'data-zaya-version="0.0.1"');
         await route.fulfill({ response: res, body: html, headers: { ...res.headers(), 'content-type': 'text/html' } });
       } catch (e) {
         try { await route.continue(); } catch (e2) { /* the request is gone */ }
@@ -763,7 +773,7 @@ test.describe('Deploy guard', () => {
     await page.goto('/index.html');
     // The guard reloads exactly once, then boots normally on the second pass.
     await expect.poll(() => page.evaluate(() => { try { return sessionStorage.getItem('zaya:reloaded-for'); } catch (e) { return null; } }).catch(() => null), { timeout: 15_000 }).toBe('0.0.1');
-    await expect(page.locator('#currentVersion')).toHaveText(/v6\.3\.0|Unreleased/, { timeout: 30_000 });
+    await expect(page.locator('#currentVersion')).toHaveText(/v7\.0\.0|Unreleased/, { timeout: 30_000 });
     const cacheNames = await page.evaluate(async () => ('caches' in window) ? (await caches.keys()).filter((k) => k.startsWith('zaya-')) : []);
     // Only the freshly (re)installed worker's cache may exist; nothing from before the reload.
     expect(cacheNames.length).toBeLessThanOrEqual(1);

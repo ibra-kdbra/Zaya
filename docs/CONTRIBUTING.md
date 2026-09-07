@@ -32,7 +32,7 @@ file belongs. In short:
 | --- | --- |
 | `index.html`, `changelog.html` | The two pages of the site |
 | `lib/js/app.js` | Ordered script loader (the only place load order is defined) |
-| `engine/` | The flipbook engine (modularised DearFlip 1.7.x fork, see licensing note below) |
+| `engine-next/` | The page-turn engine: first-party ES modules over pdf.js and three.js |
 | `lib/js/core/book.js` | `window.ZayaBook`, the one facade over the engine — the only file in `lib/` allowed to touch it |
 | `lib/js/core/load.js` | Glue between the UI, `AppState` and the flipbook; the only caller of `ZayaBook.create` |
 | `lib/js/ui/`, `lib/js/features/` | Control panel, bottom bar, media, quotes, themes, changelog, search |
@@ -82,10 +82,17 @@ should use logical properties, so it mirrors under `dir="rtl"` (see `DESIGN.md`,
 
 ## Coding conventions
 
-- Vanilla ES2020+, no framework. jQuery is still present for the flipbook engine and legacy UI; new code should not add new jQuery usage.
-- Never insert untrusted text with `innerHTML` / `.html()`. Use `textContent`, or `window.ValidationUtils.escapeHtml()` when building markup.
+- Vanilla ES2020+, no framework and no jQuery: it was removed in 7.0.0 and nothing is to bring it back.
+- Never insert untrusted text with `innerHTML`. Use `textContent`, or `window.ValidationUtils.escapeHtml()` when building markup.
 - Keep everything relative-path based so the site works from a sub-folder and from `file://`.
 
 ## Licensing note
 
-Zaya's own code is MIT. The flipbook engine under `engine/` and `vendor/js/mockup.min.js` derive from DearFlip Lite, which is distributed under CC BY-NC-ND 4.0 (non-commercial, no derivatives). See `THIRD_PARTY_NOTICES.md`, beside this file, and the Roadmap section of `README.md`. Contributions that replace those components with permissively-licensed code are very welcome.
+Zaya is MIT throughout, and the third-party code it vendors is permissively licensed — three.js
+under MIT, pdf.js and Tesseract under Apache-2.0, and the rest as listed in
+`THIRD_PARTY_NOTICES.md` beside this file. Until 6.3.0 the page-turn engine was a fork of DearFlip
+Lite under CC BY-NC-ND 4.0; it was replaced and deleted in 7.0.0.
+
+Please keep it that way: a contribution that vendors third-party code must add its licence file
+beside it and a row to `THIRD_PARTY_NOTICES.md`, and nothing under a non-commercial or
+no-derivatives licence can be accepted.
