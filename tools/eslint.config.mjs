@@ -43,7 +43,8 @@ export default [
     rules
   },
   {
-    files: ['engine/**/*.js', 'engine-next/**/*.js', 'lib/js/features/themes/**/*.js', 'lib/js/features/quotes/**/*.js',
+    files: ['engine/**/*.js', 'engine-next/**/*.js', 'lib/js/core/engine.js', 'lib/js/features/navigator/**/*.js',
+      'lib/js/features/themes/**/*.js', 'lib/js/features/quotes/**/*.js',
       'lib/js/features/changelog/**/*.js', 'lib/js/features/search/**/*.js', 'lib/js/features/settings/**/*.js', 'lib/js/pro-features/**/*.js'],
     languageOptions: { ...shared, sourceType: 'module' },
     rules
