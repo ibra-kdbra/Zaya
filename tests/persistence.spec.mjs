@@ -773,7 +773,7 @@ test.describe('Deploy guard', () => {
     await page.goto('/index.html');
     // The guard reloads exactly once, then boots normally on the second pass.
     await expect.poll(() => page.evaluate(() => { try { return sessionStorage.getItem('zaya:reloaded-for'); } catch (e) { return null; } }).catch(() => null), { timeout: 15_000 }).toBe('0.0.1');
-    await expect(page.locator('#currentVersion')).toHaveText(/v6\.3\.0|Unreleased/, { timeout: 30_000 });
+    await expect(page.locator('#currentVersion')).toHaveText(/v7\.0\.0|Unreleased/, { timeout: 30_000 });
     const cacheNames = await page.evaluate(async () => ('caches' in window) ? (await caches.keys()).filter((k) => k.startsWith('zaya-')) : []);
     // Only the freshly (re)installed worker's cache may exist; nothing from before the reload.
     expect(cacheNames.length).toBeLessThanOrEqual(1);
