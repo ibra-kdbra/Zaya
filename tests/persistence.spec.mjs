@@ -804,12 +804,17 @@ test.describe('Offline', () => {
       return {
         engine: paths.filter((p) => p.startsWith('/engine-next/')).length,
         libraries: paths.filter((p) => /\/vendor\/(three|pdfjs)\//.test(p)).length,
-        app: paths.filter((p) => p.startsWith('/lib/js/')).length
+        app: paths.filter((p) => p.startsWith('/lib/js/')).length,
+        // Fetched only when the engine first draws, so they are named to the worker explicitly.
+        webgl: paths.some((p) => p.endsWith('/renderer-webgl.js')),
+        three: paths.some((p) => p.includes('/vendor/three/'))
       };
     });
     expect(held.engine).toBeGreaterThan(5);
-    expect(held.libraries).toBeGreaterThan(1);
+    expect(held.libraries).toBeGreaterThan(0);
     expect(held.app).toBeGreaterThan(20);
+    expect(held.webgl).toBe(true);
+    expect(held.three).toBe(true);
 
     // Now with the network genuinely gone, on a page that has never been loaded before.
     await context.setOffline(true);
