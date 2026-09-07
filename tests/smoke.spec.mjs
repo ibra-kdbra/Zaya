@@ -100,6 +100,62 @@ test.describe('Zaya app shell', () => {
   });
 });
 
+test.describe('The name of the book', () => {
+  test('a document that carries its own title is called by it', async ({ page }) => {
+    await page.goto('/index.html?pdf=' + encodeURIComponent('/tests/fixtures/sample-titled.pdf'));
+    await waitForBook(page);
+    await expect
+      .poll(() => page.evaluate(() => document.querySelector('.app-doc-name')?.textContent), { timeout: 20_000 })
+      .toBe('The Meditations of Marcus Aurelius');
+    // The browser's own title bar, so a bookmark or a second window says which book it is.
+    expect(await page.title()).toBe('The Meditations of Marcus Aurelius — Zaya');
+  });
+
+  test('a document with no title of its own falls back to the file, not the host', async ({ page }) => {
+    await page.goto('/index.html?pdf=' + encodeURIComponent('/tests/fixtures/sample.pdf'));
+    await waitForBook(page);
+    await expect
+      .poll(() => page.evaluate(() => document.querySelector('.app-doc-name')?.textContent), { timeout: 20_000 })
+      .toBe('sample.pdf');
+  });
+});
+
+test.describe('Zoom', () => {
+  test('the wheel zooms without a modifier, a notch at a time, and the page then pans', async ({ page }) => {
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf');
+    await waitForBook(page);
+    const state = () => page.evaluate(() => {
+      const e = window.ZayaBook.current.engine;
+      return { zoom: e.zoomLevel, panX: Math.round(e.panX) };
+    });
+    expect((await state()).zoom).toBe(1);
+
+    const box = await page.locator('#flipbookContainer').boundingBox();
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    await page.mouse.move(cx, cy);
+
+    // One notch is a step, not a leap: it used to multiply the page by half again.
+    await page.mouse.wheel(0, -100);
+    await expect.poll(async () => (await state()).zoom > 1, { timeout: 10_000 }).toBe(true);
+    const oneNotch = (await state()).zoom;
+    expect(oneNotch).toBeGreaterThan(1.02);
+    expect(oneNotch).toBeLessThan(1.25);
+
+    // Far enough in that the page is larger than the stage, and it follows the pointer.
+    for (let i = 0; i < 9; i++) {
+      await page.mouse.wheel(0, -120);
+      await page.waitForTimeout(120);
+    }
+    await expect.poll(async () => (await state()).zoom > 2, { timeout: 10_000 }).toBe(true);
+    await page.mouse.down();
+    await page.mouse.move(cx - 200, cy, { steps: 15 });
+    await page.mouse.up();
+    await expect.poll(async () => (await state()).panX, { timeout: 10_000 }).toBeLessThan(-50);
+  });
+});
+
 test.describe('Keyboard', () => {
   /*
    * The engine takes pointer input only, so page turns from the keyboard are the application's

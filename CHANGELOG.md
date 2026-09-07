@@ -5,6 +5,32 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **A book is called by its own name.** The header showed the host a link came from — every book
+  from one site was called `example.com` — or the name of the file on disk. A PDF usually carries
+  its own title, and that is now what is shown, falling back to the file at the end of the link
+  rather than the host it came from. The browser's title bar says it too, so a bookmark or a second
+  window names the book. This is a label only: a document is still identified internally by its
+  link or by its file name and size, so notes, remembered pages and stored copies are untouched.
+
+### Fixed
+- **A page turn is quicker, and does less work while it runs.** The turn took 700ms with a curve
+  that eased in and out of it, which read as floaty rather than smooth; it now takes 480ms. Two
+  costs it carried on every frame are gone: the sheet's material is unlit, so the vertex normals
+  being recomputed for both sheets were read by nothing, and the vertices are now written straight
+  into the geometry's array rather than through three bounds-checked accessors each. Neither of
+  those changed the frame rate measurably on the machine this was tested on, where the frame rate
+  is set by a software renderer rather than by the page; they are removals of work that was doing
+  nothing, and the shorter turn is the part a reader will feel.
+- **The wheel zooms again.** It did nothing unless the control key was held, which left both the
+  magnification and the panning that depends on it out of reach — a page could only be enlarged by
+  double-clicking it. The wheel now zooms on its own, and a notch is a step rather than a leap: one
+  notch used to multiply the page by half again, crossing the whole range in three, and now moves
+  it about a tenth. The control key still works, since a trackpad pinch arrives that way. Dragging
+  a page that is larger than the window moves it, as it always did — it was simply unreachable.
+
 ## [7.1.0] - 2026-09-07
 
 ### Added

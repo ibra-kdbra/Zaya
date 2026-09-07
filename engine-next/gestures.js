@@ -13,7 +13,7 @@
  * | press and drag | the sheet follows the pointer and settles on release | the page pans |
  * | click or tap | turns the side that was tapped | nothing |
  * | double-click, double-tap | zooms in on that point | zooms back out to fit |
- * | ctrl and the wheel | zooms about the pointer | zooms about the pointer |
+ * | the wheel | zooms about the pointer | zooms about the pointer, and pans none |
  * | two fingers apart or together | zooms about their midpoint | the same, and pans with them |
  *
  * A press that lands on a run of text in the text layer never starts a drag: the reader is
@@ -264,12 +264,20 @@ export class Gestures {
 
   onWheel(event) {
     if (this.disposed || !this.on.isInteractive()) return;
-    // A trackpad pinch arrives as a wheel with the control key held; so does the keyboard zoom.
-    if (!event.ctrlKey && !event.metaKey) return;
+    /*
+     * The wheel zooms, with or without the control key. A reader reaches for the wheel to make a
+     * page bigger, and the stage has nothing to scroll; a trackpad pinch and the keyboard zoom
+     * arrive as a wheel with the control key held, and mean the same thing here.
+     */
     event.preventDefault();
+    /*
+     * Exponential in the delta, so one fast scroll and several slow ones agree. The divisor sets
+     * how much one notch does: a notch is around 100 of these units, and 1000 makes that a tenth
+     * bigger, which is roughly what a picture viewer does. It was 260 -- a single notch multiplied
+     * the page by one and a half, so the wheel went from fit to the limit in three.
+     */
+    const factor = Math.exp(-event.deltaY / 1000);
     const point = this.local(event);
-    // Exponential in the wheel delta, so a fast scroll and several slow ones agree.
-    const factor = Math.exp(-event.deltaY / 260);
     this.on.onZoomAt(factor, point.x, point.y);
   }
 

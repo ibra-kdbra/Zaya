@@ -30,7 +30,7 @@ const DEFAULTS = {
   direction: "ltr",
   openPage: 1,
   hard: "none",
-  duration: 700,
+  duration: 480,
   paddingTop: 0,
   paddingBottom: 0,
   backgroundColor: "#20232a",
