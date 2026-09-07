@@ -5,36 +5,86 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.0.0] - 2026-09-07
+
+Zaya has its own engine now. Every page you turn is drawn by `engine-next/`, written for this
+project from the contract in `docs/engine-api.md` and from first principles. The engine it
+replaces was a fork of DearFlip Lite, which Zaya had run on since its first release; that fork,
+and the libraries that existed only to feed it, are out of the repository. Nothing you can see or
+do was meant to change in the move — the same spreads, the same turn, the same drawers, the same
+shortcuts — and where something did change it is listed below, mostly because the reader's own
+code now draws what the engine used to.
+
+That matters most for the licence. Until 6.3.0 part of this repository was not free to use: the
+page-turn engine was distributed under CC BY-NC-ND 4.0, personal and non-commercial use only and
+no derivatives, which the README and the third-party notices both warned about, and which is why
+replacing the engine was the one milestone everything else waited on. With the fork deleted that
+component is gone. Zaya's own code, the new engine included, is MIT, and the third-party code it
+still vendors is permissively licensed — three.js under MIT, pdf.js and Tesseract under
+Apache-2.0, the icon and text fonts under OFL and CC BY — each with its licence beside the files
+it covers, and all of it listed in `docs/THIRD_PARTY_NOTICES.md`. The credit to DFlip stays, as
+the engine Zaya ran on for years; the new one derives nothing from it, having been written from
+the contract rather than from the code.
+
+The other half of the release finishes making a document a document: everything Zaya keeps about
+a book — where you stopped reading, your notes, the text it recognised, the copy of the file, the
+soundtrack you read it with — is filed against one identity, so two different files called
+`notes.pdf` no longer share a single memory.
 
 ### Added
-- **The reader runs on the MIT engine (issue #21)**: the pages are now drawn by `engine-next/`, and nothing loads the DearFlip-derived fork any more. Everything a reader can see or do is meant to be unchanged — the same spreads, the same turn, the same drawers, the same shortcuts — because the whole of the change is behind `lib/js/core/book.js`, which translates the published contract onto the new engine. The fork is still in the tree, along with the classic three.js, pdf.js and mockup builds it needed, so that deleting them is one reviewable change of its own; the reader fetches none of them.
-- **Notes, by page, for the document you are reading**: the Notes tab now lists the open document's
-  notes grouped under the page they were taken on. The pages on screen come first and are marked, a
-  group heading counts its notes, each note has a **Go to page** action that turns the book to it,
-  and the line above the list says how many notes are on this page. A note taken from the Text
+
+- **The page-turn engine is Zaya's own (issue #21)**: `engine-next/` loads a document with
+  pdf.js 4, lays out single and double spreads in either reading direction, maps book pages to PDF
+  pages — including scans that carry two book pages on one — and turns a sheet with three.js by
+  moving the sheet's own vertices so the paper curls, with a plain-DOM renderer of the same shape
+  for a machine with no working WebGL. The sheet follows your finger: a drag builds the page as
+  the press begins and moves it with the pointer, settling forward past halfway or on a flick and
+  falling back otherwise. `?render=css` and `?render=webgl` still pin a renderer for testing.
+- **The text on the page can be selected**: the runs of text on the pages currently on screen are
+  placed over them as transparent spans, so a passage can be selected, copied and found with the
+  browser's own search. Right-to-left runs are marked so they copy in logical order, and the layer
+  steps out of the way while a sheet is in flight. Search marks are still painted into the page
+  itself, so they print exactly as they look.
+- **Zoom, on the page you are reading**: the control key with the wheel, two fingers, a double
+  click or a double tap magnifies the spread, and a drag pans it once magnified — in both
+  renderers, with the page re-rendered at the magnified scale a moment after the magnification
+  arrives, so the text stays crisp rather than growing blurry. Turning the page comes back to fit,
+  because a pan belongs to the spread it was chosen on.
+- **Notes, by page, for the document you are reading**: the Notes tab lists the open document's
+  notes grouped under the page they were taken on. The pages on screen come first and are marked,
+  a group heading counts its notes, each note has a **Go to page** action that turns the book to
+  it, and the line above the list says how many notes are on this page. A note taken from the Text
   pane's selection behaves exactly like one typed into the tab, and the per-document list behind
-  **All notes** shows the same notes in page order with the same action.
+  **All notes** shows the same notes in page order.
 - **Every document remembers a little more of itself**: the page-mode override chosen while a book
   was open, and the soundtrack it was last read with (the YouTube link, or that it was on a local
   audio file), come back when that document is opened again — with the last choice of all as the
-  default for a document that has none of its own. Nothing starts playing by itself. Both travel in
-  a backup, in a new `documents` section of the format-2 file.
-- **The MIT engine reaches feature parity (issue #21)**: `engine-next/` now does everything the contract asks of an engine, so the switch-over behind `lib/js/core/book.js` is a facade change rather than a loss for readers. **Zoom**: `zoom(level)`, `zoomIn`, `zoomOut`, `resetZoom` and `pan`, driven by the control key with the wheel, two fingers, a double click or a double tap, and a drag to pan once magnified — in both renderers, with the page bitmaps re-rendered at the magnified scale a moment after the magnification arrives, and the `zoomChange` callback firing once on each crossing of the fit boundary rather than once per step. Turning a page comes back to fit, because a pan belongs to the spread it was chosen on. **A selectable text layer**: the runs of text on the pages currently on screen are placed over them as transparent spans, so a passage can be selected, copied and found with the browser's own find — right-to-left runs marked so they copy in logical order, hidden while a sheet is in flight, and switchable with `setTextLayerEnabled`. Search marks still live in the page texture, so they print identically. **Data for the reader's panels**: `getThumbnail(pdfPage, width)` with a cache of its own, `getOutline()` with named destinations already resolved to page numbers, and `getPageLabel(pdfPage)` — data only; the engine builds no panel, and the Navigator's Pages and Outline panes are the reader's own markup. **Chrome actions**: `toggleFullscreen()` with the state exposed and the browser's own `fullscreenchange` followed, `download()` resolving the source to a URL or a blob for the application to save, `share()` returning this address with `?page=`, plus `setInteractive`, `setSoundEnabled` and `resize`. **The sheet follows the finger**: a drag builds the sheet as the press begins and moves it with the pointer, settling forward past halfway or on a flick and falling back otherwise. `docs/engine-api.md` gains a "Data for panels" section for the three new members, and `tests/fixtures/sample-double-internal.pdf` is a new fixture — a scan whose every page is a two-page spread — so the book-page-to-PDF-page mapping for scanned books is tested rather than assumed.
-- **The foundation of the MIT page-turn engine (issue #21)**: `engine-next/` is a clean-room replacement for the DearFlip-derived `engine/`, written from the interface the reader already uses rather than from the code it replaces. It loads a document with pdf.js 4 (`vendor/pdfjs/`), lays out single and double spreads in either reading direction, maps book pages to PDF pages including scans that carry two book pages per page, and turns a sheet with three.js r169 (`vendor/three/`) by moving the sheet's vertices so the paper curls — with a plain-DOM renderer of the same shape for machines without WebGL. `engine-next/demo.html` drives it on its own, under a copy of the deployment's Content-Security-Policy; `tests/engine-next.spec.mjs` covers both renderers.
-- **The engine's contract, written down (issue #21)**: `docs/engine-api.md` specifies everything the application asks of the page-turn engine — construction and its options, teardown and resizing, navigation and the page-mode and direction rules, the pdf.js document and the mapping between PDF pages and book pages, the search hooks, the side panels and their DOM contract, the render modes and `?render=`, sound and zoom, and the ordering of the `zaya:*` events. Every member is marked as part of the contract or as internal. It is written from the outside — from what the app asks for and what it must observe in return — so a clean-room engine can be written from it without reference to the current one.
-- **Contract tests**: `tests/engine-contract.spec.mjs` exercises every kept member through `ZayaBook` on the sample, outline and Arabic fixtures: navigation and page-change events, page-mode switching and the page mapping in both modes, right-to-left reading, teardown with no stage or canvas left behind, resizing, search highlights and their repaint, both render modes including `?render=css`, and the stiff-page option. The assertions are about behaviour rather than markup, so a replacement engine runs the same file unchanged.
+  default for a document that has none of its own. Nothing starts playing by itself. Both travel
+  in a backup, in a new `documents` section of the format-2 file.
+- **The engine's contract is written down**: `docs/engine-api.md` specifies everything the
+  application asks of a page-turn engine — construction and its options, teardown and resizing,
+  navigation, the page-mode and direction rules, the pdf.js document and the mapping between PDF
+  pages and book pages, the search hooks, the data the side panels are built from, the render
+  modes, sound, zoom, and the order the `zaya:*` events arrive in. It was written from the
+  outside, from what the application asks for and what it must observe in return, which is what
+  made a clean-room replacement possible. `tests/engine-contract.spec.mjs` exercises every member
+  of it through `window.ZayaBook` alone and asserts behaviour rather than markup, which is how the
+  same file ran unchanged against both engines.
 
 ### Changed
-- **The Navigator's Pages and Outline panes are the reader's own**: they used to be built by the engine and borrowed by the application, which is why they were the last part of the interface not written in the reader's own markup. They are now `lib/js/features/navigator/panes.js`, built from the three things only the engine can work out — a picture of a page, the outline with its destinations resolved, and what a page calls itself. The tiles, the page numbers, the two columns on a phone, the collapsible chapters and their chevrons, the ring on the page you are reading and the touch scrolling that never freezes the book are all as they were; the class names underneath them are not, and `lib/css/page/shell.css`, `custom-ui.css` and `chrome.css` were rewritten to match. Opening another document with the drawer open replaces the pane rather than emptying it: the pages of the last book stay on screen until the new one can draw its own, and a document is announced as open when it starts opening rather than when it was picked, so nothing follows a new name over an old book.
-- **The Search pane is plain DOM**: `lib/js/features/search/search-panel.js` was the last part of the reader written with jQuery. It now builds its form, its results and its text-recognition offer with the DOM directly, under the same class names as the two panes beside it. jQuery is still loaded, because the media player and the loader use it.
-- **The share box and the download are the application's**: the engine works out the address of the page being read and resolves the open document to something saveable, and the reader shows the box (`lib/js/ui/share-box.js`) and saves the file. The shared link now carries `?page=`, so it opens where the sender was, and the mail it offers to write actually has the address in it.
-- **Arrow keys turn pages from the reader, not the engine**: `ArrowRight` and `ArrowLeft` move the book right and left on screen, which is forward and back in a left-to-right document and the other way round in a right-to-left one, exactly as before. They stay out of the way while a drawer, a dialog or a text field has focus.
-- **A page turn makes a sound again**: the engine is pointed at a page-turn sound the application already ships, so the setting in the More menu does something.
-- **The page a search hit turns to, in a scanned book**: for a scan whose every page carries two book pages, `toBookPage` returns the right-hand leaf, which is what the application and its tests have recorded since 6.1 and what `docs/engine-api.md` has always said. `engine-next` had chosen the left-hand one; the contract wins, one answer is worth more than either, and both leaves are on the same spread, so a reader sees the same thing either way.
-- `window.dFlipBook` and `window.flipbookInstance` now point at the `ZayaBook` handle rather than at an engine object, because nothing shaped like the fork's exists any more, and the handle is the only thing a plugin can honestly be handed. They remain deprecated.
-- **A file from disk is a document, not a filename**: everything kept on the device —
-  the remembered page, notes, recognised text, the stored copy of the file, the recent entry — is
+
+- **The Navigator's Pages and Outline panes are the reader's own**: they used to be built by the
+  engine and borrowed by the application, which is why they were the last part of the interface
+  not written in Zaya's own markup. They are now built from the three things only an engine can
+  work out — a picture of a page, the outline with its destinations resolved, and what a page
+  calls itself. The tiles, the page numbers, the two columns on a phone, the collapsible chapters
+  and their chevrons, the ring on the page you are reading and the touch scrolling that never
+  freezes the book are all as they were. Opening another document with the drawer open replaces
+  the pane rather than emptying it: the pages of the last book stay on screen until the new one
+  can draw its own, and a document is announced as open when it starts opening rather than when it
+  was picked, so nothing follows a new name over an old book.
+- **A file from disk is a document, not a filename**: everything kept on the device — the
+  remembered page, notes, recognised text, the stored copy of the file, the recent entry — is
   filed under one document key: a link by its URL with the `#fragment` and tracking parameters
   taken off, a file by its name *and its size*. Two different files called `notes.pdf` used to
   share a page, a note list and their recognised text; they are now two documents. Nothing is lost
@@ -46,9 +96,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A change of document reaches every surface at once**: the notes list, the page counts in the
   bottom bar and the Navigator, the Text pane and the print range all follow the new document in
   the same event cycle instead of on the next turn of the interface loop.
-- **The application talks to the engine through one facade**: `lib/js/core/book.js` publishes `window.ZayaBook`, and every feature — the control bar and its More menu, the Navigator, print, the Text pane, URL options and the loader — now goes through it instead of reaching into `window.dFlipBook`, `window.flipbookInstance`, `DFLIP.activeBook`, `book.target`, `book.contentProvider` or `book.ui`. `lib/js/core/load.js` is the only caller that opens a book. Reading direction and page mode are named (`"ltr"`/`"rtl"`, `"single"`/`"double"`) rather than numbered, and a disposed book hands its container back unmarked instead of leaving a stage-shaped element behind.
-- Page turns are reported through the `onPageChanged` construction option rather than by the engine writing to page memory and `AppState` itself.
-- `window.dFlipBook` and `window.flipbookInstance` remain as deprecated aliases for one release, so plugins written against them keep working. Nothing in `lib/` reads them.
+- **The share box, the download and the arrow keys are the application's**: the engine works out
+  the address of the page being read and resolves the open document to something saveable, and the
+  reader shows the box and saves the file. A shared link now carries `?page=`, so it opens where
+  the sender was, and the mail it offers to write actually has the address in it. `ArrowRight` and
+  `ArrowLeft` move the book right and left on screen — forward and back in a left-to-right
+  document, the other way round in a right-to-left one — and stay out of the way while a drawer, a
+  dialog or a text field has focus.
+- **The Search pane and the media pane are plain DOM**, like the rest of the reader: the search
+  form, its results and its offer to recognise scanned pages, and the whole of the media pane —
+  the mode switcher, the themed audio player with its transport, progress and volume, the
+  local-file import and the two loop toggles that follow each other — are built with the DOM
+  directly, under the same ids and with the same behaviour.
+- **A page turn makes a sound again**: the engine is pointed at a page-turn sound the application
+  already ships, so the setting in the More menu does something.
+- **The page a search hit turns to, in a scanned book**: for a scan whose every page carries two
+  book pages, the right-hand leaf is the answer, which is what the application and its tests have
+  recorded since 6.1 and what the contract has always said. Both leaves are on the same spread, so
+  a reader sees the same thing either way.
+- **The application talks to the engine through one facade**: `lib/js/core/book.js` publishes
+  `window.ZayaBook`, and every feature — the control bar and its More menu, the Navigator, print,
+  the Text pane, URL options and the loader — goes through it. Reading direction and page mode are
+  named (`"ltr"`/`"rtl"`, `"single"`/`"double"`) rather than numbered, and a disposed book hands
+  its container back unmarked instead of leaving a stage-shaped element behind.
+- `window.dFlipBook` and `window.flipbookInstance` now point at the `ZayaBook` handle rather than
+  at an engine object, because nothing shaped like the fork's exists any more, and the handle is
+  the only thing a plugin can honestly be handed. They remain deprecated.
+
+### Removed
+
+- **The DearFlip-derived engine and its stylesheet**, together with the vendored builds that
+  existed only to feed it: the classic three.js and pdf.js with its worker, its compatibility shim
+  and its CMaps, and `mockup.min.js`. The new engine imports pdf.js 4 and three.js r169 as ES
+  modules from `vendor/pdfjs/` and `vendor/three/` and vendors its own CMaps beside them. About
+  3 MB of files leave the repository.
+- **jQuery**. Zaya no longer ships it: the last two files written in it, the media pane and the
+  first-document loader, are the DOM directly, and a plugin that wants jQuery now brings its own.
+  The reader loads one vendored script at startup instead of two.
 
 ## [6.3.0] - 2026-09-06
 

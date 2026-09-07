@@ -763,7 +763,7 @@ test.describe('Deploy guard', () => {
       // The guard reloads the page mid-flight; a fetch cut off by that navigation must not fail the test.
       try {
         const res = await route.fetch();
-        const html = (await res.text()).replace('data-zaya-version="6.3.0"', 'data-zaya-version="0.0.1"');
+        const html = (await res.text()).replace('data-zaya-version="7.0.0"', 'data-zaya-version="0.0.1"');
         await route.fulfill({ response: res, body: html, headers: { ...res.headers(), 'content-type': 'text/html' } });
       } catch (e) {
         try { await route.continue(); } catch (e2) { /* the request is gone */ }
