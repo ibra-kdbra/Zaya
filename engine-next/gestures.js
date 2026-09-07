@@ -11,10 +11,10 @@
  * | gesture | at rest | zoomed in |
  * | --- | --- | --- |
  * | press and drag | the sheet follows the pointer and settles on release | the page pans |
- * | shift and drag, or the right button | tips the book away from flat | the same |
+ * | shift and drag up or down, or the right button | lays the book down towards a table, or stands it up | the same |
  * | click or tap | turns the side that was tapped | nothing |
  * | double-click, double-tap | zooms in on that point | zooms back out to fit |
- * | shift and double-click | lays a tipped book flat again | the same |
+ * | shift and double-click | stands the book back up, facing the reader | the same |
  * | the wheel | zooms about the pointer | zooms about the pointer, and pans none |
  * | two fingers apart or together | zooms about their midpoint | the same, and pans with them |
  *
@@ -170,8 +170,9 @@ export class Gestures {
     drag.moved = true;
 
     if (drag.orbit && !this.on.isZoomed()) {
+      // Only the up-and-down counts: the book lays down and stands up, it does not swing sideways.
       if (typeof this.on.onOrbit === "function") {
-        this.on.onOrbit(event.clientX - drag.lastX, event.clientY - drag.lastY);
+        this.on.onOrbit(0, event.clientY - drag.lastY);
       }
       drag.lastX = event.clientX;
       drag.lastY = event.clientY;

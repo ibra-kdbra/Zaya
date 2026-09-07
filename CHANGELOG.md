@@ -5,6 +5,20 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **Laying the book down works the way a book does.** The first attempt at restoring this let the
+  view swing around the book on two axes, left and right as well as up and down, which is not what
+  a book does and read as an unsteady camera rather than a book on a table. It is one angle on one
+  axis now: the book turns about the horizontal line through its own middle, the far edge receding
+  and the near edge coming forward, exactly as a book is tipped down onto a table. It never swings
+  sideways. The angle is stated the way a reader would think of it — 90 degrees is the book held up
+  facing you, which is how it opens, and it rises from there towards flat. The lens stays on the
+  line through the middle of the pages and looks at them square on; it draws straight back as the
+  book goes down, because the near edge would otherwise run off the sides of the stage, which is
+  stepping back from a table rather than walking around it.
+
 ## [7.2.0] - 2026-09-07
 
 Four things a reader reaches for, three of which the engine replacement had quietly taken away.

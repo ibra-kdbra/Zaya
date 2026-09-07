@@ -131,9 +131,8 @@ export class ZayaBook {
     this.turnToken = 0;
     this.interactive = true;
     this.zoomLevel = 1;
-    // How far the book is tipped away from flat, in radians. Flat until the reader tips it.
-    this.tiltPitch = 0;
-    this.tiltYaw = 0;
+    // Degrees from upright: 90 is the book facing the reader, which is how it opens.
+    this.tiltDegrees = 90;
     this.panX = 0;
     this.panY = 0;
     this.dragTurn = null;
@@ -621,31 +620,33 @@ export class ZayaBook {
   /* ---- tilt ------------------------------------------------------------------------------- */
 
   /**
-   * Tip the book by a drag, in pixels. A drag across the whole stage turns it about as far as it
-   * will go, so the book follows the hand at a rate that suits the size of the window.
+   * Lay the book down, or stand it up, by a drag. Only the up-and-down of the drag counts: the
+   * book turns about one axis, so a hand that wanders sideways does not send it sideways too.
+   * Dragging down lays it towards the table; dragging up brings it back to facing the reader.
    */
   tiltBy(dx, dy) {
-    const perPixel = Math.PI / Math.max(320, this.stage.clientWidth);
-    return this.setTilt(this.tiltPitch + dy * perPixel, this.tiltYaw + dx * perPixel);
+    const perPixel = 90 / Math.max(240, this.stage.clientHeight * 0.6);
+    return this.setTilt(this.tiltDegrees + dy * perPixel);
   }
 
-  /** Set the angle outright. Radians; the renderer clamps them to what stays readable. */
-  setTilt(pitch, yaw) {
+  /**
+   * Set the angle outright.
+   * @param {number} degrees 90 upright and facing the reader, rising towards flat on a table
+   */
+  setTilt(degrees) {
     if (!this.renderer || typeof this.renderer.setTilt !== "function") return this.tilt;
-    const applied = this.renderer.setTilt(pitch, yaw) || { pitch: 0, yaw: 0 };
-    this.tiltPitch = applied.pitch;
-    this.tiltYaw = applied.yaw;
+    this.tiltDegrees = this.renderer.setTilt(degrees) || 90;
     this.announceTilt();
     return this.tilt;
   }
 
-  /** Lay the book flat again. */
+  /** Stand the book back up, facing the reader. */
   resetTilt() {
-    return this.setTilt(0, 0);
+    return this.setTilt(90);
   }
 
   get tilt() {
-    return { pitch: this.tiltPitch, yaw: this.tiltYaw, tilted: !!(this.tiltPitch || this.tiltYaw) };
+    return { degrees: this.tiltDegrees, tilted: this.tiltDegrees !== 90 };
   }
 
   announceTilt() {

@@ -161,12 +161,13 @@ test.describe('Tilting the book', () => {
    * Lost in 7.0.0 and restored after it: the reader can tip the book away from flat. Held here
    * rather than only in the engine's own tests, because what matters is that a reader can do it.
    */
-  test('shift and a drag tips it, an ordinary drag still turns the page', async ({ page }) => {
+  test('shift and a drag lays it down, an ordinary drag still turns the page', async ({ page }) => {
     await stubNetwork(page);
     await page.goto('/index.html?pdf=https://example.com/sample.pdf');
     await waitForBook(page);
     const tilt = () => page.evaluate(() => window.ZayaBook.current.tilt);
-    expect(await tilt()).toEqual({ pitch: 0, yaw: 0, tilted: false });
+    // 90 is the book held up facing the reader, which is how it opens.
+    expect(await tilt()).toEqual({ degrees: 90, tilted: false });
 
     const box = await page.locator('#flipbookContainer').boundingBox();
     const y = box.y + box.height / 2;
@@ -177,15 +178,25 @@ test.describe('Tilting the book', () => {
     await page.keyboard.down('Shift');
     await page.mouse.move(box.x + box.width * 0.5, y);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width * 0.5 + 130, y - 90, { steps: 14 });
+    await page.mouse.move(box.x + box.width * 0.5 + 130, y + 90, { steps: 14 });
     await page.mouse.up();
     await page.keyboard.up('Shift');
     await expect.poll(async () => (await tilt()).tilted, { timeout: 10_000 }).toBe(true);
-    const tipped = await tilt();
-    expect(tipped.yaw).toBeGreaterThan(0);      // dragged to the right
-    expect(tipped.pitch).toBeLessThan(0);       // and upwards
+    const laid = await tilt();
+    // Dragging down lays the book towards the table, and only the up-and-down of the drag counts.
+    expect(laid.degrees).toBeGreaterThan(90);
 
-    // Dragging on the book still turns its pages rather than tipping it.
+    // A drag straight across does not lay it down any further: there is no sideways axis.
+    const before2 = (await tilt()).degrees;
+    await page.keyboard.down('Shift');
+    await page.mouse.move(box.x + box.width * 0.4, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.75, y, { steps: 12 });
+    await page.mouse.up();
+    await page.keyboard.up('Shift');
+    expect((await tilt()).degrees).toBe(before2);
+
+    // Dragging on the book still turns its pages rather than laying it down.
     const before = await activePage(page);
     await page.mouse.move(box.x + box.width * 0.75, y);
     await page.mouse.down();

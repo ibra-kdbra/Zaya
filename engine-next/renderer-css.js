@@ -36,7 +36,7 @@ export class CssRenderer {
     this.pageH = 1;
     this.frame = 0;
     this.zoom = { level: 1, x: 0, y: 0 };
-    this.tilt = { pitch: 0, yaw: 0 };
+    this.tiltDegrees = 90;
 
     this.spread = element("zn-spread");
     this.left = element("zn-page zn-page-left");
@@ -131,25 +131,25 @@ export class CssRenderer {
   }
 
   /**
-   * Tip the book away from flat. There is no camera here, so the same intention is expressed as a
-   * rotation of the spread in the browser's own perspective: the reader gets the same picture by a
-   * different route, rather than the tilt being a thing only the 3D renderer can do.
+   * Lay the book down. There is no camera here, so the same intention is expressed as a rotation
+   * of the spread in the browser's own perspective: one axis, about the middle of the pages, the
+   * reader getting the same picture by a different route.
+   * @param {number} degrees 90 upright and facing the reader, rising towards flat
    */
-  setTilt(pitch, yaw) {
-    this.tilt = { pitch: pitch || 0, yaw: yaw || 0 };
+  setTilt(degrees) {
+    const wanted = Number.isFinite(degrees) ? degrees : 90;
+    this.tiltDegrees = Math.max(90, Math.min(170, wanted));
     this.applyZoom();
-    return this.tilt;
+    return this.tiltDegrees;
   }
 
   applyZoom() {
     const { level, x, y } = this.zoom;
-    const { pitch, yaw } = this.tilt || { pitch: 0, yaw: 0 };
+    const laid = (this.tiltDegrees || 90) - 90;
     this.spread.style.transformOrigin = "50% 50%";
-    const flat = level === 1 && !x && !y && !pitch && !yaw;
-    // A positive pitch looks down on the book, which is the page leaning away at its top edge.
-    const turn = pitch || yaw
-      ? ` rotateX(${(pitch * 180) / Math.PI}deg) rotateY(${(-yaw * 180) / Math.PI}deg)`
-      : "";
+    const flat = level === 1 && !x && !y && !laid;
+    // The far edge of the page recedes, as it does when a book is tipped down onto a table.
+    const turn = laid ? ` rotateX(${laid}deg)` : "";
     this.spread.style.transform = flat
       ? "" : `translate(${x}px, ${y}px) scale(${level})${turn}`;
   }
