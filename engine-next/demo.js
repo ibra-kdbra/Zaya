@@ -51,8 +51,8 @@ const demo = window.zayaDemo = {
   },
 };
 
-["zaya:pdfLoaded", "zaya:bookReady", "zaya:pageChanged", "zaya:zoomChanged",
-  "zaya:fullscreenChanged"].forEach((name) => {
+["zaya-engine:pdfLoaded", "zaya-engine:bookReady", "zaya-engine:pageChanged", "zaya-engine:zoomChanged",
+  "zaya-engine:fullscreenChanged"].forEach((name) => {
   document.addEventListener(name, (event) => demo.events.push({ type: name, detail: event.detail }));
 });
 
@@ -172,7 +172,7 @@ async function buildOutline() {
   render(entries, outlineList);
 }
 
-document.addEventListener("zaya:pageChanged", update);
+document.addEventListener("zaya-engine:pageChanged", update);
 document.getElementById("prev").addEventListener("click", () => demo.book && demo.book.prev().then(update));
 document.getElementById("next").addEventListener("click", () => demo.book && demo.book.next().then(update));
 document.getElementById("mode").addEventListener("change", (e) => {
