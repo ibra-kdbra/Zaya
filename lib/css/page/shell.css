@@ -120,22 +120,17 @@ input:checked + .slider-modern:before {
   background: var(--text-accent);
   transform: scale(1.1);
 }
-body.df-fullscreen-active .fixed {
+body.reader-fullscreen .fixed {
   display: none !important;
 }
-body.df-fullscreen-active #toggleUnifiedPanelBtn {
+body.reader-fullscreen #toggleUnifiedPanelBtn {
   display: none !important;
 }
-body.df-fullscreen-active #unifiedPanel {
+body.reader-fullscreen #unifiedPanel {
   display: none !important;
 }
 #customControlBar {
   z-index: 2147483647 !important;
-}
-.df-ui {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
 }
 #customControlBar {
   position: fixed;
@@ -1083,10 +1078,10 @@ h3 { font-size: 12px; line-height: 1.4; }
 
 /* ------------------------------------------------- navigator drawer content */
 
-#navigatorBody .df-sidemenu,
-#navigatorBody .df-thumb-container,
-#navigatorBody .df-outline-container,
-#navigatorBody .df-search-container {
+#navigatorBody .nav-pane,
+#navigatorBody .nav-pages,
+#navigatorBody .nav-outline,
+#navigatorBody .nav-search {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
@@ -1105,18 +1100,15 @@ h3 { font-size: 12px; line-height: 1.4; }
   touch-action: pan-y;
 }
 
-#navigatorBody .df-sidemenu.df-sidemenu-visible { display: block !important; }
+#navigatorBody .nav-pane.nav-pane-visible { display: block !important; }
 
-/* The drawer has one close button; the engine's per-panel close is redundant */
-#navigatorBody .df-ui-sidemenu-close { display: none !important; }
-
-#navigatorBody .df-search-wrapper {
+#navigatorBody .nav-search-wrapper {
   position: absolute;
   inset: 0;
 }
 
-#navigatorBody .df-thumb-wrapper,
-#navigatorBody .df-outline-wrapper {
+#navigatorBody .nav-pages-list,
+#navigatorBody .nav-outline-list {
   position: absolute;
   inset: 0;
   overflow-y: auto;
@@ -1610,33 +1602,33 @@ h3 { font-size: 12px; line-height: 1.4; }
 
 /* Browser surfaces: scrollbars, selection and the caret belong to the design too */
 .panel-body,
-#navigatorBody .df-thumb-wrapper,
-#navigatorBody .df-outline-wrapper,
-#navigatorBody .df-search-results {
+#navigatorBody .nav-pages-list,
+#navigatorBody .nav-outline-list,
+#navigatorBody .nav-search-results {
   scrollbar-width: thin;
   scrollbar-color: var(--border-primary) transparent;
 }
 .panel-body::-webkit-scrollbar,
-#navigatorBody .df-thumb-wrapper::-webkit-scrollbar,
-#navigatorBody .df-outline-wrapper::-webkit-scrollbar,
-#navigatorBody .df-search-results::-webkit-scrollbar { width: 10px; }
+#navigatorBody .nav-pages-list::-webkit-scrollbar,
+#navigatorBody .nav-outline-list::-webkit-scrollbar,
+#navigatorBody .nav-search-results::-webkit-scrollbar { width: 10px; }
 .panel-body::-webkit-scrollbar-thumb,
-#navigatorBody .df-thumb-wrapper::-webkit-scrollbar-thumb,
-#navigatorBody .df-outline-wrapper::-webkit-scrollbar-thumb,
-#navigatorBody .df-search-results::-webkit-scrollbar-thumb {
+#navigatorBody .nav-pages-list::-webkit-scrollbar-thumb,
+#navigatorBody .nav-outline-list::-webkit-scrollbar-thumb,
+#navigatorBody .nav-search-results::-webkit-scrollbar-thumb {
   background: var(--border-primary);
   border: 3px solid transparent;
   background-clip: content-box;
   border-radius: 999px;
 }
 .panel-body::-webkit-scrollbar-thumb:hover,
-#navigatorBody .df-thumb-wrapper::-webkit-scrollbar-thumb:hover,
-#navigatorBody .df-outline-wrapper::-webkit-scrollbar-thumb:hover,
-#navigatorBody .df-search-results::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); background-clip: content-box; }
+#navigatorBody .nav-pages-list::-webkit-scrollbar-thumb:hover,
+#navigatorBody .nav-outline-list::-webkit-scrollbar-thumb:hover,
+#navigatorBody .nav-search-results::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); background-clip: content-box; }
 .panel-body::-webkit-scrollbar-track,
-#navigatorBody .df-thumb-wrapper::-webkit-scrollbar-track,
-#navigatorBody .df-outline-wrapper::-webkit-scrollbar-track,
-#navigatorBody .df-search-results::-webkit-scrollbar-track { background: transparent; }
+#navigatorBody .nav-pages-list::-webkit-scrollbar-track,
+#navigatorBody .nav-outline-list::-webkit-scrollbar-track,
+#navigatorBody .nav-search-results::-webkit-scrollbar-track { background: transparent; }
 
 .drawer ::selection { background: var(--bg-accent-active); color: var(--text-primary); }
 .drawer input { caret-color: var(--text-accent); }
@@ -1989,7 +1981,7 @@ body.panel-open #flipbookContainer { pointer-events: auto; opacity: 1; }
 :root[dir="rtl"] #customNextBtn i,
 :root[dir="rtl"] #menuFirstPageBtn i,
 :root[dir="rtl"] #menuLastPageBtn i,
-:root[dir="rtl"] .df-outline-toggle::before { transform: scaleX(-1); }
+:root[dir="rtl"] .nav-outline-toggle::before { transform: scaleX(-1); }
 
 /* Toasts belong to the end edge of the screen, like the rest of the interface */
 :root[dir="rtl"] .toastify.toastify-right { right: auto; left: 15px; }
