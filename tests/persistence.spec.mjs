@@ -278,7 +278,9 @@ test.describe('Settings and URL options', () => {
     await page.locator('#switchAudioMode').click();
     await page.evaluate(() => {
       window.themeManager.setTheme('nord');
-      $('#mediaLoopToggle').prop('checked', true).trigger('change');
+      const loop = document.getElementById('mediaLoopToggle');
+      loop.checked = true;
+      loop.dispatchEvent(new Event('change'));
       window.appState.setMediaVolume(23);
     });
 
@@ -372,7 +374,11 @@ test.describe('Media player', () => {
     await expect(page.locator('#youtubePlayerContainer')).toBeVisible();
 
     // Loop on -> the next embed carries the loop params, and the choice is persisted.
-    await page.evaluate(() => $('#videoMediaLoopToggle').prop('checked', true).trigger('change'));
+    await page.evaluate(() => {
+      const loop = document.getElementById('videoMediaLoopToggle');
+      loop.checked = true;
+      loop.dispatchEvent(new Event('change'));
+    });
     expect(await page.evaluate(() => localStorage.getItem('mediaLoop'))).toBe('true');
     await page.locator('#loadYoutubeBtn').click();
     await expect(src).toHaveAttribute('src', /loop=1&playlist=dQw4w9WgXcQ/, { timeout: 10_000 });
@@ -390,7 +396,11 @@ test.describe('Media player', () => {
     await waitForBook(page);
     await openPanel(page, 'Media');
     await page.locator('#switchAudioMode').click();
-    await page.evaluate(() => $('#mediaLoopToggle').prop('checked', true).trigger('change'));
+    await page.evaluate(() => {
+      const loop = document.getElementById('mediaLoopToggle');
+      loop.checked = true;
+      loop.dispatchEvent(new Event('change'));
+    });
 
     await page.setInputFiles('#localAudioFile', wavFixture(2));
     await expect(page.locator('#localAudioFileName')).toHaveText('tone.wav');

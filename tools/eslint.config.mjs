@@ -4,7 +4,6 @@ const shared = {
   ecmaVersion: 2022,
   globals: {
     ...globals.browser,
-    ...globals.jquery,
     Toastify: 'readonly',
     appState: 'writable',
     ValidationUtils: 'readonly',
