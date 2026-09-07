@@ -322,6 +322,37 @@ Zaya also emits `zaya:themeChanged`, `zaya:languageChanged`, `zaya:pageTextChang
 
 ---
 
+## 9a. What the reader can do to the stage
+
+Every row below is part of the contract, exactly as the members above are. They are listed
+separately because they are the ones easiest to lose: none of them has a call site in the
+application, so an engine rebuilt from this document's member tables alone would satisfy every
+test and still take them away. Three were in fact lost in 7.0.0 and restored afterwards — the
+wheel, panning, and tipping the book.
+
+| Gesture | At rest | Magnified |
+| --- | --- | --- |
+| click or tap | turns the side that was clicked | nothing |
+| press and drag | the sheet follows the pointer and settles by where it was let go | the page pans |
+| the wheel | zooms about the pointer, a notch at a time | the same |
+| control and the wheel | the same — it is how a trackpad pinch and the keyboard zoom arrive | the same |
+| two fingers apart or together | zooms about their midpoint | the same, and pans with them |
+| double-click or double-tap | zooms in on that point | back to fit |
+| shift and drag, or the right button | tips the book away from flat | the same |
+| shift and double-click | lays a tipped book flat | the same |
+| a press on a run of text | selects it, and never turns a page | the same |
+
+Two rules behind the table. A gesture on the book and a gesture beside it do the same thing: the
+space around a page is where a reader reaches to flick its corner, so it cannot be given to
+anything else. And a magnified page keeps its own gestures — panning replaces the page turn while
+it is magnified, rather than the two competing.
+
+Keyboard navigation is the application's, not the engine's: arrow keys, `Home` and `End` are bound
+in `lib/js/ui/controls.js`. What the engine owes is not to swallow them — a text layer that takes
+the arrow keys for its own is a defect.
+
+---
+
 ## 10. What the engine may not do
 
 An engine reads and writes nothing outside its own container and its own construction options.
