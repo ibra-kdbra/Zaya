@@ -21,9 +21,12 @@ and it works offline as a PWA.
 - **Text recognition for scanned books**: pages without a text layer are recognised on the reader's
   device (Tesseract in WebAssembly, Arabic and English packs vendored), kept per document in the
   browser, and searched and highlighted like real text. Nothing is uploaded.
-- **Selectable page text**: a **Text** tab in the Navigator shows the text of the pages on screen as
-  real text — copy a page, or select a passage and keep it as a note, copy it, or search for it.
-  Recognised pages read exactly like pages with a text layer, and Arabic reads right to left
+- **Selectable page text**: select a passage on the page itself, where you are reading — the text
+  sits over the pages as a transparent layer, so the browser's own selection, find-in-page and
+  clipboard all work on what looks like a picture of a page. A **Text** tab in the Navigator shows
+  the same text as a column: copy a page, or select a passage and keep it as a note, copy it, or
+  search for it. Recognised pages read exactly like pages with a text layer, and Arabic reads right
+  to left
 - **Print page ranges**: pick the current page, the whole document or a range like `3-7, 10, 12-14`
   (`Ctrl/Cmd+P`); the pages are rendered at about 150 dpi, one per sheet, optionally with the
   current search marks painted on them
@@ -45,7 +48,8 @@ and it works offline as a PWA.
 - Touch-first: pinned bottom bar with page numbers, tap-to-turn, swipes, 44px controls
 - Keyboard accessible dialogs (focus trapping, Escape) and labelled controls, checked against
   axe-core in both languages and at both desk and phone widths (`npm test`)
-- Works offline as a PWA; every third-party asset is vendored
+- Works offline as a PWA after a single visit — the reader keeps itself, its engine and its
+  libraries, so a book opens from disk with no connection; every third-party asset is vendored
 - Strict Content-Security-Policy, validated URLs and escaped output
 
 ### Keyboard shortcuts
@@ -84,13 +88,16 @@ Open milestones, in the order they matter:
   replaced, so that both moves landed as one change of URL; it is now the next one.
 - **More recognition languages.** Only Arabic and English packs are vendored today; the language
   packs and the picker are ready for more.
-- **Selection on the page itself.** Text can be selected in the Navigator's Text tab; selecting it
-  on the rendered page, where the reader is looking, is still to come.
 
-Closed in 7.0.0: **replace the flipbook engine**
-([issue #21](https://github.com/ibra-kdbra/Zaya/issues/21)). Zaya's pages are now drawn by
-`engine-next/`, written from the contract in `docs/engine-api.md` rather than from the fork it
-replaces, and the fork and its non-commercial licence are out of the repository.
+Recently closed. **The page-turn engine is Zaya's own** as of 7.0.0
+([issue #21](https://github.com/ibra-kdbra/Zaya/issues/21)): pages are drawn by `engine-next/`,
+written from the contract in `docs/engine-api.md` rather than from the fork it replaces, and that
+fork and its non-commercial licence are out of the repository. The same release brought
+**selection on the page itself** — a transparent layer of text sits over the pages, so a passage
+can be selected, copied and found with the browser's own find where the reader is looking, rather
+than only in the Navigator's Text tab. Since 7.1.0 **one visit is enough to read offline**: the
+reader keeps itself, its engine and its libraries, so a book opens from disk with no connection at
+all.
 
 ## Tech Stack
 
