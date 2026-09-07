@@ -788,18 +788,13 @@ test.describe('Offline', () => {
    */
   test('one visit is enough to read from disk with no network at all', async ({ page, context }) => {
     await page.goto('/index.html');
-    await expect.poll(
-      () => page.evaluate(async () => {
-        if (!('caches' in window)) return 0;
-        const name = (await caches.keys()).find((k) => k.startsWith('zaya-assets-'));
-        return name ? (await (await caches.open(name)).keys()).length : 0;
-      }).catch(() => 0),
-      { timeout: 30_000 }
-    ).toBeGreaterThan(50);
 
-    // Everything the reader needs to draw a page, not merely the shell.
-    const held = await page.evaluate(async () => {
+    // Priming runs as the worker takes control and as the engine arrives, so poll for the whole
+    // condition rather than sampling it: everything needed to draw a page, not merely the shell.
+    const held = () => page.evaluate(async () => {
+      if (!('caches' in window)) return null;
       const name = (await caches.keys()).find((k) => k.startsWith('zaya-assets-'));
+      if (!name) return null;
       const paths = (await (await caches.open(name)).keys()).map((r) => new URL(r.url).pathname);
       return {
         engine: paths.filter((p) => p.startsWith('/engine-next/')).length,
@@ -809,12 +804,15 @@ test.describe('Offline', () => {
         webgl: paths.some((p) => p.endsWith('/renderer-webgl.js')),
         three: paths.some((p) => p.includes('/vendor/three/'))
       };
-    });
-    expect(held.engine).toBeGreaterThan(5);
-    expect(held.libraries).toBeGreaterThan(0);
-    expect(held.app).toBeGreaterThan(20);
-    expect(held.webgl).toBe(true);
-    expect(held.three).toBe(true);
+    }).catch(() => null);
+
+    await expect.poll(
+      async () => {
+        const h = await held();
+        return !!(h && h.engine > 5 && h.libraries > 0 && h.app > 20 && h.webgl && h.three);
+      },
+      { timeout: 45_000 }
+    ).toBe(true);
 
     // Now with the network genuinely gone, on a page that has never been loaded before.
     await context.setOffline(true);
