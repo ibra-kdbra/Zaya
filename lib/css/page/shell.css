@@ -2212,3 +2212,24 @@ button:active {
 .quote-text {
   text-overflow: ellipsis;
 }
+
+/* The angle control in Settings: a slider that says its own value beside its label. */
+.panel-row-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.panel-range {
+  inline-size: 100%;
+  margin-block: 6px 10px;
+  accent-color: var(--text-accent);
+  block-size: 28px;
+  cursor: pointer;
+}
+
+.panel-range:focus-visible {
+  outline: 2px solid var(--text-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}

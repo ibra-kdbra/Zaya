@@ -248,6 +248,40 @@ test.describe('Tilting the book', () => {
     expect(await tilt()).toBe(90);
   });
 
+  test('Settings offers the angle where a reader can find it', async ({ page }) => {
+    /*
+     * A held modifier is not discoverable: nobody finds shift-and-drag by accident. The slider is
+     * the same setting where it can be seen, and the two follow each other.
+     */
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf');
+    await waitForBook(page);
+    await openPanel(page, 'Settings');
+
+    const range = page.locator('#tiltRange');
+    await expect(range).toBeVisible();
+    await expect(page.locator('#tiltValue')).toHaveText('90°');
+
+    await range.evaluate((el) => {
+      el.value = '130';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await expect
+      .poll(() => page.evaluate(() => window.ZayaBook.current.tilt.degrees), { timeout: 10_000 })
+      .toBe(130);
+    await expect(page.locator('#tiltValue')).toHaveText('130°');
+
+    await page.locator('#tiltResetBtn').click();
+    await expect
+      .poll(() => page.evaluate(() => window.ZayaBook.current.tilt.degrees), { timeout: 10_000 })
+      .toBe(90);
+
+    // The gesture and the slider are one setting: laying it down by hand moves the slider too.
+    await page.evaluate(() => window.ZayaBook.current.setTilt(120));
+    await expect(page.locator('#tiltValue')).toHaveText('120°', { timeout: 10_000 });
+    await expect(range).toHaveValue('120');
+  });
+
 });
 
 test.describe('Keyboard', () => {

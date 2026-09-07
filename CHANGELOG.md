@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **The angle is in Settings, under View.** Laying the book down was a held modifier and nothing
+  else, which is to say it was invisible: nobody finds shift-and-drag by accident. There is a
+  slider now, from upright to nearly flat, with the angle beside it and a button to stand the book
+  back up. The slider and the gesture are one setting and follow each other.
+
 ### Fixed
+- **Two page turns in quick succession no longer lose the second.** A turn marks the book busy
+  until it has finished tidying up, and a request arriving in that window was dropped — the code
+  said the last request would win, and it was in fact the first. Pressing next twice quickly, or
+  asking for two pages in a row from a script, lost the second turn. The request is remembered and
+  runs when the turn before it is done. Under load this failed five times in sixteen; it now passes
+  sixteen in sixteen.
 - **Laying the book down works from anywhere on the page.** It stood aside whenever the press
   landed on a run of text, so that the reader could select a passage instead — and since text
   covers most of a page, that meant it almost never worked at all. Holding shift, or using the
