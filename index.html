@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-zaya-version="7.2.0">
+<html lang="en" data-zaya-version="7.3.0">
 
 <head>
   <meta charset="utf-8">
@@ -17,16 +17,16 @@
   <link rel="preload" href="vendor/fonts/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- All third-party assets are vendored (see docs/THIRD_PARTY_NOTICES.md); no runtime CDN dependency -->
-  <link rel="stylesheet" href="vendor/css/tailwind.css?v=7.2.0">
-  <link rel="stylesheet" href="vendor/css/fontawesome.min.css?v=7.2.0">
-  <link rel="stylesheet" href="vendor/css/toastify.min.css?v=7.2.0">
-  <link rel="stylesheet" href="lib/css/style.css?v=7.2.0">
+  <link rel="stylesheet" href="vendor/css/tailwind.css?v=7.3.0">
+  <link rel="stylesheet" href="vendor/css/fontawesome.min.css?v=7.3.0">
+  <link rel="stylesheet" href="vendor/css/toastify.min.css?v=7.3.0">
+  <link rel="stylesheet" href="lib/css/style.css?v=7.3.0">
   <!-- App shell (header, drawers, tabs): loaded last so it wins by order, not by !important -->
-  <link rel="stylesheet" href="lib/css/page/shell.css?v=7.2.0">
-  <link rel="stylesheet" href="lib/css/page/storage.css?v=7.2.0">
-  <link rel="stylesheet" href="lib/css/page/text-pane.css?v=7.2.0">
+  <link rel="stylesheet" href="lib/css/page/shell.css?v=7.3.0">
+  <link rel="stylesheet" href="lib/css/page/storage.css?v=7.3.0">
+  <link rel="stylesheet" href="lib/css/page/text-pane.css?v=7.3.0">
   <!-- Print sheet: screen-invisible, and the only thing left on the page when printing -->
-  <link rel="stylesheet" href="lib/css/page/print.css?v=7.2.0">
+  <link rel="stylesheet" href="lib/css/page/print.css?v=7.3.0">
 
   <!-- Per-deployment settings (default PDF, etc.) live in config.js -->
   <script src="config.js"></script>
@@ -356,6 +356,22 @@
             </div>
 
             <div class="panel-group">
+              <h3 class="panel-section-title" data-i18n="settings.tilt">View</h3>
+              <p class="panel-note" data-i18n="settings.tiltNote">Lay the book down as it would sit on a table. Holding shift and dragging up or down does the same thing on the book itself.</p>
+              <div class="panel-row">
+                <label class="panel-row-label" for="tiltRange" data-i18n="settings.tiltAngle">Angle</label>
+                <span class="panel-row-value" id="tiltValue">90&deg;</span>
+              </div>
+              <input type="range" id="tiltRange" class="panel-range" min="90" max="160" step="1" value="90"
+                     aria-describedby="tiltValue" aria-label="How far the book is laid down, in degrees"
+                     data-i18n-aria-label="settings.tiltAria">
+              <div class="storage-actions">
+                <button id="tiltResetBtn" class="ui-btn ui-btn-quiet ui-btn-small" type="button"
+                        data-i18n="settings.tiltReset">Stand it up</button>
+              </div>
+            </div>
+
+            <div class="panel-group">
               <h3 class="panel-section-title" data-i18n="backup.heading">Backup</h3>
               <p class="panel-note" data-i18n="backup.note">Notes and preferences live in this browser. Keep a copy as a JSON file.</p>
               <div class="btn-pair">
@@ -580,7 +596,7 @@
   </div>
 
   <!-- Main Application Entry Point -->
-  <script type="module" src="lib/js/app.js?v=7.2.0"></script>
+  <script type="module" src="lib/js/app.js?v=7.3.0"></script>
 
 </body>
 </html>

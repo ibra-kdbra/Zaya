@@ -209,6 +209,79 @@ test.describe('Tilting the book', () => {
     await page.keyboard.up('Shift');
     await expect.poll(async () => (await tilt()).tilted, { timeout: 10_000 }).toBe(false);
   });
+  test('it lays down from a press on the text too, and plain drags still select', async ({ page }) => {
+    /*
+     * The regression this covers: text covers most of a page, and a tilt that stood aside for the
+     * text layer was a tilt that almost never happened — on a real book nearly every press lands
+     * on a run of text, so it looked as though tilting had stopped working altogether.
+     */
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf');
+    await waitForBook(page);
+    const tilt = () => page.evaluate(() => window.ZayaBook.current.tilt.degrees);
+
+    const run = await page.evaluate(() => {
+      const span = document.querySelector('[class*="zn-text"] span');
+      if (!span) return null;
+      const r = span.getBoundingClientRect();
+      return { x: Math.round(r.x + 4), right: Math.round(r.x + r.width - 4), y: Math.round(r.y + r.height / 2) };
+    });
+    expect(run).not.toBeNull();
+
+    await page.keyboard.down('Shift');
+    await page.mouse.move(run.x, run.y);
+    await page.mouse.down();
+    await page.mouse.move(run.x, run.y + 120, { steps: 14 });
+    await page.mouse.up();
+    await page.keyboard.up('Shift');
+    await expect.poll(tilt, { timeout: 10_000 }).toBeGreaterThan(90);
+
+    // And a plain drag across the same run still selects it, rather than laying the book down.
+    await page.evaluate(() => window.ZayaBook.current.resetTilt());
+    await page.mouse.move(run.x, run.y);
+    await page.mouse.down();
+    await page.mouse.move(run.right, run.y, { steps: 12 });
+    await page.mouse.up();
+    await expect
+      .poll(() => page.evaluate(() => window.getSelection().toString().trim().length), { timeout: 10_000 })
+      .toBeGreaterThan(0);
+    expect(await tilt()).toBe(90);
+  });
+
+  test('Settings offers the angle where a reader can find it', async ({ page }) => {
+    /*
+     * A held modifier is not discoverable: nobody finds shift-and-drag by accident. The slider is
+     * the same setting where it can be seen, and the two follow each other.
+     */
+    await stubNetwork(page);
+    await page.goto('/index.html?pdf=https://example.com/sample.pdf');
+    await waitForBook(page);
+    await openPanel(page, 'Settings');
+
+    const range = page.locator('#tiltRange');
+    await expect(range).toBeVisible();
+    await expect(page.locator('#tiltValue')).toHaveText('90°');
+
+    await range.evaluate((el) => {
+      el.value = '130';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await expect
+      .poll(() => page.evaluate(() => window.ZayaBook.current.tilt.degrees), { timeout: 10_000 })
+      .toBe(130);
+    await expect(page.locator('#tiltValue')).toHaveText('130°');
+
+    await page.locator('#tiltResetBtn').click();
+    await expect
+      .poll(() => page.evaluate(() => window.ZayaBook.current.tilt.degrees), { timeout: 10_000 })
+      .toBe(90);
+
+    // The gesture and the slider are one setting: laying it down by hand moves the slider too.
+    await page.evaluate(() => window.ZayaBook.current.setTilt(120));
+    await expect(page.locator('#tiltValue')).toHaveText('120°', { timeout: 10_000 });
+    await expect(range).toHaveValue('120');
+  });
+
 });
 
 test.describe('Keyboard', () => {

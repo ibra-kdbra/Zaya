@@ -136,6 +136,7 @@ export class ZayaBook {
     this.panX = 0;
     this.panY = 0;
     this.dragTurn = null;
+    this.queued = null;
     this.idleHandle = null;
     this.resharpenTimer = null;
     this.pageLabels = null;
@@ -410,7 +411,13 @@ export class ZayaBook {
     if (this.zoomed) this.resetZoom();
 
     const token = ++this.turnToken;
-    if (this.busy) return;                       // one turn at a time; the last request wins
+    /*
+     * One turn at a time, and the last request wins -- it is remembered and run when this one is
+     * done rather than dropped. A reader who presses next twice quickly, or a script that asks for
+     * two pages in a row, used to lose the second: `activePage` is set before the turn finishes
+     * tidying up, so a request arriving in that window found the engine still busy and vanished.
+     */
+    if (this.busy) { this.queued = { target: to, opts }; return; }
     this.busy = true;
     try {
       const step = this.pageMode === "single" ? 1 : 2;
@@ -424,6 +431,9 @@ export class ZayaBook {
       this.announce();
     } finally {
       this.busy = false;
+      const queued = this.queued;
+      this.queued = null;
+      if (queued && !this.disposed) await this.gotoPage(queued.target, queued.opts);
     }
   }
 

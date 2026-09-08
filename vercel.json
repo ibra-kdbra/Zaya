@@ -16,7 +16,11 @@
     },
     {
       "source": "/lib/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, no-cache" }]
+    },
+    {
+      "source": "/engine-next/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, no-cache" }]
     },
     {
       "source": "/sw.js",

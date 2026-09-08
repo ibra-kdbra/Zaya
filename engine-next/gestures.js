@@ -119,8 +119,20 @@ export class Gestures {
     }
     if (this.pointers.size > 2) return;
 
-    // A press on the text layer belongs to the selection, not to the book.
-    const onText = !!(event.target && event.target.closest && event.target.closest(".zn-textlayer"));
+    /*
+     * A press on the text layer belongs to the selection, not to the book -- unless the reader
+     * asked for the book. Text covers most of a page, so a tilt that stood aside for it was a tilt
+     * that almost never happened: on a real book nearly every press lands on a run of text.
+     */
+    const orbit = isOrbitGesture(event);
+    const onText = !orbit
+      && !!(event.target && event.target.closest && event.target.closest(".zn-textlayer"));
+    if (orbit) {
+      // Stop the browser starting a selection under the drag, and drop any it has already made.
+      if (event.cancelable) event.preventDefault();
+      const selection = typeof window.getSelection === "function" ? window.getSelection() : null;
+      if (selection && !selection.isCollapsed) selection.removeAllRanges();
+    }
     this.drag = {
       id: event.pointerId,
       startX: event.clientX,
@@ -132,7 +144,7 @@ export class Gestures {
       forward: this.forwardSide(point.x / point.width),
       onText,
       // Shift, or the right button, means the reader is tipping the book rather than turning it.
-      orbit: !onText && isOrbitGesture(event),
+      orbit,
       moved: false,
       preview: null,
       progress: 0,

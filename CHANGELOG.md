@@ -5,9 +5,46 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.3.0] - 2026-09-08
+
+Mostly one discovery: a fix could be deployed and still not reach anybody. Files under `/lib/`
+were served with a year-long immutable cache header, and the `?v=` on their URLs carries the
+*release*, not the build — so two deploys of the same release served different bytes at identical
+URLs, and every browser that had visited kept the first of them. Three rounds of "it still does not
+work" were, at least in part, a browser faithfully replaying old code.
+
+### Added
+- **The angle is in Settings, under View.** Laying the book down was a held modifier and nothing
+  else, which is to say it was invisible: nobody finds shift-and-drag by accident. There is a
+  slider now, from upright to nearly flat, with the angle beside it and a button to stand the book
+  back up. The slider and the gesture are one setting and follow each other.
 
 ### Fixed
+- **The hosting configuration is checked before a deploy can reject it.** `vercel.json` is the one
+  file the test suite never exercises — the tests serve the site themselves and never read it — so a
+  mistake in it passes every check and surfaces only as a failed deployment, which is a slow and
+  confusing way to find out, because the preview URL goes on quietly serving the last build that
+  worked. `npm run check` now validates it: keys the schema will reject, and any cache header that
+  would pin first-party code again.
+- **A deployed fix reaches the reader.** Everything under `/lib/` was pinned in the browser for a
+  year, on the assumption that its `?v=` changes whenever its contents do. It does not: the query
+  carries the release, so every deploy between releases served new bytes at an address the browser
+  had been told never to check again. Those files revalidate now, which costs one conditional
+  request and gives a correct answer; the service worker is what serves them offline, and it always
+  was. The engine's own modules, which are imported by path and carry no `?v=` at all, are named
+  explicitly for the same reason. This release also bumps the version, because that is the only
+  thing that dislodges a URL a browser has already been told to keep.
+- **Two page turns in quick succession no longer lose the second.** A turn marks the book busy
+  until it has finished tidying up, and a request arriving in that window was dropped — the code
+  said the last request would win, and it was in fact the first. Pressing next twice quickly, or
+  asking for two pages in a row from a script, lost the second turn. The request is remembered and
+  runs when the turn before it is done. Under load this failed five times in sixteen; it now passes
+  sixteen in sixteen.
+- **Laying the book down works from anywhere on the page.** It stood aside whenever the press
+  landed on a run of text, so that the reader could select a passage instead — and since text
+  covers most of a page, that meant it almost never worked at all. Holding shift, or using the
+  right button, now says plainly that the book is wanted rather than the words, and no selection is
+  started under the drag. A plain drag across a passage still selects it, as it did.
 - **Laying the book down works the way a book does.** The first attempt at restoring this let the
   view swing around the book on two axes, left and right as well as up and down, which is not what
   a book does and read as an unsteady camera rather than a book on a table. It is one angle on one
