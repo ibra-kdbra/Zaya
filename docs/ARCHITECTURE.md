@@ -149,3 +149,25 @@ That move was deliberately held back until the engine was replaced. Both changes
 set of URLs, and separating them from the engine work kept 7.0.0 to one subject. It is now the next
 milestone; until it happens, keep new work inside the existing feature directories so that the move
 is a rename rather than a redesign.
+
+## Caching, and why first-party code is never pinned
+
+Served code is addressed with `?v=<release>`. That query carries the **release**, not the build, so
+two deploys of one release serve different bytes at identical URLs. Anything told to keep such a URL
+is therefore told to keep whichever build it happened to see first.
+
+`/lib/` was once served `max-age=31536000, immutable` on the assumption that its address changes
+whenever its contents do. It does not, and the consequence is worse than a stale asset: a fix could
+be deployed, be correct, pass every check, and still never reach a reader who had visited before.
+Only a version bump dislodged it, because a browser holding a response it believes fresh for a year
+does not ask again whatever a later header says.
+
+So first-party code — `/lib/` and `/engine-next/`, the latter imported by path with no query at all
+— revalidates. One conditional request per file, answered with a 304 when nothing changed. The
+service worker is what makes the reader work offline, and always was; the HTTP cache was never
+carrying that weight.
+
+`vercel.json` is checked by `npm run check` (`tools/check-deploy-config.mjs`), both for keys the
+schema will reject — it accepts no property it does not know, and a deployment that fails leaves the
+preview URL quietly serving the last build that worked — and for a cache header that would pin
+first-party code again.

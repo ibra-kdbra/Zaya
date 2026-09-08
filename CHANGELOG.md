@@ -20,6 +20,12 @@ work" were, at least in part, a browser faithfully replaying old code.
   back up. The slider and the gesture are one setting and follow each other.
 
 ### Fixed
+- **The hosting configuration is checked before a deploy can reject it.** `vercel.json` is the one
+  file the test suite never exercises — the tests serve the site themselves and never read it — so a
+  mistake in it passes every check and surfaces only as a failed deployment, which is a slow and
+  confusing way to find out, because the preview URL goes on quietly serving the last build that
+  worked. `npm run check` now validates it: keys the schema will reject, and any cache header that
+  would pin first-party code again.
 - **A deployed fix reaches the reader.** Everything under `/lib/` was pinned in the browser for a
   year, on the assumption that its `?v=` changes whenever its contents do. It does not: the query
   carries the release, so every deploy between releases served new bytes at an address the browser
