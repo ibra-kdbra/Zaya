@@ -99,10 +99,10 @@ sheets in the cascade.
 
 One loose end the version rule below does not quite cover: `?v=` is appended by the loader, so
 `lib/js/core/engine.js` carries it, but the engine modules it imports do not, because a static
-`import` resolves against the module's path and drops its query. It costs nothing today — the
-immutable year-long cache header is set on `/lib/` alone, and the service worker fetches every
-script from the network while it is online and names its cache after the release — and it is
-written down here rather than worked around.
+`import` resolves against the module's path and drops its query. It costs nothing — nothing under
+`/lib/` or `/engine-next/` is pinned in the browser (see the caching section below), and the service
+worker fetches every script from the network while it is online and names its cache after the
+release — and it is written down here rather than worked around.
 
 ## The document key
 

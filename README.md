@@ -181,8 +181,8 @@ the control panel (Settings → Media Loop). The setting is remembered across se
                     └── 📁utils     ChangelogConfig.js, ChangelogUtils.js
                     ├── changelog.js
                     ├── changelog.bundle.js  (built by `npm run build:changelog`)
-                └── 📁controls  📁documents  📁media  📁print  📁quotes
-                └── 📁search    📁settings    📁text    📁themes
+                └── 📁controls  📁documents  📁media  📁navigator  📁print
+                └── 📁quotes    📁search     📁settings  📁text      📁themes
             └── 📁i18n        en.js, ar.js, i18n.js
             └── 📁ui          controls.js
             └── 📁utils       app-state.js, validation.js, mobile-support.js, …
