@@ -120,6 +120,36 @@ test.describe('The name of the book', () => {
   });
 });
 
+test.describe('Holding the first book back', () => {
+  test('a listener that cancels zaya:beforeOpen keeps the book closed until it resumes', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__gate = { held: false, resume: null };
+      document.addEventListener('zaya:beforeOpen', (e) => {
+        e.preventDefault();
+        window.__gate.held = true;
+        window.__gate.resume = e.detail.resume;
+      });
+    });
+    await page.goto('/index.html?pdf=' + encodeURIComponent('/tests/fixtures/sample.pdf'));
+    await expect.poll(() => page.evaluate(() => window.__gate.held), { timeout: 20_000 }).toBe(true);
+    // Everything is initialised, and still no book.
+    await page.waitForFunction(() => window.ZAYA_INITIALIZED === true);
+    await page.waitForTimeout(1500);
+    expect(await page.locator('#flipbookContainer canvas').count()).toBe(0);
+    expect(await page.evaluate(() => !!(window.ZayaBook && window.ZayaBook.isReady))).toBe(false);
+
+    await page.evaluate(() => { window.__gate.resume(); window.__gate.resume(); });
+    await waitForBook(page);
+    // The second resume() did not open a second book.
+    expect(await page.evaluate(() => document.querySelectorAll('#flipbookContainer').length)).toBe(1);
+  });
+
+  test('with nobody listening the book opens as before', async ({ page }) => {
+    await page.goto('/index.html?pdf=' + encodeURIComponent('/tests/fixtures/sample.pdf'));
+    await waitForBook(page);
+  });
+});
+
 test.describe('Zoom', () => {
   test('the wheel zooms without a modifier, a notch at a time, and the page then pans', async ({ page }) => {
     await stubNetwork(page);
