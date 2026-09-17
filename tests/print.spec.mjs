@@ -25,6 +25,20 @@ async function openPrintDialog(page) {
 }
 
 test.describe('Print pages', () => {
+  test('a registered painter reaches the printed sheets', async ({ page }) => {
+    await openReader(page);
+    await page.evaluate(() => {
+      window.__printed = [];
+      window.ZayaBook.painters.add((ctx, viewport, pdfPage, info) => { if (info.purpose === 'print') window.__printed.push(pdfPage); });
+    });
+    await openPrintDialog(page);
+    await page.locator('#printRangeCustom').click();
+    await page.locator('#printRangeInput').fill('1, 3');
+    await page.locator('#printConfirmBtn').click();
+    await expect.poll(() => page.evaluate(() => window.__printCalls), { timeout: 30_000 }).toBe(1);
+    expect(await page.evaluate(() => window.__printed.slice().sort())).toEqual([1, 3]);
+  });
+
   test('the More menu opens the dialog and a custom range prints those pages', async ({ page }) => {
     await openReader(page);
     await openPrintDialog(page);

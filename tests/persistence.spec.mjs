@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import {
   stubNetwork, collectErrors, waitForBook, openPanel, activePage, goToPage, readState, wavFixture,
   blankPage, seedLegacyDatabases, databaseNames, SAMPLE_PDF_PATH, SCANNED_PDF_PATH,
@@ -759,11 +760,14 @@ test.describe('Stiff pages', () => {
 test.describe('Deploy guard', () => {
   test('a script from another release than the markup purges caches and recovers', async ({ page, context }) => {
     // Serve index.html stamped with a different release than app.js reports.
+    // The release under test, so this test does not go stale with every version bump.
+    const version = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
     await context.route(/\/index\.html(\?.*)?$/, async (route) => {
       // The guard reloads the page mid-flight; a fetch cut off by that navigation must not fail the test.
       try {
         const res = await route.fetch();
-        const html = (await res.text()).replace('data-zaya-version="7.4.0"', 'data-zaya-version="0.0.1"');
+        const html = (await res.text()).replace(`data-zaya-version="${version}"`, 'data-zaya-version="0.0.1"');
+        if (html === (await res.text())) throw new Error('the markup does not carry the release under test');
         await route.fulfill({ response: res, body: html, headers: { ...res.headers(), 'content-type': 'text/html' } });
       } catch (e) {
         try { await route.continue(); } catch (e2) { /* the request is gone */ }
@@ -773,7 +777,7 @@ test.describe('Deploy guard', () => {
     await page.goto('/index.html');
     // The guard reloads exactly once, then boots normally on the second pass.
     await expect.poll(() => page.evaluate(() => { try { return sessionStorage.getItem('zaya:reloaded-for'); } catch (e) { return null; } }).catch(() => null), { timeout: 15_000 }).toBe('0.0.1');
-    await expect(page.locator('#currentVersion')).toHaveText(/v7\.3\.0|Unreleased/, { timeout: 30_000 });
+    await expect(page.locator('#currentVersion')).toHaveText(`v${version}`, { timeout: 30_000 });
     const cacheNames = await page.evaluate(async () => ('caches' in window) ? (await caches.keys()).filter((k) => k.startsWith('zaya-')) : []);
     // Only the freshly (re)installed worker's cache may exist; nothing from before the reload.
     expect(cacheNames.length).toBeLessThanOrEqual(1);
