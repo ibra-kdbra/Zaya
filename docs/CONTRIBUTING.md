@@ -57,6 +57,8 @@ engine object behind it. If the contract is missing something your feature needs
 ## Plugin / extension API
 
 Core emits `zaya:init`, `zaya:pdfLoaded`, `zaya:pageChanged`, `zaya:themeChanged` and `zaya:toolbarReady` on `document`.
+`zaya:beforeOpen` fires once before the first book opens; it is cancelable, and a plugin that calls
+`preventDefault()` on it opens the book later with `event.detail.resume()`.
 UI slots are exposed on `window.ZayaUI` (`registerToolbarButton`, `registerPanelTab`) and plugins register through `window.ZayaPlugins.register({ id, name, init })`.
 Prefer building on these hooks over editing core files, so features stay independently testable.
 

@@ -5,6 +5,17 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.4.0] - 2026-09-17
+
+One hook, for the private build. Nothing a reader of the public site will notice.
+
+### Added
+- **A plugin can hold the first book back.** Before the first document opens, the reader fires a
+  cancelable `zaya:beforeOpen` event. A plugin that cancels it opens the book itself, later, with
+  the `resume()` callback the event carries; a second call does nothing. Until now a plugin that
+  needed to ask something first (a password, a share link) could only draw over a book that was
+  already loading underneath. With nobody listening, the book opens exactly as before.
+
 ## [7.3.0] - 2026-09-08
 
 Mostly one discovery: a fix could be deployed and still not reach anybody. Files under `/lib/`
