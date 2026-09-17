@@ -5,6 +5,16 @@ All notable changes to Zaya are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.5.0] - 2026-09-17
+
+Another hook for the private build, and again nothing a reader of the public site will notice.
+
+### Added
+- **Painters.** A plugin can register a function with `ZayaBook.painters.add()` that is drawn into
+  every page as it is rendered, after the search marks, and onto every printed sheet as well.
+  Because it paints into the page texture it shows in either renderer, and adding or removing
+  one repaints the open book. A painter that throws is logged and costs nobody the page.
+
 ## [7.4.0] - 2026-09-17
 
 One hook, for the private build. Nothing a reader of the public site will notice.

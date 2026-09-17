@@ -60,6 +60,9 @@ Core emits `zaya:init`, `zaya:pdfLoaded`, `zaya:pageChanged`, `zaya:themeChanged
 `zaya:beforeOpen` fires once before the first book opens; it is cancelable, and a plugin that calls
 `preventDefault()` on it opens the book later with `event.detail.resume()`.
 UI slots are exposed on `window.ZayaUI` (`registerToolbarButton`, `registerPanelTab`) and plugins register through `window.ZayaPlugins.register({ id, name, init })`.
+A plugin that needs to draw on the pages registers a painter with `window.ZayaBook.painters.add(fn)`;
+`fn(ctx, viewport, pdfPage, { purpose })` runs after the search marks on every page as it is rendered
+(`purpose` is `"screen"`) and on every printed sheet (`"print"`). Adding or removing one repaints the open book.
 Prefer building on these hooks over editing core files, so features stay independently testable.
 
 ## Adding a user-visible string

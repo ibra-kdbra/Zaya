@@ -150,6 +150,42 @@ test.describe('Holding the first book back', () => {
   });
 });
 
+test.describe('Painters', () => {
+  test('a registered painter is run on every page as it renders, and removing it repaints', async ({ page }) => {
+    await page.goto('/index.html?pdf=' + encodeURIComponent('/tests/fixtures/sample.pdf'));
+    await waitForBook(page);
+    await page.evaluate(() => {
+      window.__painted = [];
+      window.__painter = (ctx, viewport, pdfPage, info) => {
+        window.__painted.push({ pdfPage, purpose: info.purpose, w: Math.round(viewport.width), h: Math.round(viewport.height) });
+        ctx.fillStyle = 'rgba(255,0,0,0.5)';
+        ctx.fillRect(0, 0, viewport.width, viewport.height);
+      };
+      return window.ZayaBook.painters.add(window.__painter);
+    });
+    // Adding repaints the open spread, so the painter has been asked for the visible page.
+    await expect.poll(() => page.evaluate(() => window.__painted.some((p) => p.pdfPage === 1 && p.purpose === 'screen')), { timeout: 15_000 }).toBe(true);
+    const first = await page.evaluate(() => window.__painted.find((p) => p.pdfPage === 1));
+    expect(first.w).toBeGreaterThan(50);
+    expect(first.h).toBeGreaterThan(50);
+
+    // Removing repaints again, without it.
+    await page.evaluate(() => { window.__painted = []; window.ZayaBook.painters.remove(window.__painter); });
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => window.__painted.length)).toBe(0);
+    expect(await page.evaluate(() => window.ZayaBook.painters.size)).toBe(0);
+  });
+
+  test('a painter that throws costs nobody the page', async ({ page }) => {
+    await page.goto('/index.html?pdf=' + encodeURIComponent('/tests/fixtures/sample.pdf'));
+    await waitForBook(page);
+    await page.evaluate(() => window.ZayaBook.painters.add(() => { throw new Error('bad painter'); }));
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => page.evaluate(() => window.ZayaBook.current.activePage), { timeout: 15_000 }).toBe(3);
+    await expect(page.locator('#flipbookContainer canvas').first()).toBeVisible();
+  });
+});
+
 test.describe('Zoom', () => {
   test('the wheel zooms without a modifier, a notch at a time, and the page then pans', async ({ page }) => {
     await stubNetwork(page);
