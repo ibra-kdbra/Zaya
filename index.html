@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-zaya-version="7.5.0">
+<html lang="en" data-zaya-version="7.5.1">
 
 <head>
   <meta charset="utf-8">
@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#17181c">
   <!-- First paint: the page ground and ink before any stylesheet arrives, so there is no colour flash -->
   <style>html,body{background:#17181c;color:#ecebe6;margin:0}</style>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https: http:; connect-src 'self' blob: https: http:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https: http:; connect-src 'self' blob: https: http: wss: ws:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" type="image/svg+xml" href="assets/zaya.svg">
 
@@ -17,16 +17,16 @@
   <link rel="preload" href="vendor/fonts/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- All third-party assets are vendored (see docs/THIRD_PARTY_NOTICES.md); no runtime CDN dependency -->
-  <link rel="stylesheet" href="vendor/css/tailwind.css?v=7.5.0">
-  <link rel="stylesheet" href="vendor/css/fontawesome.min.css?v=7.5.0">
-  <link rel="stylesheet" href="vendor/css/toastify.min.css?v=7.5.0">
-  <link rel="stylesheet" href="lib/css/style.css?v=7.5.0">
+  <link rel="stylesheet" href="vendor/css/tailwind.css?v=7.5.1">
+  <link rel="stylesheet" href="vendor/css/fontawesome.min.css?v=7.5.1">
+  <link rel="stylesheet" href="vendor/css/toastify.min.css?v=7.5.1">
+  <link rel="stylesheet" href="lib/css/style.css?v=7.5.1">
   <!-- App shell (header, drawers, tabs): loaded last so it wins by order, not by !important -->
-  <link rel="stylesheet" href="lib/css/page/shell.css?v=7.5.0">
-  <link rel="stylesheet" href="lib/css/page/storage.css?v=7.5.0">
-  <link rel="stylesheet" href="lib/css/page/text-pane.css?v=7.5.0">
+  <link rel="stylesheet" href="lib/css/page/shell.css?v=7.5.1">
+  <link rel="stylesheet" href="lib/css/page/storage.css?v=7.5.1">
+  <link rel="stylesheet" href="lib/css/page/text-pane.css?v=7.5.1">
   <!-- Print sheet: screen-invisible, and the only thing left on the page when printing -->
-  <link rel="stylesheet" href="lib/css/page/print.css?v=7.5.0">
+  <link rel="stylesheet" href="lib/css/page/print.css?v=7.5.1">
 
   <!-- Per-deployment settings (default PDF, etc.) live in config.js -->
   <script src="config.js"></script>
@@ -596,7 +596,7 @@
   </div>
 
   <!-- Main Application Entry Point -->
-  <script type="module" src="lib/js/app.js?v=7.5.0"></script>
+  <script type="module" src="lib/js/app.js?v=7.5.1"></script>
 
 </body>
 </html>

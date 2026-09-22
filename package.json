@@ -1,6 +1,6 @@
 {
   "name": "zaya",
-  "version": "7.5.0",
+  "version": "7.5.1",
   "private": true,
   "description": "Zaya – 3D PDF flipbook reader. Static site; this package only carries dev tooling.",
   "license": "MIT",
