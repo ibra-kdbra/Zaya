@@ -9,3 +9,13 @@ playwright-report
 .playwright
 tools/_tmp_*
 tools/_*.mjs
+
+# private material: the Pro build, signing keys and encrypted books never belong here
+/pro/
+/lib/js/pro-features/
+*.pem
+*.key
+*.zenc
+.env
+.env.*
+.zaya-pro/
